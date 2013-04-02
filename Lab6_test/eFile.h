@@ -30,7 +30,6 @@ typedef struct eFile_File {
 
 #define CHECK_DISK if(!_sysInit) { fprintf(stderr, "Error reading disk!\n"); return 1; }
 
-
 int eFile_Info(void);
 
 //---------- eFile_Init-----------------

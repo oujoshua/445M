@@ -5,8 +5,8 @@ extern _OS_MailboxType _OS_Mailbox;
 extern _OS_Event _eventLog[_OS_MAX_EVENTS]; // log timestamp data for events
 extern int _eventIndex;  // index for event log
 
-unsigned long putCount = 0;
-unsigned long getCount = 0;
+//unsigned long putCount = 0;
+//unsigned long getCount = 0;
 
 // ******** OS_Fifo_Init ************
 // Initialize the Fifo to be empty
@@ -36,7 +36,7 @@ void OS_Fifo_Init(unsigned long size) {
 int OS_Fifo_Put(unsigned long data) {
   // NOT THREAD SAFE!!
   // doesn't this actually test if there's only 1 spot left?
-  putCount++;
+  //putCount++;
 //   OS_LogEvent(EVENT_FIFO_PUT);
   if(((_OS_Fifo.PutIndex + 1) % (_OS_Fifo.size)) == _OS_Fifo.GetIndex) {
     return 0;
@@ -54,7 +54,7 @@ int OS_Fifo_Put(unsigned long data) {
 // Outputs: data 
 unsigned long OS_Fifo_Get(void) {
   unsigned long data;
-  getCount++;
+  //getCount++;
 //   OS_LogEvent(EVENT_FIFO_WAIT);
   OS_Wait(&_OS_Fifo.notEmpty);
 //   OS_LogEvent(EVENT_FIFO_WAKE);

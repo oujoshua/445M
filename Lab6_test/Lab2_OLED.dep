@@ -30,7 +30,7 @@ I (OS.h)(0x515AF10C)
 I (OS_types.h)(0x515AEEAA)
 I (debug.h)(0x515AEEAA)
 I (OS_Critical.h)(0x515AEEAA)
-I (eFile.h)(0x515AEEAA)
+I (eFile.h)(0x515AFA5A)
 I (eDisk.h)(0x515AEEAA)
 I (integer.h)(0x515AEEAA)
 I (C:\Keil\ARM\ARMCC\bin\..\include\string.h)(0x4EB19766)
@@ -48,10 +48,10 @@ I (OS_types.h)(0x515AEEAA)
 I (..\inc\hw_types.h)(0x515AEEAD)
 I (..\inc\lm3s8962.h)(0x515AEEAD)
 I (C:\Keil\ARM\ARMCC\bin\..\include\stdlib.h)(0x4EB19764)
-F (.\OS_DataStructures.c)(0x515AEEAA)(-c --cpu Cortex-M3 -D__MICROLIB -g -O2 -Otime --apcs=interwork -I.. -I..\..\.. -I..\driverlib -I..\inc -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "os_datastructures.o" --omf_browse "os_datastructures.crf" --depend "os_datastructures.d")
+F (.\OS_DataStructures.c)(0x515AF9B8)(-c --cpu Cortex-M3 -D__MICROLIB -g -O2 -Otime --apcs=interwork -I.. -I..\..\.. -I..\driverlib -I..\inc -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "os_datastructures.o" --omf_browse "os_datastructures.crf" --depend "os_datastructures.d")
 I (OS.h)(0x515AF10C)
 I (OS_types.h)(0x515AEEAA)
-F (.\OS_Threads.c)(0x515AF41A)(-c --cpu Cortex-M3 -D__MICROLIB -g -O2 -Otime --apcs=interwork -I.. -I..\..\.. -I..\driverlib -I..\inc -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "os_threads.o" --omf_browse "os_threads.crf" --depend "os_threads.d")
+F (.\OS_Threads.c)(0x515AFCC7)(-c --cpu Cortex-M3 -D__MICROLIB -g -O2 -Otime --apcs=interwork -I.. -I..\..\.. -I..\driverlib -I..\inc -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "os_threads.o" --omf_browse "os_threads.crf" --depend "os_threads.d")
 I (OS.h)(0x515AF10C)
 I (OS_types.h)(0x515AEEAA)
 I (..\inc\hw_types.h)(0x515AEEAD)
@@ -97,18 +97,18 @@ I (..\driverlib/sysctl.h)(0x515AEEAD)
 I (edisk.h)(0x515AEEAA)
 I (integer.h)(0x515AEEAA)
 F (.\eFile.c)(0x515AEEAA)(-c --cpu Cortex-M3 -D__MICROLIB -g -O2 -Otime --apcs=interwork -I.. -I..\..\.. -I..\driverlib -I..\inc -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "efile.o" --omf_browse "efile.crf" --depend "efile.d")
-I (eFile.h)(0x515AEEAA)
+I (eFile.h)(0x515AFA5A)
 I (eDisk.h)(0x515AEEAA)
 I (integer.h)(0x515AEEAA)
 I (retarget.h)(0x515AEEAB)
 I (C:\Keil\ARM\ARMCC\bin\..\include\ctype.h)(0x4EB19760)
 I (C:\Keil\ARM\ARMCC\bin\..\include\stdio.h)(0x4EB19766)
 I (C:\Keil\ARM\ARMCC\bin\..\include\string.h)(0x4EB19766)
-F (.\Retarget.c)(0x515AEEAA)(-c --cpu Cortex-M3 -D__MICROLIB -g -O2 -Otime --apcs=interwork -I.. -I..\..\.. -I..\driverlib -I..\inc -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "retarget.o" --omf_browse "retarget.crf" --depend "retarget.d")
+F (.\Retarget.c)(0x515AFA4D)(-c --cpu Cortex-M3 -D__MICROLIB -g -O2 -Otime --apcs=interwork -I.. -I..\..\.. -I..\driverlib -I..\inc -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "retarget.o" --omf_browse "retarget.crf" --depend "retarget.d")
 I (C:\Keil\ARM\ARMCC\bin\..\include\stdio.h)(0x4EB19766)
 I (C:\Keil\ARM\ARMCC\bin\..\include\rt_misc.h)(0x4EB19760)
 I (UART.h)(0x515AEEAA)
-I (eFile.h)(0x515AEEAA)
+I (eFile.h)(0x515AFA5A)
 I (retarget.h)(0x515AEEAB)
 F (.\Lab2Main.c)(0x515AEEAA)(-c --cpu Cortex-M3 -D__MICROLIB -g -O2 -Otime --apcs=interwork -I.. -I..\..\.. -I..\driverlib -I..\inc -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "lab2main.o" --omf_browse "lab2main.crf" --depend "lab2main.d")
 I (C:\Keil\ARM\ARMCC\bin\..\include\stdio.h)(0x4EB19766)

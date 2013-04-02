@@ -231,26 +231,32 @@ void _OS_ReinsertLL(_TCB *thread)
 }
 
 // increment priority of threads that haven't run after NUM_THREADS context switches
+#pragma O3
 void OS_IncPriority(void)
 {
-	_TCB *temp = _TCBHead;
-	static int num = 0;
-	if(++num % (10 * _OS_MAX_THREADS))
-		return;
-	while(temp != NULL)
+	_TCB *temp;
+	for(temp = _TCBHead; temp != NULL; temp = temp->next)
 	{
-		if(!temp->run && temp->priority > 0) {
+		if(!temp->run && temp->priority > 0)
+		{
+			_TCB *prev;
 			temp->priority--;
-			//if(temp->priority > 0) temp->priority --;
-      // remove and re-insert incase chaning priority changed its position in LL
-      _OS_RemoveFromLL(temp);
-      _OS_InsertThread(temp);
+      // calculate new position in case changing priority changed its position in LL
+			for(prev = temp->prev; prev != NULL; prev = prev->prev)
+			{
+				if(prev->prev != NULL && prev->priority <= temp->priority) // insert here
+				{
+					temp->prev = prev->prev;
+					temp->next = prev;
+					prev->prev->next = temp;
+					prev->prev = temp;
+					break;
+				}
+			}
+      //_OS_RemoveFromLL(temp);
+      //_OS_InsertThread(temp);
     }
-    else {
-      // reset run flag for next round
-      temp->run = 0;
-    }
-		temp = temp->next;
+		temp->run = 0;
 	}
 }
 

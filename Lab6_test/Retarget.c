@@ -32,23 +32,18 @@ int fputc(int c, FILE *f) {
 	return 0;
 }
 
-
 int fgetc(FILE *f) {
   return (UART_InChar());
 }
 
-
 int ferror(FILE *f) {
-  /* Your implementation of ferror */
-	
+  /* Your implementation of ferror */	
   return EOF;
 }
-
 
 void _ttywrch(int c) {
   UART_OutChar(c);
 }
-
 
 void _sys_exit(int return_code) {
 label:  goto label;  /* endless loop */
