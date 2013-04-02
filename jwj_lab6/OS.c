@@ -678,7 +678,7 @@ void OS_Init(void){int i; long delay;
 	profileIndex = 0;
 	OS_Fifo_Init();
 	PortF_Init();
-	PortD_Init();
+//	PortD_Init();
 	PortE_Init();
  
 	Timer2B_Init();

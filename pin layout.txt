@@ -1,0 +1,14 @@
+Motor 1: PWM 1, PWM 2; board 1
+Motor 2: PWM 3, PWM 4; board 1
+Tachometer1: CCP0; board 1
+Tachometer2: CCP1; board 1
+Ping: PD5, PD6, PC5, PC7; board 2
+IR sensor: ADC0,1, 2, 3; board 2
+
+OLED: board 2
+SD card: board 1
+
+
+Additional pins reserved for future use:
+ADC1, ADC2, ADC3; board 2
+PD5, PD6, PC5, PC7, ADC0, ADC1, ADC2, ADC3; board 1

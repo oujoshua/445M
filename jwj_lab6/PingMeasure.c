@@ -69,7 +69,7 @@ void EndCritical(long sr);    // restore I bit to previous value
 #define PD6 (*((volatile unsigned long *)0x40007100))
 #define PD4 (*((volatile unsigned long *)0x40007040))
 
-#define Cinv 147 //number of 20ns ticks for sound to travel 1 mm
+#define INCHDIV 1480 //constant for conversion to inches
 
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
@@ -78,8 +78,10 @@ void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
 
 unsigned long Period;              // (1/clock) units
-unsigned long First;               // Timer0A first edge
+unsigned long First;               // PD4 first edge
+unsigned long distInches;           //distance measured in inces
 unsigned char Done;                // set each rising
+
 
 
 void PingMeasure_Init(void){
@@ -91,94 +93,93 @@ void PingMeasure_Init(void){
                                    // allow time to finish activating
   First = 0;                       // first will be wrong
   Done = 0;                        // set on subsequent
-//  GPIO_PORTC_DIR_R |= 0x20;        // make PC5 out (PC5 built-in LED)
-// GPIO_PORTC_DEN_R |= 0x20;        // enable digital I/O on PC5
-//  GPIO_PORTD_DEN_R |= 0x50;        // enable digital I/O on PD4,6
-//  GPIO_PORTD_AFSEL_R |= 0x10;      // enable alt funct on PD4
-//	GPIO_PORTD_DIR_R |= 0x40;        //set PD6 to output
-//	PD6 = 0; 
-  TIMER0_CTL_R &= ~TIMER_CTL_TAEN; // disable timer0A during setup
-  TIMER0_CFG_R = TIMER_CFG_16_BIT; // configure for 16-bit timer mode
-                                   // configure for capture mode
-  TIMER0_TAMR_R = (TIMER_TAMR_TACMR|TIMER_TAMR_TAMR_CAP);
-                                   // configure for rising edge event
-  TIMER0_CTL_R |= TIMER_CTL_TAEVENT_BOTH;
-  TIMER0_TAILR_R = TIMER_TAILR_TAILRL_M;// start value
-	TIMER0_TAPR_R = 0;  //20ns ticks
-  TIMER0_IMR_R |= TIMER_IMR_CAEIM; // enable capture match interrupt
-  TIMER0_ICR_R = TIMER_ICR_CAECINT;// clear timer0A capture match flag
-  TIMER0_CTL_R |= TIMER_CTL_TAEN;  // enable timer0A 16-b, +edge timing, interrupts
-                                   // Timer0A=priority 2
-  NVIC_PRI4_R = (NVIC_PRI4_R&0x00FFFFFF)|0x40000000; // top 3 bits
-  NVIC_EN0_R |= NVIC_EN0_INT19;    // enable interrupt 19 in NVIC
+  GPIO_PORTD_DEN_R |= 0x50;        // enable digital I/O on PD4,6
+	GPIO_PORTD_DIR_R |= 0x40;        //set PD6 to output
+	GPIO_PORTD_DIR_R &= ~0x10;       //set PD4 to input
+	PD6 = 0; 
+ 
+	//set up edge interrupts for PD4
+	GPIO_PORTD_IS_R &= ~0x10; //PD4 is edge sensitive
+	GPIO_PORTD_IBE_R |= 0x10; //interrupt on both edges
+	GPIO_PORTD_ICR_R |= 0x10; //clear interrupt flag
+	GPIO_PORTD_IM_R |= 0x10; //enable interrupts
 	
-	
+	//port D: interrupt 3
+  NVIC_PRI0_R = (NVIC_PRI4_R&0x00FFFFFF)|0x80000000; // top 3 bits
+  NVIC_EN0_R |= NVIC_EN0_INT3;    // enable interrupt 19 in NVIC	
   EnableInterrupts();
 }
-void Timer0A_Handler(void){
-  TIMER0_ICR_R = TIMER_ICR_CAECINT;// acknowledge timer0A capture match
-//  GPIO_PORTC_DATA_R = GPIO_PORTC_DATA_R^0x20; // toggle PC5
-//  GPIO_PORTC_DATA_R = GPIO_PORTC_DATA_R|0x20; // turn on PC5
-  Period = (First - TIMER0_TAR_R)&0xFFFF;// (1/clock) resolution
-  First = TIMER0_TAR_R;            // setup for next
-  Done = 0xFF;
-//  GPIO_PORTC_DATA_R = GPIO_PORTC_DATA_R&~0x20;// turn off PC5
+
+void GPIOPortD_Handler(){
+	GPIO_PORTD_ICR_R |= 0x10;
+	if(PD4 == 0x10){ //if rising edge
+		First = OS_Time();
+	}
+	else{ //falling edge
+		Period = OS_TimeDifference(OS_Time(), First);
+		Done = 0xFF;
+	}
 }
 
 
 
 //trigger a ping measurement. Returns distance in mm.
-unsigned long PingMeasure(){int i; unsigned short startTime; unsigned long iBit;
-	
-	iBit = StartCritical();
-	TIMER0_IMR_R &= ~TIMER_IMR_CAEIM; // disable capture match interrupt
+void PingTrigger(){int i; unsigned long iBit;
+
+	//iBit = StartCritical();
+	GPIO_PORTD_IM_R &= ~0x10; // disable edge triggered interrupts
 	Done = 0;
 
-	//enable output on PD4 and send a send 10us pulse
-  GPIO_PORTD_DEN_R &= ~0x10;
-	GPIO_PORTD_DIR_R |= 0x10;
-	GPIO_PORTD_AFSEL_R &= ~0x10;
-	GPIO_PORTD_DEN_R |= 0x10;
-	
-	PD4 = 1;
+	//send 10us pulse
+	PD6 = 0x40;
 	for(i = 0; i < 140; i ++){} //wait approx.10 us
-  PD4 = 0;
-	
+	//enable interrupts
+  PD6 = 0;
+	//EndCritical(iBit);
+		
+  GPIO_PORTD_IM_R |= 0x10;
+	//wait for ping completion
 
-	//change PD4 to input capture (CCP0)	
-	GPIO_PORTD_DEN_R &= ~0x10;
-	GPIO_PORTD_DIR_R &= ~0x10;
-	GPIO_PORTD_AFSEL_R |= 0x10;
-	GPIO_PORTD_DEN_R |= 0x10;
+
 		
-  TIMER0_IMR_R |= TIMER_IMR_CAEIM;
-	//wait for echo start
-	while(!Done){}
-	Done = 0;
-	while(!Done){} //wait for echo end
-		
-	EndCritical(iBit);
 //	TIMER0_IMR_R &= ~TIMER_IMR_CAEIM; // disable capture match interrupt
 	//distance in mm = #ticks (period) / Cinv*2. divide by 2 because sound has to travel to object and back
-	return (Period/7400);
-	
+	 return;
 }
 
-
-//ping tester
-int PingTestmain(void){unsigned long distance; int i; int delay;
- SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL |
-                 SYSCTL_XTAL_8MHZ | SYSCTL_OSC_MAIN);
-	delay = 0;
-	PingMeasure_Init();
-	for(;;){
-		distance = PingMeasure();
-		
-		
-    
-		i = distance;
-		i = i/10;
+void testThread(void){ //test thread that waits for measurements
+  while(1){
+		while(!Done){	}
+		Done = 0;
+		distInches = Period/INCHDIV;
 	}
-	
-	
 }
+void testInterrupt(void){
+	
+	PingTrigger();
+}
+	
+//ping tester
+int main(void){//unsigned long distance; int i; int delay;
+//  SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL |
+//                  SYSCTL_XTAL_8MHZ | SYSCTL_OSC_MAIN);
+// 	delay = 0;
+// 	PingMeasure_Init();
+// 	for(;;){
+// 		distance = PingMeasure();
+// 		
+// 		
+//     
+// 		i = distance;
+// 		i = i/10;
+// 	}
+// 	
+	OS_Init();
+	PingMeasure_Init();
+	
+	OS_AddThread(&testThread, 128, 0);
+	OS_AddPeriodicThread(&testInterrupt, 50000, 1);
+	
+	OS_Launch(50*1000); //1 ms timeslice
+}
+
