@@ -239,10 +239,10 @@ void OS_IncPriority(void)
 	{
 		if(!temp->run && temp->priority > 0)
 		{
-			_TCB *prev;
+			//_TCB *prev;
 			temp->priority--;
       // calculate new position in case changing priority changed its position in LL
-			for(prev = temp->prev; prev != NULL; prev = prev->prev)
+			/*for(prev = temp; prev != NULL; prev = prev->prev)
 			{
 				if(prev->prev != NULL && prev->priority <= temp->priority) // insert here
 				{
@@ -252,9 +252,9 @@ void OS_IncPriority(void)
 					prev->prev = temp;
 					break;
 				}
-			}
-      //_OS_RemoveFromLL(temp);
-      //_OS_InsertThread(temp);
+			}*/
+      _OS_RemoveFromLL(temp);
+      _OS_InsertThread(temp);
     }
 		temp->run = 0;
 	}
@@ -264,6 +264,7 @@ void OS_IncPriority(void)
 // either because it's priority has changed or it has run
 // assume that thread is not currently in the LL
 // much easier if LL is doubly linked
+#pragma O3
 void _OS_InsertThread(_TCB* thread) {
   _TCB *temp = _TCBHead;
   // find correct position in LL
@@ -296,6 +297,7 @@ void _OS_InsertThread(_TCB* thread) {
 }
 
 // remove a thread from the LL
+#pragma O3
 void _OS_RemoveFromLL(_TCB *thread) {
   if(_TCBHead == thread) {
     // make thread->next the new head
