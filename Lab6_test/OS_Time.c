@@ -127,7 +127,6 @@ int OS_Add_Periodic_Thread(void (*task)(void), unsigned long period, unsigned lo
  * param: none
  * return: none
  */
-/*static*/ unsigned long _us100Count = 0;
 #pragma O3
 void Timer2A_Handler(void)
 {
