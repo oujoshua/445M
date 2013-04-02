@@ -69,7 +69,8 @@ void OS_WakeThread(OS_SemaphoreType *s) {
 // wake up all threads blocked on a semaphore
 void OS_WakeAllThreads(OS_SemaphoreType *s) {
   while(s->GetIndex != s->PutIndex) {
-    OS_WakeThread(s);
+    s->blockedThreads[s->GetIndex]->block = 0; // wake up thread
+    s->GetIndex = (s->GetIndex + 1) & (_OS_MAX_THREADS - 1);
   }
 }
 

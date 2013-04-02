@@ -99,6 +99,7 @@ static void _OS_SetInitialStack(_TCB* thread, void(*task)(void)){
   thread->stack[_OS_STACK_SIZE-16] = 0x04040404;  // R4
 }
 
+#pragma O3
 /* Remove _RunPt from the linked list */
 void OS_Kill(void)
 {
@@ -107,8 +108,6 @@ void OS_Kill(void)
 	OS_bWait(&_modifyTCB);
   // remove thread from linked list
   _OS_RemoveFromLL(temp);
-// 	temp->prev->next = temp->next;
-// 	temp->next->prev = temp->prev;
   _RunPt = NULL;  // signals to pendSV and FindNextThread that the last thread killed itself
   // symbollicaly free thread
   // search tcb array to find it by checking unique id's
@@ -153,6 +152,7 @@ void OS_Sleep(unsigned long sleepTime) {
   OS_Suspend(); // trigger thread switch
 }
 
+#pragma O3
 // during a context switch, index _RunPt to the first non-sleeping/blocked thread
 void OS_FindNextThread(void)
 {
@@ -178,6 +178,56 @@ void OS_FindNextThread(void)
     // TODO - add an OS_IllegalState handler?
   }
 //   OS_LogEvent(_RunPt->id);
+}
+
+#pragma O3
+void _OS_ReinsertLL(_TCB *thread)
+{
+	_TCB *next = thread->next;
+	_TCB *prev = thread->prev;
+	_TCB *temp = _TCBHead;
+	// remove from LL
+	if(temp == thread) {
+    // make thread->next the new head
+    _TCBHead = thread->next;
+    _TCBHead->prev = NULL;
+  }
+  else {
+		if(thread->prev != NULL)
+			thread->prev->next = thread->next;
+		if(thread->next != NULL)
+			thread->next->prev = thread->prev;
+  }
+	// reinsert into LL
+	// find correct position in LL
+  if(temp == NULL) {
+    // LL is currently empty
+    _TCBHead = thread;
+    thread->next = thread->prev = NULL;
+  }
+  else if(thread->priority < temp->priority) { 
+    // higher priority than the head so put at beginning of LL
+    thread->next = temp;
+    temp->prev = thread;
+    thread->prev = NULL;
+    _TCBHead = thread;
+  }
+  else {
+    // this thread should become the last of its priority
+		// start searching one before the thread. can never be inserted
+		// before it originally was.
+		if(prev == NULL)
+			prev = next;
+    while((prev->next != NULL) && (prev->next->priority <= thread->priority)) {
+      prev = prev->next;
+    }
+    // place between prev and prev->next
+    thread->next = prev->next;
+    thread->prev = prev;
+    if(prev->next != NULL) // test in case adding at end of LL
+      prev->next->prev = thread;
+    prev->next = thread;
+  }
 }
 
 // increment priority of threads that haven't run after NUM_THREADS context switches
@@ -247,54 +297,9 @@ void _OS_RemoveFromLL(_TCB *thread) {
     _TCBHead->prev = NULL;
   }
   else {
-    thread->prev->next = thread->next;
+		if(thread->prev != NULL)
+			thread->prev->next = thread->next;
+		if(thread->next != NULL)
     thread->next->prev = thread->prev;
-  }
-}
-
-void _OS_ReinsertLL(_TCB *thread)
-{
-	_TCB *next = thread->next;
-	_TCB *prev = thread->prev;
-	_TCB *temp = _TCBHead;
-	// remove from LL
-	if(temp == thread) {
-    // make thread->next the new head
-    _TCBHead = thread->next;
-    _TCBHead->prev = NULL;
-  }
-  else {
-    thread->prev->next = thread->next;
-    thread->next->prev = thread->prev;
-  }
-	// reinsert into LL
-	// find correct position in LL
-  if(temp == NULL) {
-    // LL is currently empty
-    _TCBHead = thread;
-    thread->next = thread->prev = NULL;
-  }
-  else if(thread->priority < temp->priority) { 
-    // higher priority than the head so put at beginning of LL
-    thread->next = temp;
-    temp->prev = thread;
-    thread->prev = NULL;
-    _TCBHead = thread;
-  }
-  else {
-    // this thread should become the last of its priority
-		if(prev == NULL)
-			prev = next;
-    while((prev->next != NULL) && (prev->next->priority <= thread->priority)) {
-      prev = prev->next;
-    }
-    // place between temp and temp->next
-    thread->next = prev->next;
-    thread->prev = prev;
-    if(prev->next != NULL) {
-      // test in case adding at end of LL
-      prev->next->prev = thread;
-    }
-    prev->next = thread;
   }
 }

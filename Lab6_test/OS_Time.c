@@ -16,12 +16,10 @@ static unsigned long const JitterSize = JITTERSIZE;
 static unsigned long JitterHistogram[OS_MAX_TASKS][JITTERSIZE];
 
 /***   Variable declarations   ***/
-/* Linked list of tasks */
-_OS_Task* _OS_Root = NULL;
-/* Interrupt counter, tasks executed based on this */
-unsigned int _OS_Task_Time = 0;
-/* OS system time */
-extern unsigned int _OS_System_Time;
+_OS_Task* _OS_Root = NULL; /* Linked list of tasks */
+unsigned int _OS_Task_Time = 0; /* Interrupt counter, tasks executed based on this */
+extern unsigned int _OS_System_Time; /* OS system time */
+extern _TCB *_TCBHead;
 /*** End variable declarations ***/
 
 /* Initialize timer2 for system time */
@@ -73,15 +71,12 @@ void Timer2B_Init(int priority) {
 int OS_Add_Periodic_Thread(void (*task)(void), unsigned long period, unsigned long priority)
 {
 	/* Declare function as critical */
-	OS_CRITICAL_FUNCTION;
-	
+	OS_CRITICAL_FUNCTION;	
 	/* Number of scheduled tasks */
 	static int _OS_Num_Tasks = 0;
-	
 	/* Allocate variables */
 	_OS_Task *new_task = &_tasks[0];
 	int new_priority, i;
-
 	/* Bounds checking */
 	if(_OS_Num_Tasks >= OS_MAX_TASKS)
 		return -1;
@@ -94,11 +89,8 @@ int OS_Add_Periodic_Thread(void (*task)(void), unsigned long period, unsigned lo
       break;
     }
   }
-  if(i == OS_MAX_TASKS) {
-    // maximum storage already allocated
+  if(i == OS_MAX_TASKS) // maximum storage already allocated
     return -1;
-  }
-// 	new_task = (_OS_Task*)malloc(sizeof(_OS_Task) + 1);
 	
 	/* Set task parameters */
 	new_task->task = task;
@@ -107,24 +99,19 @@ int OS_Add_Periodic_Thread(void (*task)(void), unsigned long period, unsigned lo
 	new_task->task_id = _OS_Num_Tasks;
 	new_task->time = period * 10;	
 	new_task->next = NULL;							/* No next task (last task in list) */
-	
 	/* Calculate outside critical section */
 	new_priority = ((NVIC_PRI5_R&0x00FFFFFF)
 									| (1 << (28 + priority)));
-	
 	/* Start critical section */
 	OS_ENTER_CRITICAL();
-
 	/* Insert task into position  */
 	if(_OS_Root == NULL)
 		_OS_Root = new_task;
 	else
 		new_task->next = _OS_Root, _OS_Root = new_task;
 	_OS_Update_Root(_OS_Root, new_task);
-
 	/* Update interrupt values */
 	NVIC_PRI5_R = new_priority;
-	
 	/* Enable timer and interrupt (in case this is the first task) */
 	TIMER2_CTL_R |= 0x00000001;
 	NVIC_EN0_R |= NVIC_EN0_INT23;
@@ -140,61 +127,49 @@ int OS_Add_Periodic_Thread(void (*task)(void), unsigned long period, unsigned lo
  * return: none
  */
 /*static*/ unsigned long _us100Count = 0;
+#pragma O3
 void Timer2A_Handler(void)
 {
-  int i;
-	/* Declare function as critical */
-//	OS_CRITICAL_FUNCTION;
-	
+  //int i;	
 	_OS_Task *cur_task = _OS_Root;
-	
 	/* Acknowledge interrupt */
 	TIMER2_ICR_R = TIMER_ICR_TATOCINT;
-  
-  // Sleep maitenance
+  // Sleep maintenance
   _us100Count++;
-  if((_us100Count % 10) == 0) { // 1 millisecond elapsed
+  if((_us100Count % 10) == 0)
+	{ // 1 millisecond elapsed
     // find all sleeping threads and decrement their ms time,
     // and wake up if ready
-    for(i = 0; i < _OS_MAX_THREADS; i++) {
-      if((_threads[i].id != _OS_FREE_THREAD) && _threads[i].sleep) {
-        if(_threads[i].sleepTime == 0) {
+    //for(i = 0; i < _OS_MAX_THREADS; i++)
+		_TCB *temp;
+		for(temp = _TCBHead; temp != NULL; temp = temp->next)
+		{
+      //if((_threads[i].id != _OS_FREE_THREAD) && _threads[i].sleep)
+			if(temp->sleep)
+			{
+        /*if(_threads[i].sleepTime == 0)
           _threads[i].sleep = 0;  // wake up thread
-        }
-        else {
-          _threads[i].sleepTime--;
-        }
+        else
+          _threads[i].sleepTime--;*/
+				if(temp->sleepTime == 0)
+					temp->sleep = 0;
+				else
+					temp->sleepTime--;
       }
     }
   }
-  
 	/* Update task time */
 	_OS_Task_Time++;
-	
 	if(_OS_Task_Time <= _OS_Root->time)
 		return;
-	
 	/* Execute task */
 	cur_task->task();
-  
-  // Record Jitter Measurements
-  // period is in ms, jitter is recorded in us
-//   MeasureJitter(cur_task->task_id, (cur_task->period) * 1000);
-	
-	/* Begin critical section */
-//	OS_ENTER_CRITICAL();
-	
 	/* Update task's time */
-	cur_task->time += cur_task->period;
-	
+	cur_task->time += cur_task->period;	
 	/* Insert executed task into new position */
 	_OS_Update_Root(_OS_Root, cur_task);
-	
 	/* Update interrupt priority */
 	NVIC_PRI5_R = _OS_Root->priority;
-	
-	/* End critical section */
-//	OS_EXIT_CRITICAL();
 }
 
 void Timer2B_Handler(void) {
