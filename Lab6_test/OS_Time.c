@@ -40,6 +40,7 @@ void Timer2A_Init(void)
 	
 	/* Add system time task */
 	OS_Add_Periodic_Thread(&_OS_Inc_Time, 1, 2);
+	OS_Add_Periodic_Thread(&_OS_SleepMaintenance, 1, 1);
 }
 
 // millisecond timer used to keep track of / wake up sleeping threads
@@ -130,52 +131,23 @@ int OS_Add_Periodic_Thread(void (*task)(void), unsigned long period, unsigned lo
 #pragma O3
 void Timer2A_Handler(void)
 {
-  //int i;	
 	_OS_Task *cur_task = _OS_Root;
 	/* Acknowledge interrupt */
 	TIMER2_ICR_R = TIMER_ICR_TATOCINT;
-  // Sleep maintenance
-  _us100Count++;
-  if((_us100Count % 10) == 0)
-	{ // 1 millisecond elapsed
-    // find all sleeping threads and decrement their ms time,
-    // and wake up if ready
-    //for(i = 0; i < _OS_MAX_THREADS; i++)
-		_TCB *temp;
-		for(temp = _TCBHead; temp != NULL; temp = temp->next)
-		{
-      //if((_threads[i].id != _OS_FREE_THREAD) && _threads[i].sleep)
-			if(temp->sleep)
-			{
-        /*if(_threads[i].sleepTime == 0)
-          _threads[i].sleep = 0;  // wake up thread
-        else
-          _threads[i].sleepTime--;*/
-				if(temp->sleepTime == 0)
-					temp->sleep = 0;
-				else
-					temp->sleepTime--;
-      }
-    }
-  }
 	/* Update task time */
-	_OS_Task_Time++;
-	if(_OS_Task_Time <= _OS_Root->time)
+	if(++_OS_Task_Time <= _OS_Root->time)
 		return;
-	/* Execute task */
-	cur_task->task();
-	/* Update task's time */
-	cur_task->time += cur_task->period;	
-	/* Insert executed task into new position */
-	_OS_Update_Root(_OS_Root, cur_task);
-	/* Update interrupt priority */
-	NVIC_PRI5_R = _OS_Root->priority;
+	cur_task->task(); /* Execute task */
+	cur_task->time += cur_task->period;	/* Update task's time */
+	_OS_Update_Root(_OS_Root, cur_task); /* Insert executed task into new position */
+	NVIC_PRI5_R = _OS_Root->priority; /* Update interrupt priority */
 }
 
 void Timer2B_Handler(void) {
   TIMER2_ICR_R = TIMER_ICR_TBTOCINT;  // acknowledge
 }
 
+#pragma O3
 static void _OS_Update_Root(_OS_Task *temp, _OS_Task * cur_task)
 {
 	/* Find new position */
@@ -189,6 +161,24 @@ static void _OS_Update_Root(_OS_Task *temp, _OS_Task * cur_task)
 		cur_task->next = temp->next;
 		temp->next = cur_task;
 	}
+}
+
+// find all sleeping threads and decrement their ms time,
+// and wake up if ready
+#pragma O3
+void _OS_SleepMaintenance(void)
+{
+	_TCB *temp;
+	for(temp = _TCBHead; temp != NULL; temp = temp->next)
+	{
+		if(temp->sleep)
+		{
+			if(temp->sleepTime == 0)
+				temp->sleep = 0;
+			else
+				temp->sleepTime--;
+		}
+  }
 }
 
 /* Increment OS system time (in milliseconds)
@@ -247,6 +237,7 @@ long OS_TimeDifference(unsigned long start, unsigned long stop) {
 
 // measure & record the jitter for a given periodic task
 // period should be in units of us
+#pragma O3
 void OS_MeasureJitter(int taskID, unsigned long period) {
   static unsigned long LastTime[OS_MAX_TASKS];
   static int firstTime = -1;  // each bit is a boolean for a task

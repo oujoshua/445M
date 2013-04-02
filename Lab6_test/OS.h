@@ -38,6 +38,7 @@ void Timer2A_Init(void);
 int OS_Add_Periodic_Thread(void(*task)(void), unsigned long period, unsigned long priority);
 void Timer2A_Handler(void);
 void Timer2B_Handler(void);
+void _OS_SleepMaintenance(void);
 unsigned int OS_MsTime(void);
 void OS_ClearMsTime(void);
 

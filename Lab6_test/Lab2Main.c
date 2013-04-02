@@ -86,7 +86,7 @@ int main(void)
 //   NumCreated += OS_AddThread(&jerkTask, 0, 6);
 //   NumCreated += OS_AddThread(&dummyTask3, 0, 7);
 //   NumCreated += OS_AddThread(&dummyTask1, 0, 2);
-  NumCreated += OS_AddThread(&PID, 128, 5);
+  NumCreated += OS_AddThread(&PID, 128, 1);
 //   NumCreated += OS_AddThread(&dummyTask2, 0, 2);
   NumCreated += OS_AddThread(&Consumer, 128, 0);
    NumCreated += OS_AddThread(&SH_Shell, 128, 6);
@@ -378,7 +378,7 @@ unsigned long data;
   char str[20];
    sprintf(str, "Run length is %d", RUNLENGTH/1000);
   OLED_Out(TOP, str);   // top half used for Display
-   NumCreated += OS_AddThread(&DisplayThread, 128, 5);
+   NumCreated += OS_AddThread(&DisplayThread, 128, 0);
   while(NumSamples < RUNLENGTH) {
 //    sprintf(str, "Time left is %d", (RUNLENGTH-NumSamples)/1000);
 //     OS_LogEvent(EVENT_OLED_START);
