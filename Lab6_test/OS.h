@@ -269,6 +269,7 @@ void _OS_InsertThread(_TCB* thread);
 
 // remove a thread from the LL
 void _OS_RemoveFromLL(_TCB *thread);
+void _OS_ReinsertLL(_TCB *thread);
 
 void OS_start_interrupt(void);
 void OS_end_interrupt(void);
