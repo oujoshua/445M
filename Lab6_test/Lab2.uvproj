@@ -501,6 +501,11 @@
               <FileType>1</FileType>
               <FilePath>.\OS_Ethernet.c</FilePath>
             </File>
+            <File>
+              <FileName>InputCapture.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\InputCapture.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
