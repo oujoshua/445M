@@ -154,11 +154,13 @@ void OS_Suspend(void);
 void OS_Kill(void);
 
 void OS_Sleep(unsigned short timems);
+
 void OS_AddDownTask(void(*task)(void), unsigned char priority);
-//return current clock time. Returns a long, but the value is only 16 bits because a 16 bit timer was used
+
+//return current clock time. Returns a long, but the value is only 16 bits because a 16 bit timer was used. Units of 100ns
 long OS_Time(void);
 
-//returns the difference between newTime and oldTime (they should both only be 16 bits)
+//returns the difference between newTime and oldTime (they should both only be 16 bits). Units of 100ns
 long OS_TimeDifference(long newTime, long oldTime);
 
 //returns the maximum time the OS was running with interrupts disabled in units of us
@@ -170,7 +172,8 @@ unsigned long OS_PercentCritical(void);
 //clears all data relating to time in critical sections
 void OS_ClearCriticalStats(void);
 
-// adds a given task to the timer2A interrupt, so it is run in the background every given period
+// adds a given task to the timer2A interrupt, so it is run in the background every given period.
+//period in units of 2us
 bckgndTcb* OS_AddPeriodicThread(void(*task)(void), unsigned short period, int arg3);
 
 void OS_AddButtonTask(void(*task)(void), int arg2);

@@ -48,4 +48,11 @@ typedef struct _OS_Event {
   char type;
 } _OS_Event;
 
+typedef struct OS_EthernetMailbox {
+  unsigned long size;
+  OS_SemaphoreType hasData;
+  OS_SemaphoreType gotData;
+} OS_EthernetMailbox;
+
+
 #endif

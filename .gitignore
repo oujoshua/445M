@@ -161,3 +161,20 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+
+# added by Sam - Keil project files
+*.uvgui.*
+*.axf
+*.lnp
+*.map
+*.tra
+*.uvopt
+#*.uvproj
+*.dep
+
+# added by Sam - C build files
+*.o
+*.d
+*.crf
+*.plg
+*.htm

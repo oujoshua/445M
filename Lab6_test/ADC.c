@@ -19,7 +19,7 @@
 #define PRESCALE 49 // constant prescale value, 1 us ticks
 #define TIMER_RATE 5000000
 
-static void _ADC_SetTimer0APeriod(unsigned int fs);
+static void _ADC_SetTimer1APeriod(unsigned int fs);
 // static int _ADC_EnableNVICInterrupt(int channelNum);
 // static int _ADC_DisableNVICInterrupt(int channelNum);
 // static int _ADC_SetNIVCPriority(int channelNum, unsigned int priority);
@@ -81,23 +81,23 @@ void ADC_Init(unsigned int fs) {
 // fs in kHz
 void ADC_TimerInit(unsigned int fs) {
   volatile unsigned long delay;
-  SYSCTL_RCGC1_R |= SYSCTL_RCGC1_TIMER0;    // activate timer0
+  SYSCTL_RCGC1_R |= SYSCTL_RCGC1_TIMER1;    // activate timer1
   delay = SYSCTL_RCGC1_R;                   // allow time to finish activating
-  TIMER0_CTL_R &= ~TIMER_CTL_TAEN;          // disable timer0A during setup
-  TIMER0_CTL_R |= TIMER_CTL_TAOTE;          // enable timer0A trigger to ADC
-  TIMER0_CFG_R = TIMER_CFG_16_BIT;          // configure for 16-bit timer mode
-  TIMER0_TAMR_R = TIMER_TAMR_TAMR_PERIOD;   // configure for periodic mode
-  TIMER0_TAPR_R = PRESCALE;                 // prescale value for trigger
-  _ADC_SetTimer0APeriod(fs);
-  TIMER0_IMR_R &= ~TIMER_IMR_TATOIM;        // disable timeout (rollover) interrupt
-  TIMER0_CTL_R |= TIMER_CTL_TAEN;           // enable timer0A 16-b, periodic, no interrupts
+  TIMER1_CTL_R &= ~TIMER_CTL_TAEN;          // disable timer1A during setup
+  TIMER1_CTL_R |= TIMER_CTL_TAOTE;          // enable timer1A trigger to ADC
+  TIMER1_CFG_R = TIMER_CFG_16_BIT;          // configure for 16-bit timer mode
+  TIMER1_TAMR_R = TIMER_TAMR_TAMR_PERIOD;   // configure for periodic mode
+  TIMER1_TAPR_R = PRESCALE;                 // prescale value for trigger
+  _ADC_SetTimer1APeriod(fs);
+  TIMER1_IMR_R &= ~TIMER_IMR_TATOIM;        // disable timeout (rollover) interrupt
+  TIMER1_CTL_R |= TIMER_CTL_TAEN;           // enable timer1A 16-b, periodic, no interrupts
 }
 
 // fs in Hz
 // rate is (clock period)*(prescale + 1)(period + 1)
-static void _ADC_SetTimer0APeriod(unsigned int fs) {
+static void _ADC_SetTimer1APeriod(unsigned int fs) {
   unsigned int period =  fs;// * 1000; // 1000 us per msTIMER_RATE / fs;
-  TIMER0_TAILR_R = period;                  // start value for trigger
+  TIMER1_TAILR_R = period;                  // start value for trigger
 }
 
 
@@ -141,7 +141,7 @@ unsigned short ADC_In(unsigned int channelNum) {
 
 int ADC_Collect(unsigned int channelNum, unsigned int fs, void(*task)(unsigned short)) {
 //  int i;
-  _ADC_SetTimer0APeriod(fs);
+  _ADC_SetTimer1APeriod(fs);
   _ADC_tasks[channelNum] = task;
 //   for(i = 0; i < numberOfSamples; i++) {
 //     buffer[i] = ADC_In(channelNum);

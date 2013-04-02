@@ -113,7 +113,7 @@ void OS_Init(void) {
 	OS_Add_Periodic_Thread(&OS_IncPriority, 100, 1);
   
   // Ethernet Init
-  //OS_EthernetInit();
+  OS_EthernetInit();
 }
 
 // return the id of the thread pointed to by _RunPt

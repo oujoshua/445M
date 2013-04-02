@@ -2,14 +2,20 @@
 #include "mac.h"
 #include "lm3s8962.h"
 #include <stdio.h>
+#include <string.h>
 
 void OS_EthernetListener(void);
+void OS_EthernetSender(void);
+void EthernetTest(void);
 
 unsigned char RcvMessage[MAXBUF];
+unsigned char SendBuff[MAXBUF];
 unsigned long ulUser0, ulUser1;
 unsigned long RcvCount, XmtCount;
 unsigned char Me[6];
 unsigned char All[6] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
+
+OS_EthernetMailbox _OS_EthernetMailbox;
 
 #pragma O0
 int OS_EthernetInit(void) {
@@ -41,7 +47,11 @@ int OS_EthernetInit(void) {
 
   MAC_Init(Me);
   
+  OS_EthernetMailBox_Init();
+  
   OS_AddThread(&OS_EthernetListener, 128, 4);
+  OS_AddThread(&OS_EthernetSender, 128, 4);
+  OS_AddThread(&EthernetTest, 128, 4);
   
   return 0;
 }
@@ -55,4 +65,58 @@ void OS_EthernetListener(void) {
       printf("%d %s\n",size,RcvMessage+14);
     }
   }
+}
+
+
+
+void OS_EthernetSender(void) {
+  while(1) {
+    OS_EthernetMailBox_Recv();
+    MAC_SendData(SendBuff, _OS_EthernetMailbox.size, All);
+  }
+}
+
+
+
+void EthernetTest(void) {
+  while(1) {
+    OS_EthernetMailBox_Send("testtesttesttest", 17);
+    OS_Sleep(1000);
+  }
+}
+
+// ******** OS_EthernetMailBox_Init ************
+// Initialize communication channel
+// Inputs:  none
+// Outputs: none
+void OS_EthernetMailBox_Init(void) {
+  _OS_EthernetMailbox.size = 0;
+  OS_InitSemaphore(&_OS_EthernetMailbox.hasData, 0);
+  OS_InitSemaphore(&_OS_EthernetMailbox.gotData, 1);
+}
+
+
+// ******** OS_EthernetMailBox_Send ************
+// enter mail into the MailBox
+// Inputs:  data to be sent
+// Outputs: none
+// This function will be called from a foreground thread
+// It will spin/block if the MailBox contains data not yet received 
+void OS_EthernetMailBox_Send(unsigned char* buffer, unsigned long size) {
+  OS_bWait(&_OS_EthernetMailbox.gotData);
+  size = (size > MAXBUF) ? MAXBUF : size;
+  _OS_EthernetMailbox.size = size;
+  memcpy(SendBuff, buffer, size);
+  OS_bSignal(&_OS_EthernetMailbox.hasData);  
+}
+
+// ******** OS_EthernetMailBox_Recv ************
+// remove mail from the MailBox
+// Inputs:  none
+// Outputs: data received
+// This function will be called from a foreground thread
+// It will spin/block if the MailBox is empty 
+void OS_EthernetMailBox_Recv(void) {
+  OS_bWait(&_OS_EthernetMailbox.hasData);
+  OS_bSignal(&_OS_EthernetMailbox.gotData);
 }
