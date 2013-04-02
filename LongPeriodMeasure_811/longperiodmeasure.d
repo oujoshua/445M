@@ -1,1 +1,0 @@
-longperiodmeasure.o: LongPeriodMeasure.c
