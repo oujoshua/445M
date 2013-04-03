@@ -1,0 +1,30 @@
+run 1:
+rpm = 
+avg = 77
+std_dev = 65
+max_dev = 84
+
+run 2:
+rpm = 
+avg = 26
+std_dev = 49 
+max_dev = 141
+
+
+run 3:
+rpm = 
+avg = 54
+std_dev = 74 
+max_dev = 153
+
+run 4:
+rpm = 
+avg = 64
+std_dev = 73 
+max_dev = 190
+
+run 5:
+rpm = 
+avg = 165 
+std_dev = 134 
+max_dev = 165
