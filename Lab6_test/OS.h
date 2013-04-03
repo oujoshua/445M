@@ -28,6 +28,10 @@
 #define EVENT_THREAD 32
 #define MAXBUF 200
 
+#define ATTR_ARCHIVE 0x20
+#define ATTR_DIR 0x10
+#define USE_DISK 1
+
 // lab 4 stuff
 #define X_POINTS 107
 #define BUFF_LEN X_POINTS * 2

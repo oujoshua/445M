@@ -5,6 +5,8 @@
 #include "OS_Critical.h"
 #include "OS.h"
 #include "Debug.h"
+#include "eDisk.h"
+#include "InputCapture.h"
 #include <string.h>
 
 #if DEBUG == 1
@@ -108,9 +110,16 @@ void OS_Init(void) {
   Timer2A_Init();
   Timer2B_Init(0);
   
+  // initialize input capture
+  TimerCapture_Init();
+  
   /* Add default thread in case all threads killed */
   OS_AddThread(&_OS_Default_Thread, 0, 7); // should be lowest priority
 	OS_Add_Periodic_Thread(&OS_IncPriority, 100, 1);
+  
+  #if (USE_DISK == 1)
+    OS_Add_Periodic_Thread(disk_timerproc,10,5);
+  #endif
   
   // Ethernet Init
   OS_EthernetInit();

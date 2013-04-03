@@ -1,8 +1,11 @@
 #include "os.h"
 #include "mac.h"
 #include "lm3s8962.h"
+#include "eFile.h"
 #include <stdio.h>
 #include <string.h>
+
+#define LOG_FILE "enet"
 
 void OS_EthernetListener(void);
 void OS_EthernetSender(void);
@@ -58,11 +61,25 @@ int OS_EthernetInit(void) {
 
 void OS_EthernetListener(void) {
   unsigned long size;
+  int i, haveDisk;
+  eFile_Init();
+  haveDisk = eFile_Create(LOG_FILE, ATTR_DIR);
   while(1) {
     size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
     if(size){
       RcvCount++;
-      printf("%d %s\n",size,RcvMessage+14);
+      // if an SD card is available, dump messages to disk; otherwise print to UART
+      if(haveDisk == 0) {
+        eFile_WOpen(LOG_FILE);
+        for(i = 14; i < size; i++) {
+          eFile_Write(RcvMessage[i]);
+        }
+        eFile_Write('\n');
+        eFile_WClose();
+      }
+      else {
+        printf("%d %s\n",size,RcvMessage+14);
+      }
     }
   }
 }

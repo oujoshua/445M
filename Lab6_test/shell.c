@@ -109,6 +109,7 @@ void SH_Init(void)
 static char input[SH_MAX_LENGTH] = {0};
 void SH_Shell(void) {
   SH_Init();
+//   eFile_Init();
   while(1)
 	{
 		/* Show prompt */

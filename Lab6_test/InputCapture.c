@@ -22,6 +22,7 @@
  http://users.ece.utexas.edu/~valvano/
  */
  
+ #include "InputCapture.h"
  #include "hw_types.h"
  #include "lm3s8962.h"
  
@@ -74,6 +75,7 @@ void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
 
 volatile unsigned long Count;      // incremented on interrupt
+#pragma O0
 void TimerCapture_Init(void){
   SYSCTL_RCGC1_R |= SYSCTL_RCGC1_TIMER0;// activate timer0
                                    // activate port C and port D
@@ -94,9 +96,8 @@ void TimerCapture_Init(void){
   TIMER0_ICR_R = TIMER_ICR_CAECINT;// clear timer0A capture match flag
   TIMER0_CTL_R |= TIMER_CTL_TAEN;  // enable timer0A 16-b, +edge timing, interrupts
                                    // Timer0A=priority 2
-  NVIC_PRI8_R = (NVIC_PRI8_R&0x00FFFFFF)|0x40000000; // top 3 bits
-  NVIC_EN1_R |= NVIC_EN1_INT35;    // enable interrupt 35 in NVIC
-  EnableInterrupts();
+  NVIC_PRI4_R = (NVIC_PRI4_R&0x00FFFFFF)|0x40000000; // top 3 bits
+  NVIC_EN0_R |= NVIC_EN0_INT19;    // enable interrupt 19 in NVIC
 }
 void Timer0A_Handler(void){
   TIMER0_ICR_R = TIMER_ICR_CAECINT;// acknowledge timer0A capture match

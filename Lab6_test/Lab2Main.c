@@ -346,7 +346,7 @@ unsigned long myId = OS_Id();
     DCcomponent = y[0]&0xFFFF; // Real part at frequency 0, imaginary part should be zero
      OS_MailBox_Send(DCcomponent);
   }
-  OLED_Out(BOTTOM, "CONSUMER DONE");
+//   OLED_Out(BOTTOM, "CONSUMER DONE");
   OS_Kill();  // done
   OS_Delay(OS_ARBITRARY_DELAY);
 }
@@ -376,9 +376,9 @@ void DisplayThread(void)
 void Display(void){ 
 unsigned long data;
   char str[20];
-   sprintf(str, "Run length is %d", RUNLENGTH/1000);
+//    sprintf(str, "Run length is %d", RUNLENGTH/1000);
   OLED_Out(TOP, str);   // top half used for Display
-   NumCreated += OS_AddThread(&DisplayThread, 128, 0);
+//    NumCreated += OS_AddThread(&DisplayThread, 128, 0);
   while(NumSamples < RUNLENGTH) {
 //    sprintf(str, "Time left is %d", (RUNLENGTH-NumSamples)/1000);
 //     OS_LogEvent(EVENT_OLED_START);
@@ -390,7 +390,7 @@ unsigned long data;
 //		OLED_Out(TOP, str);
 // 		OS_Delay(OS_ARBITRARY_DELAY);
   }
-	OLED_Out(BOTTOM, "DONE");
+// 	OLED_Out(BOTTOM, "DONE");
 	OS_Kill();  // done
   OS_Delay(OS_ARBITRARY_DELAY);
 }
