@@ -8,22 +8,12 @@
 #include "ADC.h"
 #include "IR.h"
 #include "lm3s8962.h"
-
-#define PROFILING 1
-#if PROFILING == 1
-  #define PINS 0x07
-#endif
+#include "edisk.h"
+#include "efile.h"
 
 #define TIMESLICE TIME_2MS    // thread switch time in system time units
 #define RUNLENGTH 10000   // display results and quit when NumSamples==RUNLENGTH
 
-void dummyTask1(void);
-void dummyTask2(void);
-void dummyTask3(void);
-void dummyButtonTask(void);
-void dummyDownTask(void);
-void dummyPeriodicTask(void);
-void jerkTask(void);
 void PID(void);
 void DAS(void);
 void ButtonPush(void);
@@ -43,21 +33,23 @@ unsigned long const JitterSize=JITTERSIZE;
 unsigned long JitterHistogram[JITTERSIZE]={0,};
 long x[64],y[64];         // input and output arrays for FFT
 
+void SD_Init(void)
+{
+	eFile_Init();
+	OS_Kill();
+}
+
 int main(void)
 {
-  #if PROFILING == 1
-    volatile unsigned long delay;
-  #endif
 	/* Initialize 8MHz clock */
 	SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_8MHZ | SYSCTL_OSC_MAIN);
-  OLED_Init(15);
+//  OLED_Init(15);
   ADC_Init(1000);
   ADC_Open(0);
   ADC_Open(1);
   SH_Init();
   OS_Init();
   OS_MailBox_Init();
-  SH_Init();
   
   //********initialize communication channels
   OS_MailBox_Init();
@@ -68,138 +60,19 @@ int main(void)
   MaxJitter = 0;       // OS_Time in 20ns units
   MinJitter = 10000000;
   
-  #if PROFILING
-    // intialize port b pins as specified by PINS mask
-    // for digital output for use in profiling threads
-    SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOB;
-    delay = SYSCTL_RCGC2_R;
-    GPIO_PORTB_DIR_R |= PINS;
-    GPIO_PORTB_DEN_R |= PINS;
-    GPIO_PORTB_DATA_R &= ~PINS;
-  #endif
-  
   // testing/debugging stuff
   OS_Add_Periodic_Thread(&DAS,2,1);
-//  OS_AddButtonTask(&dummyButtonTask, 1);
+  OS_Add_Periodic_Thread(&disk_timerproc,10,0);   // time out routines for disk
   OS_AddButtonTask(&ButtonPush, 1);
   OS_AddDownTask(&ButtonPush, 1);
-  
-//   NumCreated += OS_AddThread(&jerkTask, 0, 6);
-//   NumCreated += OS_AddThread(&dummyTask3, 0, 7);
-//   NumCreated += OS_AddThread(&dummyTask1, 0, 2);
   NumCreated += OS_AddThread(&PID, 128, 1);
-//   NumCreated += OS_AddThread(&dummyTask2, 0, 2);
   NumCreated += OS_AddThread(&Consumer, 128, 0);
-   NumCreated += OS_AddThread(&SH_Shell, 128, 6);
-  OS_Launch(TIMESLICE/2);
+  NumCreated += OS_AddThread(&SH_Shell, 128, 6);
+	OS_AddThread(&SD_Init, 128, 0);
+  OS_Launch(TIMESLICE);
 	
 	/* Loop indefinitely */
   while(1);
-}
-
-OS_SemaphoreType binarySemaphore;
-//int count1 = 0;
-void dummyTask1(void) {
-//   int i;
-//   #if PROFILING == 1
-//     int myPin = 0x01;
-//   #endif
-  OS_InitSemaphore(&binarySemaphore, OS_BINARY_SEMAPHORE);
-  while(1) {
-    OS_bWait(&binarySemaphore);
-    OLED_Out(TOP, "task 1 acquired");
-//     for(i = 0; i < 100000; i++) {
-//       #if PROFILING == 1
-//         GPIO_PORTB_DATA_R ^= myPin;
-//       #endif
-//     }
-    OS_Sleep(1000);
-    OS_bSignal(&binarySemaphore);
-    OLED_Out(TOP, "task 1 released");
-    OS_Sleep(1000);
-//     for(i = 0; i < 100000; i++) {
-//       #if PROFILING == 1
-//         GPIO_PORTB_DATA_R ^= myPin;
-//       #endif
-//     }
-//     OLED_Out(TOP, "task 1 dead");
-//     OS_AddThread(&dummyTask2, 0 ,1);
-//     OS_Kill();
-  }
-}
-
-//int count2 = 0;
-void dummyTask2(void) {
-//   int i;
-//   unsigned long data;
-//   #if PROFILING == 1
-//     int myPin = 0x02;
-//   #endif
-  while(1) {
- //     OLED_Out(BOTTOM, "task 2 request");
-      OS_bWait(&binarySemaphore);
-      OLED_Out(BOTTOM, "task 2 acquired");
-//     for(i = 0; i < 100000; i++) {
-//       #if PROFILING == 1
-//         GPIO_PORTB_DATA_R ^= myPin;
-//       #endif
-//     }
-    OS_Sleep(1000);
-    OS_bSignal(&binarySemaphore);
-    OLED_Out(BOTTOM, "task 2 released");
-    OS_Sleep(1000);
-//     for(i = 0; i < 100000; i++) {
-//       #if PROFILING == 1
-//         GPIO_PORTB_DATA_R ^= myPin;
-//       #endif
-//     }
-//    data = OS_MailBox_Recv();
-//    OLED_Out(BOTTOM, "task 2 receive");
-    
-//     OS_AddThread(&dummyTask1, 0, 1);
-//     OLED_Out(BOTTOM, "task 2 dead");
-//     OS_Kill();
-//    OS_Sleep(2000);
-  }
-}
-
-int count3 = 0;
-void dummyTask3(void) {
-  count3++;
-  OS_Sleep(4000); // sleep for 4 seconds
-  OLED_Out(BOTTOM, "task 3 Yaaaaaaaaaawn");
-  NumCreated += OS_AddThread(&dummyTask3, 64, 2);
-  OS_Kill();
-//   #if PROFILING == 1
-//     int myPin = 0x04;
-//   #endif
-//   while(1) {
-//     count3++;
-//     #if PROFILING == 1
-//       GPIO_PORTB_DATA_R ^= myPin;
-//     #endif
-//   }
-}
-
-void dummyButtonTask(void) {
-  OLED_Out(TOP, "Select Pressed");
-  OS_Kill();
-}
-
-void dummyDownTask(void) {
-  OLED_Out(BOTTOM, "Down Pressed");
-  OS_Kill();
-}
-
-unsigned long countPeriodic = 0;
-void dummyPeriodicTask(void) {
-  countPeriodic++;
-}
-
-// never sleeps or blocks
-void jerkTask(void) {
-  while(1)
-    ;
 }
 
 //------------------Task 1--------------------------------
@@ -264,19 +137,19 @@ unsigned long i;
 unsigned long myId = OS_Id(); 
   char str[20];
   sprintf(str, "NumCreated = %d", NumCreated);
-  OLED_Out(BOTTOM, str); 
+//  OLED_Out(BOTTOM, str); 
   if(NumSamples < RUNLENGTH){   // finite time run
     for(i=0;i<20;i++){  // runs for 2 seconds
       OS_Sleep(50);     // set this to sleep for 0.1 sec
     }
   }
   sprintf(str, "PIDWork    = %d", PIDWork);
-  OLED_Out(BOTTOM, str);
+//  OLED_Out(BOTTOM, str);
   sprintf(str, "DataLost   = %d", DataLost);
-  OLED_Out(BOTTOM, str);
+//  OLED_Out(BOTTOM, str);
   sprintf(str, "Jitter(us) = %d",MaxJitter-MinJitter);
-  OLED_Out(BOTTOM, str);
-  OLED_Out(BOTTOM, "");
+//  OLED_Out(BOTTOM, str);
+//  OLED_Out(BOTTOM, "");
   OS_Kill();  // done
   OS_Delay(OS_ARBITRARY_DELAY);
 } 
@@ -362,9 +235,9 @@ void DisplayThread(void)
 	while(NumSamples < RUNLENGTH)
 	{
 		sprintf(str, "Time left is %d  ", (RUNLENGTH-NumSamples)/1000);
-		_OLED_Message(TOP, 1, str, 15);
+//		_OLED_Message(TOP, 1, str, 15);
 		sprintf(str, "v(mV) = %d", voltage);
-		_OLED_Message(TOP, 2, str, 15);
+//		_OLED_Message(TOP, 2, str, 15);
 //    OS_Suspend();
      OS_Sleep(500);
 	}
@@ -381,7 +254,7 @@ void Display(void){
 unsigned long data;
   char str[20];
 //    sprintf(str, "Run length is %d", RUNLENGTH/1000);
-  OLED_Out(TOP, str);   // top half used for Display
+//  OLED_Out(TOP, str);   // top half used for Display
 //    NumCreated += OS_AddThread(&DisplayThread, 128, 0);
   while(NumSamples < RUNLENGTH) {
 //    sprintf(str, "Time left is %d", (RUNLENGTH-NumSamples)/1000);

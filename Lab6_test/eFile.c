@@ -34,12 +34,8 @@ int eFile_Init(void) {
   // initialize file system
 	if(_sysInit)
 		return 1;
-  if(eDisk_Init(DRIVE))
-	{
-		//fprintf(stderr, "Error reading disk\n");
+  if(eDisk_Init(DRIVE) || eDisk_ReadBlock(_blockBuff, BOOT_SECTOR))
 		return 1;
-	}
-  eDisk_ReadBlock(_blockBuff, BOOT_SECTOR);
 	
 	SECT_PER_CLUSTER = _blockBuff[SECT_PER_CLUST_INDEX];
 	FAT_OFFSET = (_blockBuff[RES_SECT_INDEX + 1] << 8) | _blockBuff[RES_SECT_INDEX];
@@ -77,15 +73,31 @@ int eFile_Format(void)
 	eFile_WClose();
 	eFile_RClose();
 	
+	// Sector 0
+	_eFile_ClearBlockBuff();
+	_blockBuff[0] = 0xEB;
+	_blockBuff[SECT_PER_CLUST_INDEX] = 32;
+	_blockBuff[RES_SECT_INDEX] = 0x2A;
+	_blockBuff[RES_SECT_INDEX + 1] = 0x09;
+	_blockBuff[NUM_FATS_INDEX] = 2;
+	_blockBuff[FAT_SIZE_INDEX] = 0x68;
+	_blockBuff[FAT_SIZE_INDEX + 1] = 0x3B;
+	_blockBuff[FAT_SIZE_INDEX + 2] = 0x00;
+	_blockBuff[FAT_SIZE_INDEX + 3] = 0x00;
+	_blockBuff[510] = 0x55;
+	_blockBuff[511] = 0xAA;
+	eDisk_WriteBlock(_blockBuff, 0);
+	// Root dir at 0x8000 = 32,768
 	_eFile_ClearBlockBuff();
 	_blockBuff[0] = _blockBuff[32] = 0xE5;
-	eDisk_WriteBlock(_blockBuff, _dir);
+	eDisk_WriteBlock(_blockBuff, 0x8000);
 	_eFile_ClearBlockBuff();
+	// First FAT dir at 2346
 	memset(_blockBuff, 0xFF, 16);
 	_blockBuff[0] = 0xF8;
 	_blockBuff[3] = _blockBuff[7] = 
 		_blockBuff[11] = _blockBuff[15] = 0x0F;
-	eDisk_WriteBlock(_blockBuff, FAT_OFFSET);
+	eDisk_WriteBlock(_blockBuff, 2346);
 	
   return 0;
 }
