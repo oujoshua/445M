@@ -23,9 +23,12 @@
  */
  
  #include "InputCapture.h"
+ #include "os.h"
  #include "hw_types.h"
  #include "lm3s8962.h"
  #include <stdio.h>
+ 
+ // wheel radis = 3.8 cm
  
  /*********************************
   *********************************
@@ -74,6 +77,7 @@ void EnableInterrupts(void);  // Enable interrupts
 long StartCritical (void);    // previous I bit, disable interrupts
 void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
+static void IC_calc(void);
 
 volatile unsigned long Count;      // incremented on interrupt
 #pragma O0
@@ -100,11 +104,57 @@ void TimerCapture_Init(void){
   NVIC_PRI4_R = (NVIC_PRI4_R&0x00FFFFFF)|0x40000000; // top 3 bits
   NVIC_EN0_R |= NVIC_EN0_INT19;    // enable interrupt 19 in NVIC
 }
+
+unsigned long first_capture, last_capture;
+unsigned long IC_buffer[64] = {0, };
+int IC_idx = 0;
 void Timer0A_Handler(void){
+  static int i = 0;
   TIMER0_ICR_R = TIMER_ICR_CAECINT;// acknowledge timer0A capture match
   GPIO_PORTC_DATA_R = GPIO_PORTC_DATA_R^0x20; // toggle PC5
+  if(Count == 0) {
+    first_capture = OS_MsTime();
+  }
   Count = Count + 1;
-  printf("Count = %d\n", Count);
+  if(IC_idx < 64) {
+    IC_buffer[IC_idx++] = OS_Time();
+  }
+  if(OS_MsTime() - first_capture > 10000) {
+//     last_capture = OS_MsTime();
+    IC_calc();
+//     printf("%d events -> %d rotations in %d ms\n", Count, Count/2, OS_MsTime() - first_capture);
+    Count = 0;
+  }
+}
+
+unsigned long time_diffs[63] = {0, };
+static void IC_calc(void) {
+  int i, num = 0;
+  unsigned long avg, std_dev, max_dev;
+  // calculate the time difference between each event
+  for(i = 0; i < IC_idx - 1; i++) {
+    num++;
+    printf("IC_buffer[%d] = %d\n", i, IC_buffer[i]);
+    time_diffs[i] = IC_buffer[i + 1] - IC_buffer[i];
+  }
+  // calculate the average
+  avg = 0;
+  for(i = 0; i < num; i++) {
+    printf("time_diffs[%d] = %d\n", i, time_diffs[i]);
+    avg = avg + time_diffs[i];
+  }
+  avg = avg / IC_idx;
+  // calculate the standard and max deviaton
+  std_dev = 0; max_dev = 0;
+  for(i = 0; i < num; i++) {
+    long tdiff = time_diffs[i] - avg;
+    std_dev += tdiff * tdiff;
+    if(ABS(tdiff) > max_dev) {
+      max_dev = ABS(tdiff);
+    }
+  }
+  std_dev = sqrt(std_dev / IC_idx);
+  printf("average = %d\nstandard_deviation = %d\n maximum deviaton = %d\n", avg, std_dev, max_dev);
 }
 
 //debug code

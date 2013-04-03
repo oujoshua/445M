@@ -36,6 +36,8 @@
 #define X_POINTS 107
 #define BUFF_LEN X_POINTS * 2
 
+#define ABS(x) ((x < 0) ? -x : x)
+
 #include "OS_types.h"
 
 void Timer2A_Init(void);
@@ -308,6 +310,8 @@ void OS_EthernetMailBox_Send(unsigned char* buffer, unsigned long size);
 // This function will be called from a foreground thread
 // It will spin/block if the MailBox is empty 
 void OS_EthernetMailBox_Recv(void);
+
+unsigned long sqrt(unsigned long s);
 
 void DisableInterrupts(void);
 void EnableInterrupts(void);
