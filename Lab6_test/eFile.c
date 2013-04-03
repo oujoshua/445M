@@ -21,7 +21,7 @@ static unsigned char	NUM_FATS = 0;
 static unsigned int		FAT_SIZE = 0;
 static unsigned int		ROOT_OFFSET = 0;
 static unsigned int		_dir = 0;
-static unsigned int		_cluster = 0;
+//static unsigned int		_cluster = 0;
 
 //---------- eFile_Init-----------------
 // Activate the file system, without formating
@@ -68,6 +68,8 @@ int eFile_Info(void)
 // Output: 0 if successful and 1 on failure (e.g., trouble writing to flash)
 int eFile_Format(void)
 {
+	int i;
+	
 	CHECK_DISK // check disk state
 	
 	eFile_WClose();
@@ -80,7 +82,7 @@ int eFile_Format(void)
 	_blockBuff[RES_SECT_INDEX] = 0x2A;
 	_blockBuff[RES_SECT_INDEX + 1] = 0x09;
 	_blockBuff[NUM_FATS_INDEX] = 2;
-	_blockBuff[FAT_SIZE_INDEX] = 0x68;
+	_blockBuff[FAT_SIZE_INDEX] = 0x6B;
 	_blockBuff[FAT_SIZE_INDEX + 1] = 0x3B;
 	_blockBuff[FAT_SIZE_INDEX + 2] = 0x00;
 	_blockBuff[FAT_SIZE_INDEX + 3] = 0x00;
@@ -89,16 +91,16 @@ int eFile_Format(void)
 	eDisk_WriteBlock(_blockBuff, 0);
 	// Root dir at 0x8000 = 32,768
 	_eFile_ClearBlockBuff();
-	_blockBuff[0] = _blockBuff[32] = 0xE5;
-	eDisk_WriteBlock(_blockBuff, 0x8000);
-	_eFile_ClearBlockBuff();
+	for(i = 0; i < SECT_PER_CLUSTER; i++)
+		eDisk_WriteBlock(_blockBuff, 0x8000 + i);
 	// First FAT dir at 2346
 	memset(_blockBuff, 0xFF, 16);
 	_blockBuff[0] = 0xF8;
 	_blockBuff[3] = _blockBuff[7] = 
 		_blockBuff[11] = _blockBuff[15] = 0x0F;
 	eDisk_WriteBlock(_blockBuff, 2346);
-	
+
+	eFile_Init();
   return 0;
 }
 
@@ -120,15 +122,15 @@ int eFile_Create(const char name[FILE_NAME_SIZE], char attr)
 	_eFile_FATName(name, _file.name, &toupper, 0); // somewhat unsafe; overflows to ext
 	_file.attr = attr; // archive is 0x20, dir is 0x10
 	cluster = _eFile_FreeCluster(); // also marks as in-use
-	if(attr == 0x10)
-			cluster += 2;
+//	if(attr == 0x10)
+//			cluster += 2;
 	_file.cluster[0] = cluster & 0xFF;
 	_file.cluster[1] = (cluster >> 8) & 0xFF;
 	_file.hiCluster[0] = (cluster >> 16) & 0xFF;
 	_file.hiCluster[1] = (cluster >> 24) & 0xFF;
 	memset(_file.size, 0, 4);
 	
-	if(cluster == -1)
+	if(cluster < 0)
 		return 1; // no free space
 	
 	eDisk_ReadBlock(_blockBuff, _dir);
@@ -144,7 +146,7 @@ int eFile_Create(const char name[FILE_NAME_SIZE], char attr)
 			continue;
 		memcpy(&_blockBuff[i], &_file, sizeof(eFile_File));
 		eDisk_WriteBlock(_blockBuff, _dir);
-		if(attr == 0x10) // make directory
+/*		if(attr == 0x10) // make directory
 		{
 			// directory "."
 			memset(&_file, 0, 32);
@@ -170,7 +172,7 @@ int eFile_Create(const char name[FILE_NAME_SIZE], char attr)
 			_file.hiCluster[1] = (_cluster >> 24) & 0xFF;
 			memcpy(&_blockBuff[32], &_file, 32);
 			eDisk_WriteBlock(_blockBuff, (ROOT_OFFSET + SECT_PER_CLUSTER*(cluster-2)));
-		}
+		}*/
 		return 0;
 	}
 	
@@ -197,7 +199,7 @@ int eFile_WOpen(const char name[FILE_NAME_SIZE])
 	_wDirIndex = _dirIndex;
 	_wCluster = (_file.cluster[0] | (_file.cluster[1] << 8));
 	_wSize = _file.size[0] | (_file.size[1] << 8) |
-					(_file.size[1] << 16) | (_file.size[3] << 24);
+					(_file.size[2] << 16) | (_file.size[3] << 24);
 	_wIndex = _wSize % 512;
 	// seek to end of file
 	eDisk_ReadBlock(_writeBuff, FAT_OFFSET + _wCluster / 128);
@@ -214,11 +216,12 @@ int eFile_WOpen(const char name[FILE_NAME_SIZE])
 			eDisk_ReadBlock(_writeBuff, FAT_OFFSET + next / 128);
 		_wCluster = next;
 	}
-	_wSector = ROOT_OFFSET + SECT_PER_CLUSTER*(_wCluster - 2);
+	_wSector = ROOT_OFFSET + SECT_PER_CLUSTER*(_wCluster - 2) + ((_wSize % (32 * 512)) / 512);
 	eDisk_ReadBlock(_writeBuff, _wSector);
 	_wOpen = 1;
   return 0;
 }
+
 
 //---------- eFile_Write-----------------
 // save at end of the open file
@@ -228,7 +231,7 @@ int eFile_Write(const char data)
 {
 	CHECK_DISK // check disk state
 	
-	if(!_wOpen)
+	if(!_wOpen || !data)
 		return 1;
 	
 	if(_wIndex == 512) // need to allocate more data
@@ -238,7 +241,7 @@ int eFile_Write(const char data)
 		{
 			// allocate new cluster from FAT
 			int next = _eFile_FreeCluster();
-			if(next == -1)
+			if(next < 0)
 				return 1;
 			eDisk_WriteBlock(_writeBuff, _wSector);
 			eDisk_ReadBlock(_blockBuff, FAT_OFFSET + _wCluster / 128);
@@ -292,10 +295,10 @@ int eFile_WClose(void)
   if(!_wOpen)
 		return 1;
 	eDisk_WriteBlock(_writeBuff, _wSector);
-	_wFile.size[0] = _wSize & 0xFF;
-	_wFile.size[1] = (_wSize >> 8) & 0xFF;
-	_wFile.size[2] = (_wSize >> 16) & 0xFF;
-	_wFile.size[3] = (_wSize >> 24) & 0xFF;
+	_wFile.size[0] = (_wSize & 0xFF);
+	_wFile.size[1] = ((_wSize >> 8) & 0xFF);
+	_wFile.size[2] = ((_wSize >> 16) & 0xFF);
+	_wFile.size[3] = ((_wSize >> 24) & 0xFF);
 	eDisk_ReadBlock(_blockBuff, _dir);
 	memcpy(&_blockBuff[_wDirIndex], &_wFile, 32 /* bytes */);
 	eDisk_WriteBlock(_blockBuff, _dir);
@@ -547,7 +550,7 @@ int eFile_ChangeDirectory(char newdir[13])
 		return 1;
 	cluster = (_file.cluster[0] | (_file.cluster[1] << 8) |
 							(_file.hiCluster[0] << 16) | (_file.hiCluster[1] << 24));
-	_cluster = cluster;
+//	_cluster = cluster;
 	if(cluster == 0)
 		cluster += 2;
 	sector = ROOT_OFFSET + SECT_PER_CLUSTER*(cluster-2);
@@ -630,12 +633,17 @@ static int _eFile_FreeCluster(void)
 		eDisk_ReadBlock(_blockBuff, i + FAT_OFFSET);
 		for(index = 0; index < 512; index += 4)
 		{
+			int sector, j;
 			if(_blockBuff[index] || _blockBuff[index + 1]
 					|| _blockBuff[index + 2] || _blockBuff[index + 3])
 				continue;
 			_blockBuff[index] = _blockBuff[index + 1] = _blockBuff[index + 2] = 0xFF;
 			_blockBuff[index + 3] = 0x0F;
 			eDisk_WriteBlock(_blockBuff, i + FAT_OFFSET);
+			sector = ROOT_OFFSET + SECT_PER_CLUSTER*(((i * 128 + index) / 4) - 2);
+			_eFile_ClearBlockBuff();
+			for(j = 0; j < SECT_PER_CLUSTER; j++)
+				eDisk_WriteBlock(_blockBuff, sector + j); // clear out newly allocated cluster
 			return (i * 128 + index) / 4;
 		}
 	}

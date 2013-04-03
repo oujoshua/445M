@@ -65,8 +65,8 @@ int main(void)
   OS_Add_Periodic_Thread(&disk_timerproc,10,0);   // time out routines for disk
   OS_AddButtonTask(&ButtonPush, 1);
   OS_AddDownTask(&ButtonPush, 1);
-  NumCreated += OS_AddThread(&PID, 128, 1);
-  NumCreated += OS_AddThread(&Consumer, 128, 0);
+  //NumCreated += OS_AddThread(&PID, 128, 1);
+  //NumCreated += OS_AddThread(&Consumer, 128, 0);
   NumCreated += OS_AddThread(&SH_Shell, 128, 6);
 	OS_AddThread(&SD_Init, 128, 0);
   OS_Launch(TIMESLICE);
@@ -216,7 +216,7 @@ unsigned long myId = OS_Id();
       data = OS_Fifo_Get();    // get from producer
       x[t] = data;             // real part is 0 to 1023, imaginary part is 0
     }
-    printf("ADC: %d -> cm: %d\n", x[0], IRDistance(x[0]));
+//    printf("ADC: %d -> cm: %d\n", x[0], IRDistance(x[0]));
     
     cr4_fft_64_stm32(y,x,64);  // complex FFT of last 64 ADC values
     DCcomponent = y[0]&0xFFFF; // Real part at frequency 0, imaginary part should be zero

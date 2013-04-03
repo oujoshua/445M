@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define LOG_FILE "enet"
+#define LOG_FILE "enet.txt"
 
 void OS_EthernetListener(void);
 void OS_EthernetSender(void);
@@ -63,7 +63,9 @@ void OS_EthernetListener(void) {
   unsigned long size;
   int i, haveDisk;
   eFile_Init();
-  haveDisk = eFile_Create(LOG_FILE, ATTR_DIR);
+  //haveDisk = eFile_Create(LOG_FILE, ATTR_ARCHIVE);
+	haveDisk = eFile_WOpen(LOG_FILE);
+	eFile_WClose();
   while(1) {
     size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
     if(size){
@@ -72,7 +74,8 @@ void OS_EthernetListener(void) {
       if(haveDisk == 0) {
         eFile_WOpen(LOG_FILE);
         for(i = 14; i < size; i++) {
-          eFile_Write(RcvMessage[i]);
+					if(RcvMessage[i])
+						eFile_Write(RcvMessage[i]);
         }
         eFile_Write('\n');
         eFile_WClose();
