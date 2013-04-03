@@ -1,0 +1,26 @@
+ping sensor, pretty accurate in inches
+
+10 cm - 2.95 V
+15 cm - 2.35 V
+20 cm - 1.83 V
+30 cm - 1.35 V
+50 cm - 0.85 V
+70 cm - 0.75 V
+80 cm - 0.7 V
+
+
+
+ping
+truth     measured      std     span
+100cm     99cm          1       1
+200cm     199cm         1       1
+250cm     249cm         1       1
+300cm     298cm         2       2
+250cm     348cm         2       2
+
+ir sensor
+12cm      11            1       1
+17        16            1       1
+22        20            2       2
+32        
+37        
