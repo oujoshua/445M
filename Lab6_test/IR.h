@@ -1,0 +1,2 @@
+
+long IRDistance(long x);

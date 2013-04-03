@@ -6,6 +6,7 @@
 #include "UART.h"
 #include "shell.h"
 #include "ADC.h"
+#include "IR.h"
 #include "lm3s8962.h"
 
 #define PROFILING 1
@@ -342,9 +343,12 @@ unsigned long myId = OS_Id();
       data = OS_Fifo_Get();    // get from producer
       x[t] = data;             // real part is 0 to 1023, imaginary part is 0
     }
+    printf("ADC: %d -> cm: %d\n", x[0], IRDistance(x[0]));
+    
     cr4_fft_64_stm32(y,x,64);  // complex FFT of last 64 ADC values
     DCcomponent = y[0]&0xFFFF; // Real part at frequency 0, imaginary part should be zero
-     OS_MailBox_Send(DCcomponent);
+    OS_MailBox_Send(DCcomponent);
+    
   }
 //   OLED_Out(BOTTOM, "CONSUMER DONE");
   OS_Kill();  // done

@@ -25,6 +25,7 @@
  #include "InputCapture.h"
  #include "hw_types.h"
  #include "lm3s8962.h"
+ #include <stdio.h>
  
  /*********************************
   *********************************
@@ -103,6 +104,7 @@ void Timer0A_Handler(void){
   TIMER0_ICR_R = TIMER_ICR_CAECINT;// acknowledge timer0A capture match
   GPIO_PORTC_DATA_R = GPIO_PORTC_DATA_R^0x20; // toggle PC5
   Count = Count + 1;
+  printf("Count = %d\n", Count);
 }
 
 //debug code
