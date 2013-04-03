@@ -1,0 +1,17 @@
+y = y1 + (x-x1)*slope
+
+long outputY[7] = {10, 15, 20, 20, 50, 70, 80};//output is in centimeters
+long inputX[7] = {1006, 802, 624, 460, 290, 256, 238}
+
+long slope = {-2451, -2809, -6098, -11765, -58824, -55556, -29412};// divide by 100000
+
+
+long IRDistance(long x){
+  long retVal;
+  long i = 0;
+  while(x < inputX[i] && i < 7){
+    i++;
+  }
+  retVal = outputY[i] + ((x - inputX[i]) * slope[i])) / 100000;
+  return retVal;
+}
