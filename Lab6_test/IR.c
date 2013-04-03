@@ -4,10 +4,10 @@
 
 // y = y1 + (x-x1)*slope
 
-long outputY[7] = {10, 15, 20, 30, 35, 50, 55};//output is in centimeters
-long inputX[7] = {800, 575, 450, 315, 270, 205, 196};
+long outputY[7] = {10, 15, 20, 30, 40, 50, 55};//output is in centimeters
+long inputX[7] = {800, 575, 450, 315, 240, 205, 196};
 
-long slope[7] = {-2223, -4000, -7408, -11112, -23077, -55556, -16130};// divide by 100000
+long slope[7] = {-2223, -4000, -7408, -13334, -28572, -55556, -16130};// divide by 100000
 
 
 long IRDistance(long x){
