@@ -69,7 +69,8 @@ void EndCritical(long sr);    // restore I bit to previous value
 #define PD6 (*((volatile unsigned long *)0x40007100))
 #define PD4 (*((volatile unsigned long *)0x40007040))
 
-#define INCHDIV 1480 //constant for conversion to inches
+#define INCHDIV 148 //constant for conversion to inches
+#define CMDIV 58 //constant for conversion to centimeters
 
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
@@ -139,8 +140,6 @@ void PingTrigger(){int i; unsigned long iBit;
 		
   GPIO_PORTD_IM_R |= 0x10;
 	//wait for ping completion
-
-
 		
 //	TIMER0_IMR_R &= ~TIMER_IMR_CAEIM; // disable capture match interrupt
 	//distance in mm = #ticks (period) / Cinv*2. divide by 2 because sound has to travel to object and back
@@ -151,7 +150,7 @@ void testThread(void){ //test thread that waits for measurements
   while(1){
 		while(!Done){	}
 		Done = 0;
-		distInches = Period/INCHDIV;
+		distInches = Period/CMDIV;
 	}
 }
 void testInterrupt(void){

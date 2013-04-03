@@ -322,7 +322,7 @@ void Timer2B_Init(void){ long delay;
     TIMER2_CFG_R = 0x00000007;       // 2) configure for 16-bit timer mode
 	  TIMER2_TBMR_R = 0x00000002;      //configure timer B for periodic mode
 	  TIMER2_TBILR_R = 0xFFFFFFFF;         //configure timer B for maximum reload time
-	  TIMER2_TBPR_R = 4;               //configure for 100ns ticks
+	  TIMER2_TBPR_R = 49;               //configure for 1us ticks
 	  TIMER2_IMR_R &= ~(0x00000700);   //disable timer2B interrrupts
     TIMER2_CTL_R |= 0x00000100;      // enable timer2B
 
