@@ -78,6 +78,8 @@ int eFile_Format(void)
 	// Sector 0
 	_eFile_ClearBlockBuff();
 	_blockBuff[0] = 0xEB;
+	_blockBuff[1] = 0x58;
+	_blockBuff[2] = 0x90;
 	_blockBuff[SECT_PER_CLUST_INDEX] = 32;
 	_blockBuff[RES_SECT_INDEX] = 0x2A;
 	_blockBuff[RES_SECT_INDEX + 1] = 0x09;

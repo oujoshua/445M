@@ -287,7 +287,7 @@ unsigned long OS_max_int_time(void);
 int OS_LogEvent(char type);
 
 /************* Ethernet Functions ***************/
-int OS_EthernetInit(void);
+void OS_EthernetInit(void);
 
 // ******** OS_EthernetMailBox_Init ************
 // Initialize communication channel

@@ -122,7 +122,7 @@ void OS_Init(void) {
   #endif
   
   // Ethernet Init
-	//OS_EthernetInit();
+	OS_AddThread(&OS_EthernetInit, 128, 4);
 }
 
 // return the id of the thread pointed to by _RunPt

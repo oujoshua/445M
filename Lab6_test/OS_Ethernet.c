@@ -21,7 +21,7 @@ unsigned char All[6] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 OS_EthernetMailbox _OS_EthernetMailbox;
 
 #pragma O0
-int OS_EthernetInit(void) {
+void OS_EthernetInit(void) {
   volatile unsigned long delay;
   SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOF; // activate port F
   SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOD; // activate port D
@@ -56,7 +56,7 @@ int OS_EthernetInit(void) {
   OS_AddThread(&OS_EthernetSender, 128, 4);
   OS_AddThread(&EthernetTest, 128, 4);
   
-  return 0;
+  OS_Kill();
 }
 
 void OS_EthernetListener(void) {
