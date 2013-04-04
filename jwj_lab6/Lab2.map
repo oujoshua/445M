@@ -370,7 +370,6 @@ Section Cross References
     entry2.o(__vectab_stack_and_reset_area) refers to startup.o(STACK) for __initial_sp
     entry2.o(__vectab_stack_and_reset_area) refers to entry.o(.ARM.Collect$$$$00000000) for __main
     entry5.o(.ARM.Collect$$$$00000004) refers to init.o(.text) for __scatterload
-    entry8.o(.ARM.Collect$$$$00000009) refers to pingmeasure.o(.text) for main
     uldiv.o(.text) refers to llushr.o(.text) for __aeabi_llsr
     uldiv.o(.text) refers to llshl.o(.text) for __aeabi_llsl
     dadd.o(.text) refers to llshl.o(.text) for __aeabi_llsl
@@ -519,6 +518,7 @@ Removing Unused input sections from the image.
 
 ==============================================================================
 
+<<<<<<< HEAD
 Image Symbol Table
 
     Local Symbols
@@ -869,53 +869,52 @@ Image Symbol Table
 
 ==============================================================================
 
+=======
+>>>>>>> updated ping measure
 Memory Map of the image
 
-  Image Entry point : 0x00000101
+  Image Entry point : 0x00000000
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x00001cd0, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x00001c88, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Base: 0x00000000, Size: 0x00001c4c, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Base: 0x00000000, Size: 0x00001bfc, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x00000000   0x00000118   Code   RO            3  * RESET               startup.o
-    0x00000118   0x00000000   Code   RO          895  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
-    0x00000118   0x00000004   Code   RO         1161    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
-    0x0000011c   0x00000004   Code   RO         1164    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
-    0x00000120   0x00000000   Code   RO         1166    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
-    0x00000120   0x00000008   Code   RO         1167    .ARM.Collect$$$$00000009  mc_w.l(entry8.o)
-    0x00000128   0x00000004   Code   RO         1162    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
-    0x0000012c   0x00000006   Code   RO          528    .emb_text           driverlib.lib(sysctl.o)
+    0x00000118   0x00000000   Code   RO          898  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
+    0x00000118   0x00000004   Code   RO         1164    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
+    0x0000011c   0x00000004   Code   RO         1167    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
+    0x00000120   0x00000000   Code   RO         1169    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
+    0x00000120   0x00000008   Code   RO         1170    .ARM.Collect$$$$00000009  mc_w.l(entry8.o)
+    0x00000128   0x00000004   Code   RO         1165    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
+    0x0000012c   0x00000006   Code   RO          531    .emb_text           driverlib.lib(sysctl.o)
     0x00000132   0x00000002   PAD
     0x00000134   0x0000001c   Code   RO            4    .text               startup.o
     0x00000150   0x00000496   Code   RO           12    .text               uart2.o
     0x000005e6   0x00000002   PAD
     0x000005e8   0x000012a8   Code   RO           39    .text               os.o
     0x00001890   0x0000005c   Code   RO           68    .text               osasm.o
-    0x000018ec   0x000001c4   Code   RO          173    .text               pingmeasure.o
-    0x00001ab0   0x00000024   Code   RO         1184    .text               mc_w.l(init.o)
-    0x00001ad4   0x00000138   Code   RO          534    i.SysCtlClockSet    driverlib.lib(sysctl.o)
-    0x00001c0c   0x0000000e   Code   RO         1196    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x00001c1a   0x00000002   Code   RO         1197    i.__scatterload_null  mc_w.l(handlers.o)
-    0x00001c1c   0x0000000e   Code   RO         1198    i.__scatterload_zeroinit  mc_w.l(handlers.o)
-    0x00001c2a   0x00000002   PAD
-    0x00001c2c   0x00000020   Data   RO         1194    Region$$Table       anon$$obj.o
+    0x000018ec   0x000001b4   Code   RO          173    .text               pingmeasure.o
+    0x00001aa0   0x00000024   Code   RO         1187    .text               mc_w.l(init.o)
+    0x00001ac4   0x00000138   Code   RO          537    i.SysCtlClockSet    driverlib.lib(sysctl.o)
+    0x00001bfc   0x00000000   Data   RO         1197    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Base: 0x20000000, Size: 0x00000084, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Base: 0x20000000, Size: 0x0000008c, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x20000000   0x00000010   Data   RW           14    .data               uart2.o
     0x20000010   0x00000064   Data   RW           42    .data               os.o
-    0x20000074   0x0000000d   Data   RW          174    .data               pingmeasure.o
+    0x20000074   0x00000015   Data   RW          174    .data               pingmeasure.o
 
 
-    Execution Region ER_ZI (Base: 0x20000084, Size: 0x0000ae3c, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_ZI (Base: 0x2000008c, Size: 0x0000ae3c, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
+<<<<<<< HEAD
     0x20000084   0x00000020   Zero   RW           13    .bss                uart2.o
     0x200000a4   0x0000aa1c   Zero   RW           40    .bss                os.o
     0x2000aac0   0x00000400   Zero   RW            1    STACK               startup.o
@@ -984,4 +983,9 @@ Image component sizes
     Total ROM Size (Code + RO Data + RW Data)       7376 (   7.20kB)
 
 ==============================================================================
+=======
+    0x2000008c   0x00000020   Zero   RW           13    .bss                uart2.o
+    0x200000ac   0x0000aa1c   Zero   RW           40    .bss                os.o
+    0x2000aac8   0x00000400   Zero   RW            1    STACK               startup.o
+>>>>>>> updated ping measure
 

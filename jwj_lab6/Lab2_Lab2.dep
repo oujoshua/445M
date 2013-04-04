@@ -1,18 +1,18 @@
 Dependencies for Project 'Lab2', Target 'Lab2': (DO NOT MODIFY !)
-F (.\Startup.s)(0x515B8D4D)(--cpu Cortex-M3 --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1" -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "Startup.o" --depend "Startup.d")
-F (.\UART2.c)(0x515B8D4D)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "uart2.o" --omf_browse "uart2.crf" --depend "uart2.d")
+F (.\Startup.s)(0x514B23F3)(--cpu Cortex-M3 --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1" -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "Startup.o" --depend "Startup.d")
+F (.\UART2.c)(0x51511A09)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "uart2.o" --omf_browse "uart2.crf" --depend "uart2.d")
 I (FIFO.h)(0x515B8D4D)
 I (UART2.h)(0x515B8D4D)
 I (OS.h)(0x515B8D4D)
-F (.\OS.c)(0x515B9236)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "os.o" --omf_browse "os.crf" --depend "os.d")
+F (.\OS.c)(0x515CE259)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "os.o" --omf_browse "os.crf" --depend "os.d")
 I (..\inc/hw_types.h)(0x515B8D4D)
 I (..\driverlib/sysctl.h)(0x515B8D4D)
 I (C:\Keil\ARM\Inc\Luminary\lm3s8962.h)(0x4F58FC3E)
 I (OS.h)(0x515B8D4D)
 I (FIFO.h)(0x515B8D4D)
-F (.\OS.h)(0x515B8D4D)()
-F (.\OSasm.s)(0x515B8D4D)(--cpu Cortex-M3 --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1" -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "OSasm.o" --depend "OSasm.d")
-F (.\edisk.c)(0x515B8D4D)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "edisk.o" --omf_browse "edisk.crf" --depend "edisk.d")
+F (.\OS.h)(0x515B63CE)()
+F (.\OSasm.s)(0x51510E80)(--cpu Cortex-M3 --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1" -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "OSasm.o" --depend "OSasm.d")
+F (.\edisk.c)(0x514B23F3)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "edisk.o" --omf_browse "edisk.crf" --depend "edisk.d")
 I (..\inc/hw_memmap.h)(0x515B8D4D)
 I (..\inc/hw_types.h)(0x515B8D4D)
 I (..\driverlib/gpio.h)(0x515B8D4C)
@@ -20,32 +20,8 @@ I (..\driverlib/ssi.h)(0x515B8D4D)
 I (..\driverlib/sysctl.h)(0x515B8D4D)
 I (edisk.h)(0x515B8D4D)
 I (integer.h)(0x515B8D4D)
-F (.\eFile.c)(0x515B8D4D)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "efile.o" --omf_browse "efile.crf" --depend "efile.d")
-I (C:\Keil\ARM\RV31\Inc\string.h)(0x4F58FA5C)
-I (C:\Keil\ARM\RV31\Inc\stdio.h)(0x4F58FA5C)
-I (OS.h)(0x515B8D4D)
-I (eFile.h)(0x515B8D4D)
-I (edisk.h)(0x515B8D4D)
-I (integer.h)(0x515B8D4D)
-I (UART2.h)(0x515B8D4D)
-F (.\Interperter.c)(0x515B8D4D)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "interperter.o" --omf_browse "interperter.crf" --depend "interperter.d")
-I (C:\Keil\ARM\Inc\Luminary\lm3s8962.h)(0x4F58FC3E)
-I (eFile.h)(0x515B8D4D)
-I (UART2.h)(0x515B8D4D)
-I (C:\Keil\ARM\RV31\Inc\string.h)(0x4F58FA5C)
-F (.\Lab5.c)(0x515B8D4D)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "lab5.o" --omf_browse "lab5.crf" --depend "lab5.d")
-I (C:\Keil\ARM\RV31\Inc\stdio.h)(0x4F58FA5C)
-I (C:\Keil\ARM\RV31\Inc\string.h)(0x4F58FA5C)
-I (..\inc/hw_types.h)(0x515B8D4D)
-I (UART2.h)(0x515B8D4D)
-I (os.h)(0x515B8D4D)
-I (C:\Keil\ARM\Inc\Luminary\lm3s8962.h)(0x4F58FC3E)
-I (edisk.h)(0x515B8D4D)
-I (integer.h)(0x515B8D4D)
-I (efile.h)(0x515B8D4D)
-F (.\PingMeasure.c)(0x515B9357)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "pingmeasure.o" --omf_browse "pingmeasure.crf" --depend "pingmeasure.d")
-I (OS.h)(0x515B8D4D)
-I (C:\Keil\ARM\Inc\Luminary\lm3s8962.h)(0x4F58FC3E)
-I (..\inc/hw_types.h)(0x515B8D4D)
-I (..\driverlib/sysctl.h)(0x515B8D4D)
-F (..\driverlib\rvmdk\driverlib.lib)(0x515B8D4D)()
+F (.\eFile.c)(0x5151F6F9)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\Inc -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "efile.o" --omf_browse "efile.crf" --depend "efile.d")
+F (.\Interperter.c)(0x5151E84B)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "interperter.o" --omf_browse "interperter.crf" --depend "interperter.d")
+F (.\Lab5.c)(0x51576A0E)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "lab5.o" --omf_browse "lab5.crf" --depend "lab5.d")
+F (.\PingMeasure.c)(0x515CE3A4)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I.. -I..\..\.. -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\Luminary -o "pingmeasure.o" --omf_browse "pingmeasure.crf" --depend "pingmeasure.d")
+F (..\driverlib\rvmdk\driverlib.lib)(0x4C61A20A)()

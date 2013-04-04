@@ -18,10 +18,14 @@
 ### ADS-LD Output File: 'Lab2.axf'
 ### ADS-LD Command File: 'Lab2.lnp'
 ### Checking for dirty Components...
+<<<<<<< HEAD
 ### Creating CmdFile 'Lab2.lnp', Handle=0x0000058C
+=======
+### Creating CmdFile 'Lab2.lnp', Handle=0x00000548
+>>>>>>> updated ping measure
 ### Writing '.lnp' file
 ### ADS-LD Command file 'Lab2.lnp' is ready.
 ### ADS-LD: About to start ADS-LD Thread.
-### ADS-LD: executed with 0 errors
+### ADS-LD: executed with 1 errors
 ### Updating obj list
 ### LDADS_file() completed.
