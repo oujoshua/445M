@@ -180,8 +180,8 @@ unsigned char netBuffer[46] = {0,}; //padded buffer for ethernet packet, since m
 
 
 void Consumer(void){
-unsigned long data,DCcomponent; // 10-bit raw ADC sample, 0 to 1023
-unsigned long t;  // time in ms
+unsigned long data /*,DCcomponent*/; // 10-bit raw ADC sample, 0 to 1023
+//unsigned long t;  // time in ms
 unsigned long myId = OS_Id();
 //   unsigned long avg, std_dev, max_dev;
 //   int i;
@@ -253,7 +253,7 @@ void DisplayThread(void)
 // outputs: none
 void Display(void){ 
 unsigned long data;
-  char str[20];
+//  char str[20];
 //    sprintf(str, "Run length is %d", RUNLENGTH/1000);
 //  OLED_Out(TOP, str);   // top half used for Display
 //    NumCreated += OS_AddThread(&DisplayThread, 128, 0);

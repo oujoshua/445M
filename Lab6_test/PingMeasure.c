@@ -131,8 +131,10 @@ void Ping_Reset(void) {
 //returns 0 on success. 
 //returns 1 if sensor is not ready.
 #pragma O0
-int PingTriggerPD56(void){int i; unsigned long iBit;
-  if(!Done){return 1;}
+void PingTriggerPD56(void)
+{
+	int i; unsigned long iBit;
+  if(!Done){return /*1*/;}
 	iBit = StartCritical(); //send start signal in critical section
 	GPIO_PORTD_IM_R &= ~0x20; // disable edge triggered interrupts
 	Done = 0;
@@ -146,7 +148,7 @@ int PingTriggerPD56(void){int i; unsigned long iBit;
 	//reenable edge triggered interrupts
   GPIO_PORTD_IM_R |= 0x20;
 		
-	return 0;
+	//return 0;
 }
 
 void testDummyThread(void){
