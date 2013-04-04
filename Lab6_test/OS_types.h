@@ -54,5 +54,11 @@ typedef struct OS_EthernetMailbox {
   OS_SemaphoreType gotData;
 } OS_EthernetMailbox;
 
+typedef struct OS_GlobalState {
+  unsigned long tacho;
+  unsigned long IR;
+  unsigned long ping;
+}
+
 
 #endif

@@ -28,7 +28,7 @@ typedef struct eFile_File {
 
 #define MAX_FILES 16 //(512/sizeof(eFile_File))
 
-#define CHECK_DISK if(!_sysInit) { fprintf(stderr, "Error reading disk!\n"); return 1; }
+#define CHECK_DISK if(!_sysInit) { /*fprintf(stderr, "Error reading disk!\n");*/ return 1; }
 
 int eFile_Info(void);
 

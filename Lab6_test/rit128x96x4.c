@@ -32,6 +32,11 @@ static char char_buff[NUM_DEVICES][OLED_LINES+1][OLED_COLUMNS+1];
  */
 void OLED_Init(unsigned char color)
 {
+  static char haveInit = 0;
+  if(haveInit) {
+    return;
+  }
+  haveInit = 1;
 	RIT128x96x4Init(1000000);
 	OLED_Set_Color(color);
   OS_InitSemaphore(&OLED_Semaphore, OS_BINARY_SEMAPHORE);

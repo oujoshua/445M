@@ -2,14 +2,16 @@
 #include "mac.h"
 #include "lm3s8962.h"
 #include "eFile.h"
+#include "OS_Ethernet.h"
+#include "rit128x96x4.h"
 #include <stdio.h>
 #include <string.h>
 
 #define LOG_FILE "enet.txt"
 
-void OS_EthernetListener(void);
-void OS_EthernetSender(void);
-void EthernetTest(void);
+// void OS_EthernetListener(void);
+// void OS_EthernetSender(void);
+// void EthernetTest(void);
 
 unsigned char RcvMessage[MAXBUF];
 unsigned char SendBuff[MAXBUF];
@@ -61,6 +63,7 @@ void OS_EthernetInit(void) {
 }
 
 void OS_EthernetListener(void) {
+  char str[16] = {0, };
   unsigned long size;
   int i;
   eFile_Init();
@@ -78,7 +81,9 @@ void OS_EthernetListener(void) {
         eFile_WClose();
       }
       else {
-        printf("%d %s\n",size,RcvMessage+14);
+        OLED_Init(15);  // repeated calls just return immediately
+        sprintf(str, "%d %s\n",size,RcvMessage+14);
+        _OLED_Message(TOP, 0, str, 15);
       }
     }
   }
