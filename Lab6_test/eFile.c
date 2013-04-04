@@ -22,6 +22,134 @@ static unsigned int		FAT_SIZE = 0;
 static unsigned int		ROOT_OFFSET = 0;
 static unsigned int		_dir = 0;
 //static unsigned int		_cluster = 0;
+unsigned long format[] = {0xeb58904d,
+0x53444f53,
+0x352e3000,
+0x02202a09,
+0x02000000,
+0x00f80000,
+0x3f00ff00,
+0x00000000,
+0x0024b703,
+0x6b3b0000,
+0x00000000,
+0x02000000,
+0x01000600,
+0x00000000,
+0x00000000,
+0x00000000,
+0x80002989,
+0x4fafc84e,
+0x4f204e41,
+0x4d452020,
+0x20204641,
+0x54333220,
+0x202033c9,
+0x8ed1bcf4,
+0x7b8ec18e,
+0xd9bd007c,
+0x884e028a,
+0x5640b441,
+0xbbaa55cd,
+0x13721081,
+0xfb55aa75,
+0x0af6c101,
+0x7405fe46,
+0x02eb2d8a,
+0x5640b408,
+0xcd137305,
+0xb9ffff8a,
+0xf1660fb6,
+0xc640660f,
+0xb6d180e2,
+0x3ff7e286,
+0xcdc0ed06,
+0x41660fb7,
+0xc966f7e1,
+0x668946f8,
+0x837e1600,
+0x7538837e,
+0x2a007732,
+0x668b461c,
+0x6683c00c,
+0xbb0080b9,
+0x0100e82b,
+0x00e92c03,
+0xa0fa7db4,
+0x7d8bf0ac,
+0x84c07417,
+0x3cff7409,
+0xb40ebb07,
+0x00cd10eb,
+0xeea0fb7d,
+0xebe5a0f9,
+0x7debe098,
+0xcd16cd19,
+0x6660807e,
+0x02000f84,
+0x2000666a,
+0x00665006,
+0x53666810,
+0x000100b4,
+0x428a5640,
+0x8bf4cd13,
+0x66586658,
+0x66586658,
+0xeb33663b,
+0x46f87203,
+0xf9eb2a66,
+0x33d2660f,
+0xb74e1866,
+0xf7f1fec2,
+0x8aca668b,
+0xd066c1ea,
+0x10f7761a,
+0x86d68a56,
+0x408ae8c0,
+0xe4060acc,
+0xb80102cd,
+0x1366610f,
+0x8275ff81,
+0xc3000266,
+0x40497594,
+0xc3424f4f,
+0x544d4752,
+0x20202020,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x00000000,
+0x0d0a5265,
+0x6d6f7665,
+0x20646973,
+0x6b73206f,
+0x72206f74,
+0x68657220,
+0x6d656469,
+0x612eff0d,
+0x0a446973,
+0x6b206572,
+0x726f72ff,
+0x0d0a5072,
+0x65737320,
+0x616e7920,
+0x6b657920,
+0x746f2072,
+0x65737461,
+0x72740d0a,
+0x00000000,
+0x00accbd8,
+0x000055aa };
 
 //---------- eFile_Init-----------------
 // Activate the file system, without formating
@@ -77,19 +205,16 @@ int eFile_Format(void)
 	
 	// Sector 0
 	_eFile_ClearBlockBuff();
-	_blockBuff[0] = 0xEB;
-	_blockBuff[1] = 0x58;
-	_blockBuff[2] = 0x90;
-	_blockBuff[SECT_PER_CLUST_INDEX] = 32;
-	_blockBuff[RES_SECT_INDEX] = 0x2A;
-	_blockBuff[RES_SECT_INDEX + 1] = 0x09;
-	_blockBuff[NUM_FATS_INDEX] = 2;
-	_blockBuff[FAT_SIZE_INDEX] = 0x6B;
-	_blockBuff[FAT_SIZE_INDEX + 1] = 0x3B;
-	_blockBuff[FAT_SIZE_INDEX + 2] = 0x00;
-	_blockBuff[FAT_SIZE_INDEX + 3] = 0x00;
-	_blockBuff[510] = 0x55;
-	_blockBuff[511] = 0xAA;
+	for(i = 0; i < 128; i++)
+	{
+		char a, b, c, d;
+		a = (char) (format[i] & 0xFF);
+		b = (char) ((format[i] >> 8) & 0xFF);
+		c = (char) ((format[i] >> 16) & 0xFF);
+		d = (char) ((format[i] >> 24) & 0xFF);
+		format[i] = ((a << 24) | (b << 16) | (c << 8) | d);
+		memcpy(&_blockBuff[i*4], &format[i], 4);
+	}
 	eDisk_WriteBlock(_blockBuff, 0);
 	// Root dir at 0x8000 = 32,768
 	_eFile_ClearBlockBuff();

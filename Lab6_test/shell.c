@@ -36,10 +36,6 @@ static _SH_CommandPtr _SH_CommandList[] = {
 	{"set", &_SH_Set},
 	{"unset", &_SH_Unset},
 	{"echo", &_SH_Echo},
-	{"./", &_SH_BinFile},
-	{"fload", &_SH_LoadBin},
-	{"hexdump", &_SH_HexDump},
-	{"reset", &_SH_Reset},
 	{"sector", &_SH_SectorDump},
 	{"diskinfo", &_SH_DiskInfo},
 	{"cd", &_SH_ChangeDirectory},
@@ -100,15 +96,14 @@ void SH_Init(void)
 		_SH_Env[i].set = 0;
 	
 	UART_Init();
-	printf("\nShell startup\n");
+	printf("\nShell startup\n\n");
 	_SH_setVar(SH_PROMPT_NAME, ">");
-	printf("\n");
-//   OS_AddThread(&SH_Shell,128,3);
+	//   OS_AddThread(&SH_Shell,128,3);
 }
 
 static char input[SH_MAX_LENGTH] = {0};
 void SH_Shell(void) {
-  SH_Init();
+  //SH_Init();
 //   eFile_Init();
   while(1)
 	{
@@ -617,120 +612,11 @@ static int _SH_Echo(void)
 	return 0;
 }
 
-union {
-	char c[1000];
-	int i;
-	int (*f)(void);
-} funcBuff ;
-
-static int _SH_BinFile(void)
-{
-	char c;
-	int i = 0;
-	int (*f)(void);
-	void* v;
-	
-	if(!_SH_cmd.args[0][0])
-	{
-		fprintf(stderr, "Usage: %s <file_name>\n", _SH_cmd.command);
-		return 1;
-	}
-	if(eFile_ROpen(_SH_cmd.args[0]))
-	{
-		fprintf(stderr, "Unable to open file for reading!\n");
-		eFile_RClose();
-		return 1;
-	}
-	i = 0;
-	while(!eFile_ReadNext(&c))
-		funcBuff.c[i++] = c;
-	eFile_RClose();
-	v = (void*)((int)&(funcBuff.c[0]) | 0x1);
-	f = (int (*)(void))v;
-	f();
-	return 0;
-}
-
-static int _SH_LoadBin(void)
-{
-	int i;
-	long* l;
-	char* c = funcBuff.c;
-	if(!_SH_cmd.args[0][0])
-	{
-		fprintf(stderr, "Usage: %s <filename>\n", _SH_cmd.command);
-		return 1;
-	}
-	funcBuff.f = &_SH_Time;
-	l = (long*)(((c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0]) - 1);
-	memcpy((void*)((int)&funcBuff.c[0]), l, 200);
-	if(eFile_WOpen(_SH_cmd.args[0]))
-
-	{
-		fprintf(stderr, "Unable to open file for writing\n");
-		return 1;
-	}
-	for(i = 0; i < 200; i++)
-	{
-		if(eFile_Write(funcBuff.c[i]))
-		{
-			fprintf(stderr, "Error writing to file\n");
-			return 1;
-		}
-	}
-	eFile_WClose();
-	return 0;
-}
-
-static int _SH_HexDump(void)
-{
-	char c[4];
-	int i, ret = 0;
-	if(!_SH_cmd.args[0][0])
-	{
-		fprintf(stderr, "Usage: %s <filename>\n", _SH_cmd.command);
-		return 1;
-	}
-	if(eFile_ROpen(_SH_cmd.args[0]))
-	{
-		fprintf(stderr, "Error opening file for reading\n");
-		eFile_RClose();
-		return 1;
-	}
-	while(1)
-	{
-		for(i = 0; i < 4; i++)
-		{
-			unsigned long l;
-			eFile_ReadNext(&c[0]);
-			eFile_ReadNext(&c[1]);
-			eFile_ReadNext(&c[2]);
-			ret = eFile_ReadNext(&c[3]);
-			l = ((c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0]);
-			UART_OutUHex(l);
-			printf("\n");
-			if(ret || l == 0)
-			{
-				eFile_RClose();
-				printf("\n");
-				return 0;
-			}
-		}
-	}
-}
-
-
-extern void Reset_Handler(void);
-static int _SH_Reset(void)
-{
-	Reset_Handler();
-	return 0;
-}
-
+static char buff[512];
 static int _SH_SectorDump(void)
 {
 	int i;
-	unsigned char* c = (unsigned char*)funcBuff.c;
+	unsigned char* c = (unsigned char*)buff;
 	if(!_SH_cmd.args[0][0])
 	{
 		fprintf(stderr, "Usage: %s <sector number>\n", _SH_cmd.command);
