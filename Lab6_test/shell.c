@@ -96,15 +96,14 @@ void SH_Init(void)
 		_SH_Env[i].set = 0;
 	
 	UART_Init();
-	printf("\nShell startup\n");
+	printf("\nShell startup\n\n");
 	_SH_setVar(SH_PROMPT_NAME, ">");
-	printf("\n");
-//   OS_AddThread(&SH_Shell,128,3);
+	//   OS_AddThread(&SH_Shell,128,3);
 }
 
 static char input[SH_MAX_LENGTH] = {0};
 void SH_Shell(void) {
-  SH_Init();
+  //SH_Init();
 //   eFile_Init();
   while(1)
 	{

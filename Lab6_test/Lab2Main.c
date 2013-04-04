@@ -67,7 +67,7 @@ int main(void)
   OS_AddDownTask(&ButtonPush, 1);
   //NumCreated += OS_AddThread(&PID, 128, 1);
   //NumCreated += OS_AddThread(&Consumer, 128, 0);
-  NumCreated += OS_AddThread(&SH_Shell, 128, 6);
+  OS_AddThread(&SH_Shell, 128, 6);
 	OS_AddThread(&SD_Init, 128, 0);
   OS_Launch(TIMESLICE);
 	
