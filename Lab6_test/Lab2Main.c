@@ -11,6 +11,7 @@
 #include "edisk.h"
 #include "efile.h"
 #include "PingMeasure.h"
+#include "OS_Ethernet.h"
 
 #define TIMESLICE TIME_2MS    // thread switch time in system time units
 #define RUNLENGTH 10000   // display results and quit when NumSamples==RUNLENGTH
@@ -175,6 +176,9 @@ void Display(void);
 // calculates FFT, sends DC component to Display
 // inputs:  none
 // outputs: none
+unsigned char netBuffer[46] = {0,}; //padded buffer for ethernet packet, since min. size is 46 bytes
+
+
 void Consumer(void){
 unsigned long data,DCcomponent; // 10-bit raw ADC sample, 0 to 1023
 unsigned long t;  // time in ms
@@ -184,6 +188,11 @@ unsigned long myId = OS_Id();
   ADC_Collect(0, 1000, &Producer); // start ADC sampling, channel 0, 1000 Hz
   NumCreated += OS_AddThread(&Display,128,0); 
   while(NumSamples < RUNLENGTH) {
+		
+		data = OS_Fifo_Get();
+		((unsigned long*)netBuffer)[0] = data;
+		OS_EthernetMailBox_Send(netBuffer, 46);
+		/*
     for(t = 0; t < 64; t++){   // collect 64 ADC samples
       data = OS_Fifo_Get();    // get from producer
       x[t] = IR_Distance(data);             // real part is 0 to 1023, imaginary part is 0
@@ -212,6 +221,7 @@ unsigned long myId = OS_Id();
     cr4_fft_64_stm32(y,x,64);  // complex FFT of last 64 ADC values
     DCcomponent = y[0]&0xFFFF; // Real part at frequency 0, imaginary part should be zero
     OS_MailBox_Send(DCcomponent);
+		*/
     
   }
 //   OLED_Out(BOTTOM, "CONSUMER DONE");

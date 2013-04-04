@@ -16,6 +16,7 @@ void PingMeasurePD56_Init(void(*task)(unsigned long distance));
 //trigger a ping measurement
 //returns 0 on success. 
 //returns 1 if sensor is not ready.
+//User function will get executed when the measurement is done
 int PingTriggerPD56(void);
 
 // record samples into buffer -- for use as argument to PingMeasurePD56_Init
