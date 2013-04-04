@@ -58,7 +58,7 @@ typedef struct OS_GlobalState {
   unsigned long tacho;
   unsigned long IR;
   unsigned long ping;
-}
+} OS_GlobalState;
 
 
 #endif
