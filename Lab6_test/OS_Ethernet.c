@@ -56,6 +56,7 @@ void OS_EthernetInit(void) {
   OS_AddThread(&OS_EthernetSender, 128, 4);
   OS_AddThread(&EthernetTest, 128, 4);
   
+	printf("Ethernet connected\n");
   OS_Kill();
 }
 
