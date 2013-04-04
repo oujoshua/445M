@@ -62,18 +62,14 @@ void OS_EthernetInit(void) {
 
 void OS_EthernetListener(void) {
   unsigned long size;
-  int i, haveDisk;
+  int i;
   eFile_Init();
-  //haveDisk = eFile_Create(LOG_FILE, ATTR_ARCHIVE);
-	haveDisk = eFile_WOpen(LOG_FILE);
-	eFile_WClose();
   while(1) {
     size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
     if(size){
       RcvCount++;
       // if an SD card is available, dump messages to disk; otherwise print to UART
-      if(haveDisk == 0) {
-        eFile_WOpen(LOG_FILE);
+      if(eFile_WOpen(LOG_FILE) == 0) {
         for(i = 14; i < size; i++) {
 					if(RcvMessage[i])
 						eFile_Write(RcvMessage[i]);
