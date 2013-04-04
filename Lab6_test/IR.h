@@ -3,7 +3,7 @@
 
 void IR_Init(void);
 
-long IRDistance(long x);
+long IR_Distance(long x);
 
 // default producer
 void IR_Producer(unsigned short data);
