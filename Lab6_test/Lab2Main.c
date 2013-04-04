@@ -21,7 +21,6 @@ void ButtonPush(void);
 void Consumer(void);
 void cr4_fft_64_stm32(void *pssOUT, void *pssIN, unsigned short Nbin);
 short PID_stm32(short Error, short *Coeff);
-void Ping(unsigned long distance);
 
 unsigned long NumCreated;   // number of foreground threads created
 unsigned long DataLost;     // data sent by Producer, but not received by Consumer
@@ -46,9 +45,9 @@ int main(void)
 	/* Initialize 8MHz clock */
 	SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_8MHZ | SYSCTL_OSC_MAIN);
 //  OLED_Init(15);
-  ADC_Init(1000);
-  ADC_Open(0);
-  ADC_Open(1);
+//   ADC_Init(1000);
+//   ADC_Open(0);
+//   ADC_Open(1);
   SH_Init();
   OS_Init();
   OS_MailBox_Init();
@@ -62,12 +61,12 @@ int main(void)
   MaxJitter = 0;       // OS_Time in 20ns units
   MinJitter = 10000000;
   
-  PingMeasurePD56_Init(&Ping);
+  PingMeasurePD56_Init(&PingHandler);
+  IR_Init();
   
   // testing/debugging stuff
-  OS_Add_Periodic_Thread(&DAS,2,1);
   OS_Add_Periodic_Thread(&disk_timerproc,10,0);   // time out routines for disk
-  printf("%d", OS_Add_Periodic_Thread(&PingTriggerPD56, 500, 0));
+  OS_Add_Periodic_Thread(&PingTriggerPD56, 500, 0);
   OS_AddButtonTask(&ButtonPush, 1);
   OS_AddDownTask(&ButtonPush, 1);
   //NumCreated += OS_AddThread(&PID, 128, 1);
@@ -78,10 +77,6 @@ int main(void)
 	
 	/* Loop indefinitely */
   while(1);
-}
-
-void Ping(unsigned long distance) {
-  printf("Ping: %d\n", distance);
 }
 
 //------------------Task 1--------------------------------
@@ -100,41 +95,7 @@ static unsigned int n=3;   // 3, 4, or 5
   y[n-3] = y[n];         // two copies of filter outputs too
   return y[n];
 } 
-//******** DAS *************** 
-// background thread, calculates 60Hz notch filter
-// runs 2000 times/sec
-// inputs:  none
-// outputs: none
-unsigned short DASoutput;
 
-void DAS(void){
-	int index;
-	unsigned short input;  
-	unsigned static long LastTime;  // time at previous ADC sample
-	unsigned long thisTime;         // time at current ADC sample
-	long jitter;                    // time between measured and expected
-  if(NumSamples < RUNLENGTH){   // finite time run
-    input = ADC_In(1);
-    thisTime = OS_Time();       // current time, 20 ns
-    DASoutput = Filter(input);
-    FilterWork++;        // calculation finished
-    if(FilterWork>1){    // ignore timing of first interrupt
-      jitter = OS_TimeDifference(LastTime,thisTime) - 100000/50;  // in usec
-      if(jitter > MaxJitter){
-        MaxJitter = jitter;
-      }
-      if(jitter < MinJitter){
-        MinJitter = jitter;
-      }        // jitter should be 0
-      index = jitter+JITTERSIZE/2;   // us units
-      if(index<0)index = 0;
-      if(index>=JitterSize) index = JITTERSIZE-1;
-      JitterHistogram[index]++;
-    }
-    LastTime = thisTime;
-  }
-}
-//--------------end of Task 1-----------------------------
 
 //------------------Task 2--------------------------------
 // background thread executes with select button
@@ -218,14 +179,14 @@ void Consumer(void){
 unsigned long data,DCcomponent; // 10-bit raw ADC sample, 0 to 1023
 unsigned long t;  // time in ms
 unsigned long myId = OS_Id();
-  unsigned long avg, std_dev, max_dev;
-  int i;
+//   unsigned long avg, std_dev, max_dev;
+//   int i;
   ADC_Collect(0, 1000, &Producer); // start ADC sampling, channel 0, 1000 Hz
   NumCreated += OS_AddThread(&Display,128,0); 
   while(NumSamples < RUNLENGTH) {
     for(t = 0; t < 64; t++){   // collect 64 ADC samples
       data = OS_Fifo_Get();    // get from producer
-      x[t] = IRDistance(data);             // real part is 0 to 1023, imaginary part is 0
+      x[t] = IR_Distance(data);             // real part is 0 to 1023, imaginary part is 0
     }
   
 //   // calculate the average

@@ -1,6 +1,10 @@
+#include "OS.h"
 #include "IR.h"
+#include "ADC.h"
+#include <stdio.h>
 
 #define PTS 16
+
 
 // y = y1 + (x-x1)*slope
 
@@ -17,9 +21,18 @@ long slope[PTS] = {-1819, -2041, -2778, -2273, -2278, -2858, -3847, -8772, -7693
 long cA = 2;
 long cB = -2337;
 long cC = 888820;
+  
+unsigned long IR_DataLost = 0;
+unsigned long IR_Buff[IR_BUFFLEN] = {0, };
+int IR_BuffIdx = 0;
 
+void IR_Init(void) {
+  ADC_Init(1000);
+  ADC_Collect(0, 1000, &IR_Producer);
+  OS_AddThread(&IR_Consumer, 128, 3);
+}
 
-long IRDistance(long x){
+long IR_Distance(long x){
   long retVal;
   long i = 0;
 //   return ((cA * x * x) + cB * x + cC)/10000;
@@ -28,4 +41,35 @@ long IRDistance(long x){
   }
   retVal = outputY[i] + ((x - inputX[i]) * slope[i]) / 100000;
   return retVal;
+}
+
+// default producer
+void IR_Producer(unsigned short data) {
+  if(OS_Fifo_Put(data) == 0){ // send to consumer
+    IR_DataLost++;
+  }   
+}
+
+// default consumer
+void IR_Consumer(void) {
+  while(1) {
+    unsigned long distance = IR_Distance(OS_Fifo_Get());
+    if(IR_BuffIdx < IR_BUFFLEN) {
+      IR_Buff[IR_BuffIdx++] = distance;
+    }
+  }
+}
+
+// dump buffer data to UART
+void IR_Dump(void) {
+  int i;
+  printf("Conents of the IR sensor's buffer:\n");
+  for(i = 0; i < IR_BuffIdx; i++) {
+    printf("%d cm\n", IR_Buff[i]);
+  }
+}
+
+// reset IR buffer
+void IR_Reset(void) {
+  IR_BuffIdx = 0;
 }

@@ -6,6 +6,9 @@
 #include "OS_Critical.h"
 #include "eFile.h"
 #include "eDisk.h"
+#include "InputCapture.h"
+#include "PingMeasure.h"
+#include "IR.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -41,6 +44,9 @@ static _SH_CommandPtr _SH_CommandList[] = {
 	{"cd", &_SH_ChangeDirectory},
 	{"eject", &eFile_Close},
 	{"init", &eFile_Init},
+  {"tacho", &_SH_Tacho},
+  {"ping", &_SH_Ping},
+  {"ir", &_SH_IR},
 	{"",0}
 };
 
@@ -651,4 +657,43 @@ static int _SH_ChangeDirectory(void)
 		return 1;
 	}
 	return 0;
+}
+
+// dump the tachometer (input capture) data.
+// if the -r flag is specified, reset tacho measurements
+static int _SH_Tacho(void) {
+  if(strcmp(_SH_cmd.args[0], "-r") == 0) {
+    IC_Reset();
+    printf("Reset InputCapture buffer\n");
+  }
+  else {
+    IC_Calc();
+  }
+  return 0;
+}
+
+// dump the ping distance sensor data.
+// if the -r flag is specified, reset buffer
+static int _SH_Ping(void) {
+  if(strcmp(_SH_cmd.args[0], "-r") == 0) {
+    Ping_Reset();
+    printf("Reset Ping buffer\n");
+  }
+  else {
+    Ping_Dump();
+  }
+  return 0;
+}
+
+// dump the IR distance sensor data.
+// if the -r flag is specified, reset the buffer
+static int _SH_IR(void) {
+  if(strcmp(_SH_cmd.args[0], "-r") == 0) {
+    IR_Reset();
+    printf("Reset IR buffer\n");
+  }
+  else {
+    IR_Dump();
+  }
+  return 0;
 }

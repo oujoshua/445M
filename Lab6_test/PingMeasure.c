@@ -27,6 +27,7 @@
 #include "inc/hw_types.h"
 #include "driverlib/sysctl.h"
 #include "PingMeasure.h"
+#include <stdio.h>
 
 
 long StartCritical (void);    // previous I bit, disable interrupts
@@ -89,6 +90,9 @@ unsigned long distInches;           //distance measured in inces
 unsigned long distCm;
 unsigned char Done;                // set each rising
 
+unsigned long PingBuff[PING_BUFF] = {0,};
+int PingBuff_Idx = 0;
+
 
 #pragma O0
 void PingMeasurePD56_Init(void(*task)(unsigned long distance)){
@@ -115,7 +119,7 @@ void PingMeasurePD56_Init(void(*task)(unsigned long distance)){
 	//port D: interrupt 3
   NVIC_PRI0_R = (NVIC_PRI0_R&0x00FFFFFF)|0x00000000; // top 3 bits
   NVIC_EN0_R |= NVIC_EN0_INT3;    // enable interrupt 19 in NVIC	
-  EnableInterrupts();
+//   EnableInterrupts();
 }
 
 void GPIOPortD_Handler(){
@@ -130,6 +134,27 @@ void GPIOPortD_Handler(){
 		Done = 0xFF;
 		(*userTask)(distCm);
 	}
+}
+
+// record samples into buffer -- for use as argument to PingMeasurePD56_Init
+void PingHandler(unsigned long distance) {
+  if(PingBuff_Idx < PING_BUFF) {
+    PingBuff[PingBuff_Idx++] = distance;
+  }
+}
+
+// dumps contents of ping buffer to UART
+void Ping_Dump(void) {
+  int i;
+  printf("Ping Buffer Contents:\n");
+  for(i = 0; i < PingBuff_Idx; i++) {
+    printf("%d cm\n", PingBuff[i]);
+  }
+}
+
+// reset the ping buffer
+void Ping_Reset(void) {
+  PingBuff_Idx = 0;
 }
 
 

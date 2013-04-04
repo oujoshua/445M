@@ -66,5 +66,8 @@ static int _SH_Reset(void);
 static int _SH_SectorDump(void);
 static int _SH_DiskInfo(void);
 static int _SH_ChangeDirectory(void);
+static int _SH_Tacho(void);
+static int _SH_Ping(void);
+static int _SH_IR(void);
 
 #endif //__SHELL_H__

@@ -77,7 +77,6 @@ void EnableInterrupts(void);  // Enable interrupts
 long StartCritical (void);    // previous I bit, disable interrupts
 void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
-static void IC_calc(void);
 
 volatile unsigned long Count;      // incremented on interrupt
 #pragma O0
@@ -109,7 +108,6 @@ unsigned long first_capture, last_capture;
 unsigned long IC_buffer[64] = {0, };
 int IC_idx = 0;
 void Timer0A_Handler(void){
-  static int i = 0;
   TIMER0_ICR_R = TIMER_ICR_CAECINT;// acknowledge timer0A capture match
   GPIO_PORTC_DATA_R = GPIO_PORTC_DATA_R^0x20; // toggle PC5
   if(Count == 0) {
@@ -117,18 +115,21 @@ void Timer0A_Handler(void){
   }
   Count = Count + 1;
   if(IC_idx < 64) {
-    IC_buffer[IC_idx++] = OS_Time();
+    IC_buffer[IC_idx++] = OS_MsTime();
   }
   if(OS_MsTime() - first_capture > 10000) {
 //     last_capture = OS_MsTime();
-    IC_calc();
+//     IC_Calc();
 //     printf("%d events -> %d rotations in %d ms\n", Count, Count/2, OS_MsTime() - first_capture);
     Count = 0;
   }
 }
 
+// calculate the average, standard deviation, and maximum deviation
+// on a buffer of timestamps from the input capture module and print
+// the results to the UART
 unsigned long time_diffs[63] = {0, };
-static void IC_calc(void) {
+void IC_Calc(void) {
   int i, num = 0;
   unsigned long avg, std_dev, max_dev;
   // calculate the time difference between each event
@@ -155,6 +156,11 @@ static void IC_calc(void) {
   }
   std_dev = sqrt(std_dev / IC_idx);
   printf("average = %d\nstandard_deviation = %d\n maximum deviaton = %d\n", avg, std_dev, max_dev);
+}
+
+// reset the input capture event log
+void IC_Reset(void) {
+  IC_idx = 0;
 }
 
 //debug code

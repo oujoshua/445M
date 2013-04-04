@@ -103,26 +103,6 @@ static void _ADC_SetTimer1APeriod(unsigned int fs) {
 
 // should this take a channel number as the argument?
 int ADC_Open(int channelNum) {
-//   long sr;
-//   sr = StartCritical();
-//   switch (channelNum) {
-//     case 0:
-//       _ADC_ADC0_Init();
-//       break;
-//     case 1:
-//       _ADC_ADC1_Init();
-//       break;
-//     case 2:
-//       _ADC_ADC2_Init();
-//       break;
-//     case 3:
-//       _ADC_ADC3_Init();
-//       break;
-//     default:
-//       EndCritical(sr);
-//       return 0;
-//   }
-//   EndCritical(sr);
   return 1;
 }  
 
