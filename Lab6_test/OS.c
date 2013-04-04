@@ -105,22 +105,14 @@ void OS_Init(void) {
   for(i = 0; i < OS_MAX_TASKS; i++) {
     _tasks[i].task_id = _OS_FREE_THREAD;
   }
-  
   // initialize timers used by OS
   Timer2A_Init();
-  Timer2B_Init(0);
-  
+  Timer2B_Init(0); 
   // initialize input capture
-  TimerCapture_Init();
-  
+  TimerCapture_Init(); 
   /* Add default thread in case all threads killed */
   OS_AddThread(&_OS_Default_Thread, 0, 7); // should be lowest priority
 	OS_Add_Periodic_Thread(&OS_IncPriority, 100, 1);
-  
-//   #if (USE_DISK == 1)
-//     OS_Add_Periodic_Thread(disk_timerproc,10,5);
-//   #endif
-  
   // Ethernet Init
 	OS_AddThread(&OS_EthernetInit, 128, 4);
 }

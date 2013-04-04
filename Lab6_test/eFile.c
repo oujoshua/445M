@@ -2,18 +2,18 @@
 #include "eDisk.h"
 #include "retarget.h"
 #include "ctype.h"
+#include "os.h"
 #include <stdio.h>
 #include <string.h>
 
 #define memcpy memmove
 
 static unsigned char _blockBuff[BLOCK_SIZE];
-unsigned int num_files = 0;
-eFile_File _wFile, _rFile, _file;
-char _wOpen, _rOpen, _sysInit = 0;
-unsigned int _wIndex, _wCluster, _wSector, _wSize, _dirIndex, _wDirIndex;
-unsigned int _rIndex, _rCluster, _rSector, _rSize;
-unsigned char _writeBuff[BLOCK_SIZE], _readBuff[BLOCK_SIZE];
+static eFile_File _wFile, _rFile, _file;
+static char _wOpen, _rOpen, _sysInit = 0;
+static unsigned int _wIndex, _wCluster, _wSector, _wSize, _dirIndex, _wDirIndex;
+static unsigned int _rIndex, _rCluster, _rSector, _rSize;
+static unsigned char _writeBuff[BLOCK_SIZE], _readBuff[BLOCK_SIZE];
 
 static unsigned short FAT_OFFSET = 0;
 static unsigned char	SECT_PER_CLUSTER = 0;
@@ -22,7 +22,7 @@ static unsigned int		FAT_SIZE = 0;
 static unsigned int		ROOT_OFFSET = 0;
 static unsigned int		_dir = 0;
 //static unsigned int		_cluster = 0;
-unsigned long format[] = {0xeb58904d, 0x53444f53, 0x352e3000, 0x02202a09,
+static unsigned long format[] = {0xeb58904d, 0x53444f53, 0x352e3000, 0x02202a09,
 													0x02000000, 0x00f80000, 0x3f00ff00, 0x00000000,
 													0x0024b703, 0x6b3b0000, 0x00000000, 0x02000000,
 													0x01000600, 0x00000000, 0x00000000, 0x00000000,
@@ -54,6 +54,8 @@ unsigned long format[] = {0xeb58904d, 0x53444f53, 0x352e3000, 0x02202a09,
 													0x6b206572, 0x726f72ff, 0x0d0a5072, 0x65737320,
 													0x616e7920, 0x6b657920, 0x746f2072, 0x65737461,
 													0x72740d0a, 0x00000000, 0x00accbd8, 0x000055aa };
+													
+static OS_SemaphoreType _clusterSemaphore, _fileModifySemaphore;
 
 //---------- eFile_Init-----------------
 // Activate the file system, without formating
@@ -77,6 +79,9 @@ int eFile_Init(void) {
 					 | (_blockBuff[FAT_SIZE_INDEX + 1] << 8)
 					 | _blockBuff[FAT_SIZE_INDEX]; // fat size in sectors
 	_dir = ROOT_OFFSET = FAT_OFFSET + (NUM_FATS * FAT_SIZE);
+	
+	OS_InitSemaphore(&_clusterSemaphore, 1);
+	OS_InitSemaphore(&_fileModifySemaphore, 1);
 	
 	_sysInit = 1;
 	return 0;
@@ -145,10 +150,14 @@ int eFile_Create(const char name[FILE_NAME_SIZE], char attr)
 	
 	CHECK_DISK // check disk state
 	
+	OS_bWait(&_fileModifySemaphore);
 	memset(&_file, 0, sizeof(eFile_File));
 	_file = _eFile_Find(name, 0);
 	if(_file.name[0]) // exists
+	{
+		OS_bSignal(&_fileModifySemaphore);
 		return 1;
+	}
 	
 	_eFile_FATName(name, _file.name, &toupper, 0); // somewhat unsafe; overflows to ext
 	_file.attr = attr; // archive is 0x20, dir is 0x10
@@ -162,7 +171,10 @@ int eFile_Create(const char name[FILE_NAME_SIZE], char attr)
 	memset(_file.size, 0, 4);
 	
 	if(cluster < 0)
+	{
+		OS_bSignal(&_fileModifySemaphore);
 		return 1; // no free space
+	}
 	
 	eDisk_ReadBlock(_blockBuff, _dir);
 	// write two empty files
@@ -204,9 +216,11 @@ int eFile_Create(const char name[FILE_NAME_SIZE], char attr)
 			memcpy(&_blockBuff[32], &_file, 32);
 			eDisk_WriteBlock(_blockBuff, (ROOT_OFFSET + SECT_PER_CLUSTER*(cluster-2)));
 		}*/
+		_dirIndex = i;
+		OS_bSignal(&_fileModifySemaphore);
 		return 0;
 	}
-	
+	OS_bSignal(&_fileModifySemaphore);
 	return 1; // no space in dir
 }
 
@@ -222,9 +236,15 @@ int eFile_WOpen(const char name[FILE_NAME_SIZE])
 	if(_wOpen)
 		return 1;
 	
+	OS_bWait(&_fileModifySemaphore);
 	_file = _eFile_Find(name, 0);
 	if(!_file.name[0])
-		eFile_Create(name, 0x20);
+	{
+		OS_bSignal(&_fileModifySemaphore);
+		if(eFile_Create(name, 0x20))
+			return 1;
+		OS_bWait(&_fileModifySemaphore);
+	}
 	
 	_wFile = _file;
 	_wDirIndex = _dirIndex;
@@ -250,6 +270,7 @@ int eFile_WOpen(const char name[FILE_NAME_SIZE])
 	_wSector = ROOT_OFFSET + SECT_PER_CLUSTER*(_wCluster - 2) + ((_wSize % (32 * 512)) / 512);
 	eDisk_ReadBlock(_writeBuff, _wSector);
 	_wOpen = 1;
+	OS_bSignal(&_fileModifySemaphore);
   return 0;
 }
 
@@ -265,6 +286,7 @@ int eFile_Write(const char data)
 	if(!_wOpen || !data)
 		return 1;
 	
+	OS_bWait(&_fileModifySemaphore);
 	if(_wIndex == 512) // need to allocate more data
 	{
 		_wSector++;
@@ -273,7 +295,10 @@ int eFile_Write(const char data)
 			// allocate new cluster from FAT
 			int next = _eFile_FreeCluster();
 			if(next < 0)
+			{
+				OS_bSignal(&_fileModifySemaphore);
 				return 1;
+			}
 			eDisk_WriteBlock(_writeBuff, _wSector);
 			eDisk_ReadBlock(_blockBuff, FAT_OFFSET + _wCluster / 128);
 			_blockBuff[(_wCluster % 128) * 4] = next & 0xFF;
@@ -295,6 +320,7 @@ int eFile_Write(const char data)
 	}
 	_writeBuff[_wIndex++] = data;
 	_wSize++;
+	OS_bSignal(&_fileModifySemaphore);
   return 0;
 }
 
@@ -325,7 +351,11 @@ int eFile_WClose(void)
   // close the file for writing
   if(!_wOpen)
 		return 1;
+	// acquire semaphore to modify file
+	OS_bWait(&_fileModifySemaphore);
+	// Write the data to the file
 	eDisk_WriteBlock(_writeBuff, _wSector);
+	// Update file size and write
 	_wFile.size[0] = (_wSize & 0xFF);
 	_wFile.size[1] = ((_wSize >> 8) & 0xFF);
 	_wFile.size[2] = ((_wSize >> 16) & 0xFF);
@@ -333,6 +363,8 @@ int eFile_WClose(void)
 	eDisk_ReadBlock(_blockBuff, _dir);
 	memcpy(&_blockBuff[_wDirIndex], &_wFile, 32 /* bytes */);
 	eDisk_WriteBlock(_blockBuff, _dir);
+	// release semaphore and return
+	OS_bSignal(&_fileModifySemaphore);
 	return (_wOpen = 0);
 }
 
@@ -344,14 +376,18 @@ int eFile_ROpen(const char name[FILE_NAME_SIZE])
 {
 	CHECK_DISK // check disk state
 	
-  // open a file for reading 
+  // open a file for reading
 	memset(&_file, 0, sizeof(eFile_File));
 	if(_rOpen)
 		return 1;
 	
+	OS_bWait(&_fileModifySemaphore);
 	_file = _eFile_Find(name, 0);
 	if(!_file.name[0])
+	{
+		OS_bSignal(&_fileModifySemaphore);
 		return 1;
+	}
 	
 	_rFile = _file;
 	_rCluster = (_file.cluster[0] | (_file.cluster[1] << 8) |
@@ -361,6 +397,7 @@ int eFile_ROpen(const char name[FILE_NAME_SIZE])
 	eDisk_ReadBlock(_readBuff, _rSector);
 	_rOpen = 1;
 	_rSize = 0;
+	OS_bSignal(&_fileModifySemaphore);
   return 0;
 }
 
@@ -378,6 +415,7 @@ int eFile_ReadNext(char *pt)
   if(_rSize >= size)
 		return 1;
 	
+	OS_bWait(&_fileModifySemaphore);
 	if(_rIndex == 512)
 	{
 		// get next sector
@@ -391,7 +429,10 @@ int eFile_ReadNext(char *pt)
 			next = (_blockBuff[c + 3] << 24) | (_blockBuff[c + 2] << 16)
 					 | (_blockBuff[c + 1] << 8)  | _blockBuff[c];
 			if((next & 0x0FFFFFF8) == 0x0FFFFFF8) // no more clusters
+			{
+				OS_bSignal(&_fileModifySemaphore);
 				return 1;
+			}
 			_rCluster = next;
 			_rSector = ROOT_OFFSET + SECT_PER_CLUSTER*(_rCluster - 2);
 			eDisk_ReadBlock(_readBuff, _rSector);
@@ -406,6 +447,7 @@ int eFile_ReadNext(char *pt)
 	
 	*pt = _readBuff[_rIndex++];
 	_rSize++;
+	OS_bSignal(&_fileModifySemaphore);
   return 0;
 }
 
@@ -510,6 +552,7 @@ int eFile_Delete(const char name[FILE_NAME_SIZE])
 	if(!_file.name[0])
 		return 1; // does not exist
 	
+	OS_bWait(&_fileModifySemaphore);
 	_file.name[0] = 0xe5; // mark as deleted
 	eDisk_ReadBlock(_blockBuff, _dir);
 	memcpy(&_blockBuff[_dirIndex], &_file, 32 /* bytes */);
@@ -537,6 +580,7 @@ int eFile_Delete(const char name[FILE_NAME_SIZE])
 		cluster = next;
 	}
 	eDisk_WriteBlock(_blockBuff, FAT_OFFSET + cluster / 128);
+	OS_bSignal(&_fileModifySemaphore);
 	return 0;
 }
 
@@ -658,6 +702,7 @@ static int _eFile_FreeCluster(void)
 {
 	// find free cluster in FAT and mark as allocated
 	int i;
+	OS_bWait(&_clusterSemaphore);
 	for(i = 0; i < FAT_SIZE; i++)
 	{
 		int index;
@@ -675,8 +720,10 @@ static int _eFile_FreeCluster(void)
 			_eFile_ClearBlockBuff();
 			for(j = 0; j < SECT_PER_CLUSTER; j++)
 				eDisk_WriteBlock(_blockBuff, sector + j); // clear out newly allocated cluster
+			OS_bSignal(&_clusterSemaphore);
 			return (i * 128 + index) / 4;
 		}
 	}
+	OS_bSignal(&_clusterSemaphore);
 	return -1;
 }
