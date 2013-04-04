@@ -66,7 +66,7 @@ int main(void)
   OS_AddButtonTask(&ButtonPush, 1);
   OS_AddDownTask(&ButtonPush, 1);
   //NumCreated += OS_AddThread(&PID, 128, 1);
-  //NumCreated += OS_AddThread(&Consumer, 128, 0);
+  NumCreated += OS_AddThread(&Consumer, 128, 0);
   OS_AddThread(&SH_Shell, 128, 6);
 	OS_AddThread(&SD_Init, 128, 0);
   OS_Launch(TIMESLICE);
@@ -209,14 +209,35 @@ void Consumer(void){
 unsigned long data,DCcomponent; // 10-bit raw ADC sample, 0 to 1023
 unsigned long t;  // time in ms
 unsigned long myId = OS_Id();
+  unsigned long avg, std_dev, max_dev;
+  int i;
   ADC_Collect(0, 1000, &Producer); // start ADC sampling, channel 0, 1000 Hz
   NumCreated += OS_AddThread(&Display,128,0); 
   while(NumSamples < RUNLENGTH) {
     for(t = 0; t < 64; t++){   // collect 64 ADC samples
       data = OS_Fifo_Get();    // get from producer
-      x[t] = data;             // real part is 0 to 1023, imaginary part is 0
+      x[t] = IRDistance(data);             // real part is 0 to 1023, imaginary part is 0
     }
-//    printf("ADC: %d -> cm: %d\n", x[0], IRDistance(x[0]));
+  
+  // calculate the average
+  avg = 0;
+  for(i = 0; i < 64; i++) {
+    avg = avg + x[i];
+  }
+  avg = avg / 64;
+  // calculate the standard and max deviaton
+  std_dev = 0; max_dev = 0;
+  for(i = 0; i < 64; i++) {
+    long tdiff = x[i] - avg;
+    std_dev += tdiff * tdiff;
+    if(ABS(tdiff) > max_dev) {
+      max_dev = ABS(tdiff);
+    }
+  }
+  
+  std_dev = sqrt(std_dev / 64);
+  printf("average = %d\nstandard_deviation = %d\n maximum deviaton = %d\n", avg, std_dev, max_dev);
+//     printf("ADC: %d -> cm: %d\n", x[0], IRDistance(x[0]));
     
     cr4_fft_64_stm32(y,x,64);  // complex FFT of last 64 ADC values
     DCcomponent = y[0]&0xFFFF; // Real part at frequency 0, imaginary part should be zero
