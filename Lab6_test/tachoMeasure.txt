@@ -1,30 +1,30 @@
-run 1:
+run 1: 8.4V
 rpm = 
-avg = 77
-std_dev = 65
-max_dev = 84
+avg = 273
+std_dev = 1
+max_dev = 2
 
-run 2:
+run 2: 7.4V
 rpm = 
-avg = 26
-std_dev = 49 
-max_dev = 141
+avg = 326
+std_dev = 0
+max_dev = 1
 
 
-run 3:
+run 3: 6.4V
 rpm = 
-avg = 54
-std_dev = 74 
-max_dev = 153
+avg = 385
+std_dev = 1
+max_dev = 2
 
-run 4:
+run 4: 5.4V
 rpm = 
-avg = 64
-std_dev = 73 
-max_dev = 190
+avg = 481
+std_dev = 1
+max_dev = 3
 
-run 5:
+run 5: 4.4V
 rpm = 
-avg = 165 
-std_dev = 134 
-max_dev = 165
+avg = 641
+std_dev = 1
+max_dev = 2
