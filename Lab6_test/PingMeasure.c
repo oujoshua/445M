@@ -69,7 +69,7 @@ void EndCritical(long sr);    // restore I bit to previous value
 */
 
 #define PD6 (*((volatile unsigned long *)0x40007100))
-#define PD5 (*((volatile unsigned long *)0x40007040))
+#define PD5 (*((volatile unsigned long *)0x40007080))
 
 #define INCHDIV 148 //constant for conversion to inches
 #define CMDIV 58 //constant for conversion to centimeters
@@ -90,7 +90,7 @@ unsigned long distCm;
 unsigned char Done;                // set each rising
 
 
-
+#pragma O0
 void PingMeasurePD56_Init(void(*task)(unsigned long distance)){
   SYSCTL_RCGC1_R |= SYSCTL_RCGC1_TIMER0;// activate timer0
                                    // activate port D
@@ -113,7 +113,7 @@ void PingMeasurePD56_Init(void(*task)(unsigned long distance)){
 	GPIO_PORTD_IM_R |= 0x20; //enable interrupts
 	
 	//port D: interrupt 3
-  NVIC_PRI0_R = (NVIC_PRI4_R&0x00FFFFFF)|0x00000000; // top 3 bits
+  NVIC_PRI0_R = (NVIC_PRI0_R&0x00FFFFFF)|0x00000000; // top 3 bits
   NVIC_EN0_R |= NVIC_EN0_INT3;    // enable interrupt 19 in NVIC	
   EnableInterrupts();
 }
@@ -124,7 +124,7 @@ void GPIOPortD_Handler(){
 		First = OS_Time();
 	}
 	else{ //falling edge
-		Period = OS_TimeDifference(OS_Time(), First);
+		Period = OS_TimeDifference(First, OS_Time());
 		//distInches = Period/INCHDIV;
 		distCm = Period/CMDIV;
 		Done = 0xFF;
@@ -137,6 +137,7 @@ void GPIOPortD_Handler(){
 //trigger a ping measurement
 //returns 0 on success. 
 //returns 1 if sensor is not ready.
+#pragma O0
 int PingTriggerPD56(void){int i; unsigned long iBit;
   if(!Done){return 1;}
 	iBit = StartCritical();
@@ -145,7 +146,7 @@ int PingTriggerPD56(void){int i; unsigned long iBit;
 
 	//send 10us pulse
 	PD6 = 0x40;
-	for(i = 0; i < 140; i ++){} //wait approx.10 us
+	for(i = 0; i < 140; i ++){} //wait approx.10 us (140)
 	//enable interrupts
   PD6 = 0;
 	EndCritical(iBit);
