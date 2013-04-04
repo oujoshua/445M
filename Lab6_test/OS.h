@@ -1,7 +1,7 @@
 #ifndef __OS_H__
 #define __OS_H__
 
-#define OS_MAX_TASKS 4
+#define OS_MAX_TASKS 6
 #define OS_BINARY_SEMAPHORE 1
 #define _OS_STACK_SIZE 128 // stack size in words (long)
 #define _OS_MAX_THREADS 16

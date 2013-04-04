@@ -10,6 +10,7 @@
 #include "lm3s8962.h"
 #include "edisk.h"
 #include "efile.h"
+#include "PingMeasure.h"
 
 #define TIMESLICE TIME_2MS    // thread switch time in system time units
 #define RUNLENGTH 10000   // display results and quit when NumSamples==RUNLENGTH
@@ -20,6 +21,7 @@ void ButtonPush(void);
 void Consumer(void);
 void cr4_fft_64_stm32(void *pssOUT, void *pssIN, unsigned short Nbin);
 short PID_stm32(short Error, short *Coeff);
+void Ping(unsigned long distance);
 
 unsigned long NumCreated;   // number of foreground threads created
 unsigned long DataLost;     // data sent by Producer, but not received by Consumer
@@ -60,19 +62,26 @@ int main(void)
   MaxJitter = 0;       // OS_Time in 20ns units
   MinJitter = 10000000;
   
+  PingMeasurePD56_Init(&Ping);
+  
   // testing/debugging stuff
   OS_Add_Periodic_Thread(&DAS,2,1);
   OS_Add_Periodic_Thread(&disk_timerproc,10,0);   // time out routines for disk
+  printf("%d", OS_Add_Periodic_Thread(&PingTriggerPD56, 500, 0));
   OS_AddButtonTask(&ButtonPush, 1);
   OS_AddDownTask(&ButtonPush, 1);
   //NumCreated += OS_AddThread(&PID, 128, 1);
-  NumCreated += OS_AddThread(&Consumer, 128, 0);
+//   NumCreated += OS_AddThread(&Consumer, 128, 0);
   OS_AddThread(&SH_Shell, 128, 6);
 	OS_AddThread(&SD_Init, 128, 0);
   OS_Launch(TIMESLICE);
 	
 	/* Loop indefinitely */
   while(1);
+}
+
+void Ping(unsigned long distance) {
+  printf("Ping: %d\n", distance);
 }
 
 //------------------Task 1--------------------------------
@@ -219,24 +228,24 @@ unsigned long myId = OS_Id();
       x[t] = IRDistance(data);             // real part is 0 to 1023, imaginary part is 0
     }
   
-  // calculate the average
-  avg = 0;
-  for(i = 0; i < 64; i++) {
-    avg = avg + x[i];
-  }
-  avg = avg / 64;
-  // calculate the standard and max deviaton
-  std_dev = 0; max_dev = 0;
-  for(i = 0; i < 64; i++) {
-    long tdiff = x[i] - avg;
-    std_dev += tdiff * tdiff;
-    if(ABS(tdiff) > max_dev) {
-      max_dev = ABS(tdiff);
-    }
-  }
-  
-  std_dev = sqrt(std_dev / 64);
-  printf("average = %d\nstandard_deviation = %d\n maximum deviaton = %d\n", avg, std_dev, max_dev);
+//   // calculate the average
+//   avg = 0;
+//   for(i = 0; i < 64; i++) {
+//     avg = avg + x[i];
+//   }
+//   avg = avg / 64;
+//   // calculate the standard and max deviaton
+//   std_dev = 0; max_dev = 0;
+//   for(i = 0; i < 64; i++) {
+//     long tdiff = x[i] - avg;
+//     std_dev += tdiff * tdiff;
+//     if(ABS(tdiff) > max_dev) {
+//       max_dev = ABS(tdiff);
+//     }
+//   }
+//   
+//   std_dev = sqrt(std_dev / 64);
+//   printf("average = %d\nstandard_deviation = %d\n maximum deviaton = %d\n", avg, std_dev, max_dev);
 //     printf("ADC: %d -> cm: %d\n", x[0], IRDistance(x[0]));
     
     cr4_fft_64_stm32(y,x,64);  // complex FFT of last 64 ADC values
