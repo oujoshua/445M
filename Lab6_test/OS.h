@@ -6,6 +6,7 @@
 #define _OS_STACK_SIZE 128 // stack size in words (long)
 #define _OS_MAX_THREADS 16
 #define _OS_FREE_THREAD -1
+#define _OS_HEAP_SIZE 0x400
 #define OS_ARBITRARY_DELAY 100
 #define _OS_FIFO_SIZE 128  // must be power of 2
 #define MAX_FIFO_SIZE _OS_FIFO_SIZE
@@ -27,18 +28,12 @@
 #define EVENT_OLED_FINISH 7
 #define EVENT_THREAD 32
 #define MAXBUF 200
-
 #define ATTR_ARCHIVE 0x20
 #define ATTR_DIR 0x10
-#define USE_DISK 1
-
-// lab 4 stuff
-#define X_POINTS 107
-#define BUFF_LEN X_POINTS * 2
-
 #define ABS(x) ((x < 0) ? -x : x)
 
 #include "OS_types.h"
+#include <stddef.h>
 
 void Timer2A_Init(void);
 int OS_Add_Periodic_Thread(void(*task)(void), unsigned long period, unsigned long priority);
@@ -312,6 +307,10 @@ void OS_EthernetMailBox_Send(unsigned char* buffer, unsigned long size);
 void OS_EthernetMailBox_Recv(void);
 
 unsigned long sqrt(unsigned long s);
+
+void OS_MemoryInit(void);
+void* OS_alloc(size_t size);
+void OS_free(void*);
 
 void DisableInterrupts(void);
 void EnableInterrupts(void);
