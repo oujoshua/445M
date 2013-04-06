@@ -14,7 +14,7 @@
 #include "OS_Ethernet.h"
 
 #define TIMESLICE TIME_2MS    // thread switch time in system time units
-#define RUNLENGTH 10000   // display results and quit when NumSamples==RUNLENGTH
+#define RUNLENGTH 100000   // display results and quit when NumSamples==RUNLENGTH
 
 void PID(void);
 void DAS(void);
@@ -55,7 +55,7 @@ int main(void)
   
   //********initialize communication channels
   OS_MailBox_Init();
-  OS_Fifo_Init(MAX_FIFO_SIZE);
+  OS_Fifo_Init(MAX_FIFO_SIZE/2);
   
   NumCreated = 0;
   NumSamples = 0;
@@ -71,7 +71,7 @@ int main(void)
   OS_AddButtonTask(&ButtonPush, 1);
   OS_AddDownTask(&ButtonPush, 1);
   //NumCreated += OS_AddThread(&PID, 128, 1);
-//   NumCreated += OS_AddThread(&Consumer, 128, 0);
+  NumCreated += OS_AddThread(&Consumer, 128, 0);
   OS_AddThread(&SH_Shell, 128, 6);
 	OS_AddThread(&SD_Init, 128, 0);
   OS_Launch(TIMESLICE);
@@ -178,7 +178,7 @@ void Display(void);
 // outputs: none
 unsigned char netBuffer[46] = {0,}; //padded buffer for ethernet packet, since min. size is 46 bytes
 
-
+unsigned char strbuf[8] = {0};
 void Consumer(void){
 unsigned long data /*,DCcomponent*/; // 10-bit raw ADC sample, 0 to 1023
 //unsigned long t;  // time in ms
@@ -186,12 +186,14 @@ unsigned long myId = OS_Id();
 //   unsigned long avg, std_dev, max_dev;
 //   int i;
   ADC_Collect(0, 1000, &Producer); // start ADC sampling, channel 0, 1000 Hz
-  NumCreated += OS_AddThread(&Display,128,0); 
+//   NumCreated += OS_AddThread(&Display,128,0); 
   while(NumSamples < RUNLENGTH) {
 		
 		data = OS_Fifo_Get();
+//     sprintf(strbuf, "%d", data);
 		((unsigned long*)netBuffer)[0] = data;
-		OS_EthernetMailBox_Send(netBuffer, 46);
+    printf("consumer sending\n");
+		OS_EthernetMailBox_Send("barbarbarbar", 13);
 		/*
     for(t = 0; t < 64; t++){   // collect 64 ADC samples
       data = OS_Fifo_Get();    // get from producer
@@ -224,6 +226,7 @@ unsigned long myId = OS_Id();
 		*/
     
   }
+  printf("Consumer dead\n");
 //   OLED_Out(BOTTOM, "CONSUMER DONE");
   OS_Kill();  // done
   OS_Delay(OS_ARBITRARY_DELAY);

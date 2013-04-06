@@ -30,7 +30,7 @@ int OS_AddButtonTask(void(*task)(void), unsigned long priority) {
   }
   _OS_SelTask = task;
   // initialize NVIC interrupts for port F
-  NVIC_PRI7_R = ((NVIC_PRI7_R&0xFF0FFFFFFF)
+  NVIC_PRI7_R = ((NVIC_PRI7_R&0xFF0FFFFF)
 									| (priority << 21));
   NVIC_EN0_R |= NVIC_EN0_INT30;
   return 1;  
@@ -45,7 +45,7 @@ int OS_AddDownTask(void(*task)(void), unsigned long priority) {
   }
   _OS_DownTask = task;
   // initialize NVIC interrupts for port E
-  NVIC_PRI1_R = ((NVIC_PRI1_R&0xFFFFFFFF0F)
+  NVIC_PRI1_R = ((NVIC_PRI1_R&0xFFFFFF0F)
 									| (priority << 5));
   NVIC_EN0_R |= NVIC_EN0_INT4;
   return 1;  

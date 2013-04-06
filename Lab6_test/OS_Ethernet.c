@@ -55,8 +55,8 @@ void OS_EthernetInit(void) {
   OS_EthernetMailBox_Init();
   
   OS_AddThread(&OS_EthernetListener, 128, 4);
-  OS_AddThread(&OS_EthernetSender, 128, 4);
-  OS_AddThread(&EthernetTest, 128, 4);
+  OS_AddThread(&OS_EthernetSender, 128, 0);
+    OS_AddThread(&EthernetTest, 128, 0);
   
 	printf("Ethernet connected\n");
   OS_Kill();
@@ -93,7 +93,9 @@ void OS_EthernetListener(void) {
 
 void OS_EthernetSender(void) {
   while(1) {
+    printf("waiting to send\n");
     OS_EthernetMailBox_Recv();
+    printf("sending\n");
     MAC_SendData(SendBuff, _OS_EthernetMailbox.size, All);
   }
 }
@@ -101,9 +103,15 @@ void OS_EthernetSender(void) {
 
 
 void EthernetTest(void) {
+  int i = 0;
   while(1) {
-    OS_EthernetMailBox_Send("testtesttesttest", 17);
-    OS_Sleep(1000);
+    if(i++ % 2) {
+      OS_EthernetMailBox_Send("testtesttesttest", 17);
+    }
+    else {
+      OS_EthernetMailBox_Send("foofoofoofoo", 13);
+    }
+     OS_Sleep(1000);
   }
 }
 

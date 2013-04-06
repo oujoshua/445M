@@ -47,6 +47,7 @@ static _SH_CommandPtr _SH_CommandList[] = {
   {"tacho", &_SH_Tacho},
   {"ping", &_SH_Ping},
   {"ir", &_SH_IR},
+  {"performance", &_SH_Performance},
 	{"",0}
 };
 
@@ -696,5 +697,12 @@ static int _SH_IR(void) {
   else {
     IR_Dump();
   }
+  return 0;
+}
+
+extern unsigned long DataLost;
+// dump performance metrics (DataLost)
+static int _SH_Performance(void) {
+  printf("%d Data Lost\n", DataLost);
   return 0;
 }
