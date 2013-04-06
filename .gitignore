@@ -171,6 +171,7 @@ pip-log.txt
 *.uvopt
 #*.uvproj
 *.dep
+*.__i
 
 # added by Sam - C build files
 *.o

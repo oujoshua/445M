@@ -5,9 +5,11 @@
 
 static void DebouncePortFTask(void);
 static void DebouncePortETask(void);
+static void DebouncePortATask(void);
 
 static void(*_OS_SelTask)(void) = NULL;
 static void(*_OS_DownTask)(void) = NULL;
+static void(*_OS_BumperTask)(void) = NULL;
 
 //******** OS_AddButtonTask *************** 
 // add a background task to run whenever the Select button is pushed
@@ -51,6 +53,20 @@ int OS_AddDownTask(void(*task)(void), unsigned long priority) {
   return 1;  
 }
 
+int OS_AddBumperTask(void(*task)(void), unsigned long priority) {
+  static unsigned int haveInit = 0;  // only initialize once
+  if(!haveInit) {
+    PORTA_Init();  // initialize; for now, just down switch (PA7)
+    haveInit = 1;
+  }
+  _OS_BumperTask = task;
+  // initialize NVIC interrupts for port A
+  NVIC_PRI0_R = ((NVIC_PRI0_R&0xFFFFFFF0)
+									| (priority));
+  NVIC_EN0_R |= NVIC_EN0_INT0;
+  return 1;  
+}
+
 //static unsigned long LastPF1 = 1;
 void GPIOPortF_Handler(void) {
   if(_OS_SelTask != NULL) {
@@ -68,6 +84,13 @@ void GPIOPortE_Handler(void) {
   OS_AddThread(&DebouncePortETask, _OS_STACK_SIZE, 1); // TODO - handle priority
 }
 
+void GPIOPortA_Handler(void) {
+  if(_OS_BumperTask != NULL) {
+    OS_AddThread(_OS_BumperTask, _OS_STACK_SIZE, 1);
+  }
+  GPIO_PORTA_IM_R &= ~PORTA_PINS; // disarm interrupt
+  OS_AddThread(&DebouncePortATask, _OS_STACK_SIZE, 1); // TODO - handle priority
+}
 static void DebouncePortFTask(void) {
   OS_Sleep(BUTTON_SLEEP_MS);   // foreground sleeping, must run within 50ms
   GPIO_PORTF_ICR_R |= PORTF_PINS;    // acknowledge interrupt
@@ -80,6 +103,14 @@ static void DebouncePortETask(void) {
   OS_Sleep(BUTTON_SLEEP_MS);   // foreground sleeping, must run within 50ms
   GPIO_PORTE_ICR_R |= PORTE_PINS;    // acknowledge interrupt
   GPIO_PORTE_IM_R |= PORTE_PINS;    // re-arm interrupt
+  OS_Kill();
+  OS_Delay(OS_ARBITRARY_DELAY);
+}
+
+static void DebouncePortATask(void) {
+  OS_Sleep(BUTTON_SLEEP_MS);   // foreground sleeping, must run within 50ms
+  GPIO_PORTA_ICR_R |= PORTA_PINS;    // acknowledge interrupt
+  GPIO_PORTA_IM_R |= PORTA_PINS;    // re-arm interrupt
   OS_Kill();
   OS_Delay(OS_ARBITRARY_DELAY);
 }
@@ -111,4 +142,19 @@ void PORTE_Init(void) {
 //  GPIO_PORTE_IEV_R &= ~PORTE_PINS;   // rising edge triggered
   GPIO_PORTE_ICR_R = PORTE_PINS;   // clear flags
   GPIO_PORTE_IM_R |= PORTE_PINS;   // re-arm interrupt
+}
+
+void PORTA_Init(void) {
+  volatile unsigned long delay;
+  SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOA;
+  delay = SYSCTL_RCGC2_R;
+  GPIO_PORTA_IM_R &= ~PORTA_PINS;  // interrupt mask register should be set to 0 for setup
+  GPIO_PORTA_DIR_R &= ~PORTA_PINS; // input
+  GPIO_PORTA_DEN_R |= PORTA_PINS;  // digital mode
+  GPIO_PORTA_PUR_R |= PORTA_PINS;  // enable pull-up res
+  GPIO_PORTA_IS_R &= ~PORTA_PINS;  // edge-sensitive
+  GPIO_PORTA_IBE_R &= ~PORTA_PINS;  // not interrupt both edges
+//  GPIO_PORTA_IEV_R &= ~PORTA_PINS;   // rising edge triggered
+  GPIO_PORTA_ICR_R = PORTA_PINS;   // clear flags
+  GPIO_PORTA_IM_R |= PORTA_PINS;   // re-arm interrupt
 }
