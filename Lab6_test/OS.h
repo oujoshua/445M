@@ -13,6 +13,7 @@
 #define PF1 (*(volatile unsigned long *)0x40025000 + 0x80)
 #define PORTF_PINS 0x02 // select button, PF1
 #define PORTE_PINS 0x02 // down button, PE1
+#define PORTA_PINS 0x80 // bumper thingy PA7
 #define TIME_1MS  50000          
 #define TIME_2MS  2*TIME_1MS
 #define BUTTON_SLEEP_MS 400
@@ -249,6 +250,8 @@ void OS_Debug(void);
 void PORTF_Init(void);
 
 void PORTE_Init(void);
+
+void PORTA_Init(void);
 
 // millisecond timer used to keep track of / wake up sleeping threads
 void Timer2B_Init(int priority);
