@@ -21,6 +21,7 @@ unsigned char Me[6];
 unsigned char All[6] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 
 OS_EthernetMailbox _OS_EthernetMailbox;
+unsigned char Ethernet_okToSend = 0;
 
 #pragma O0
 void OS_EthernetInit(void) {
@@ -55,11 +56,12 @@ void OS_EthernetInit(void) {
   OS_EthernetMailBox_Init();
   
   OS_AddThread(&OS_EthernetListener, 128, 4);
-  OS_AddThread(&OS_EthernetSender, 128, 0);
-    OS_AddThread(&EthernetTest, 128, 0);
+  OS_AddThread(&OS_EthernetSender, 128, 4);
+//     OS_AddThread(&EthernetTest, 128, 0);
   
 	printf("Ethernet connected\n");
-  OS_Kill();
+  Ethernet_okToSend = 1;
+//   OS_Kill();
 }
 
 void OS_EthernetListener(void) {
@@ -82,8 +84,9 @@ void OS_EthernetListener(void) {
       }
       else {
         OLED_Init(15);  // repeated calls just return immediately
+        i = (i + 1) % 5;
         sprintf(str, "%d %s\n",size,RcvMessage+14);
-        _OLED_Message(TOP, 0, str, 15);
+        _OLED_Message(TOP, i, str, 15);
       }
     }
   }
@@ -93,9 +96,9 @@ void OS_EthernetListener(void) {
 
 void OS_EthernetSender(void) {
   while(1) {
-    printf("waiting to send\n");
+//     printf("waiting to send\n");
     OS_EthernetMailBox_Recv();
-    printf("sending\n");
+//     printf("sending\n");
     MAC_SendData(SendBuff, _OS_EthernetMailbox.size, All);
   }
 }

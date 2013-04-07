@@ -701,8 +701,10 @@ static int _SH_IR(void) {
 }
 
 extern unsigned long DataLost;
+extern unsigned long NumSamples;
 // dump performance metrics (DataLost)
 static int _SH_Performance(void) {
+  printf("%d Sampples \n", NumSamples);
   printf("%d Data Lost\n", DataLost);
   return 0;
 }

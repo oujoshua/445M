@@ -12,14 +12,16 @@
 #include "efile.h"
 #include "PingMeasure.h"
 #include "OS_Ethernet.h"
+#include <string.h>
 
 #define TIMESLICE TIME_2MS    // thread switch time in system time units
-#define RUNLENGTH 100000   // display results and quit when NumSamples==RUNLENGTH
+#define RUNLENGTH 10000   // display results and quit when NumSamples==RUNLENGTH
 
 void PID(void);
 void DAS(void);
 void ButtonPush(void);
 void Consumer(void);
+void enetTest(void);
 void cr4_fft_64_stm32(void *pssOUT, void *pssIN, unsigned short Nbin);
 short PID_stm32(short Error, short *Coeff);
 
@@ -35,6 +37,8 @@ unsigned long const JitterSize=JITTERSIZE;
 unsigned long JitterHistogram[JITTERSIZE]={0,};
 long x[64],y[64];         // input and output arrays for FFT
 
+extern unsigned char Ethernet_okToSend;
+
 void SD_Init(void)
 {
 	eFile_Init();
@@ -49,7 +53,7 @@ int main(void)
 //   ADC_Init(1000);
 //   ADC_Open(0);
 //   ADC_Open(1);
-  SH_Init();
+//   SH_Init();
   OS_Init();
   OS_MailBox_Init();
   
@@ -74,10 +78,26 @@ int main(void)
   NumCreated += OS_AddThread(&Consumer, 128, 0);
   OS_AddThread(&SH_Shell, 128, 6);
 	OS_AddThread(&SD_Init, 128, 0);
+//   NumCreated += OS_AddThread(&enetTest, 128, 2);
   OS_Launch(TIMESLICE);
 	
 	/* Loop indefinitely */
   while(1);
+}
+
+void enetTest(void) {
+  unsigned char str[8];
+//   while(!Ethernet_okToSend) {
+//       OS_Sleep(50);
+//   }
+  while(1) {
+    memset(str, 0, 8);
+    sprintf(str, "%d", DataLost);
+    printf("attempting to send %s\n", str);
+    OS_EthernetMailBox_Send(str, 8);
+    printf("sent %s\n", str);
+    OS_Sleep(2000);
+  }
 }
 
 //------------------Task 1--------------------------------
@@ -155,7 +175,7 @@ void ButtonPush(void){
 // inputs:  none
 // outputs: none
 void Producer(unsigned short data){
-  if(NumSamples < RUNLENGTH){   // finite time run
+  if(1 /* NumSamples < RUNLENGTH */){   // finite time run
 //     NumSamples++;               // number of samples
     if(OS_Fifo_Put(data) == 0){ // send to consumer
       DataLost++;
@@ -178,22 +198,23 @@ void Display(void);
 // outputs: none
 unsigned char netBuffer[46] = {0,}; //padded buffer for ethernet packet, since min. size is 46 bytes
 
-unsigned char strbuf[8] = {0};
+// unsigned char strbuf[8] = {0};
 void Consumer(void){
 unsigned long data /*,DCcomponent*/; // 10-bit raw ADC sample, 0 to 1023
 //unsigned long t;  // time in ms
 unsigned long myId = OS_Id();
 //   unsigned long avg, std_dev, max_dev;
 //   int i;
-  ADC_Collect(0, 1000, &Producer); // start ADC sampling, channel 0, 1000 Hz
+  ADC_Collect(0, 500, &Producer); // start ADC sampling, channel 0, 1000 Hz
 //   NumCreated += OS_AddThread(&Display,128,0); 
-  while(NumSamples < RUNLENGTH) {
-		
+  while(1 /* NumSamples < RUNLENGTH */) {
+// 		printf("A\n");
 		data = OS_Fifo_Get();
+//     printf("B\n");
 //     sprintf(strbuf, "%d", data);
 		((unsigned long*)netBuffer)[0] = data;
-    printf("consumer sending\n");
-		OS_EthernetMailBox_Send("barbarbarbar", 13);
+//     printf("consumer sending\n");
+		OS_EthernetMailBox_Send(netBuffer, 46);
 		/*
     for(t = 0; t < 64; t++){   // collect 64 ADC samples
       data = OS_Fifo_Get();    // get from producer

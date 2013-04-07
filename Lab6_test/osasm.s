@@ -48,10 +48,9 @@ OS_bSignal
   STREX R2, R1, [R0]
   CMP R2, #0
   BNE OS_bSignal    ; repeat until successful increment
+  ; wake thread
   PUSH {LR}
-  CMP R1, #0
-  IT LE            ; if R1 <= 0, need to wake up a blocked thread
-  BLLE OS_WakeThread
+  BL OS_WakeThread
   POP {LR}
   BX LR
 

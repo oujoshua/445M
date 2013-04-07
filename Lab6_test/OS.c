@@ -107,14 +107,21 @@ void OS_Init(void) {
   }
   // initialize timers used by OS
   Timer2A_Init();
-  Timer2B_Init(0); 
+  Timer2B_Init(0);
+  
   // initialize input capture
   TimerCapture_Init(); 
+  
   /* Add default thread in case all threads killed */
   OS_AddThread(&_OS_Default_Thread, 0, 7); // should be lowest priority
 	OS_Add_Periodic_Thread(&OS_IncPriority, 100, 1);
+  
+  // Shell init
+  SH_Init();
+  
   // Ethernet Init
-	OS_AddThread(&OS_EthernetInit, 128, 4);
+// 	OS_AddThread(&OS_EthernetInit, 128, 0);
+  OS_EthernetInit();
 }
 
 // return the id of the thread pointed to by _RunPt

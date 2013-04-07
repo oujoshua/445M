@@ -69,5 +69,6 @@ static int _SH_ChangeDirectory(void);
 static int _SH_Tacho(void);
 static int _SH_Ping(void);
 static int _SH_IR(void);
+static int _SH_Performance(void);
 
 #endif //__SHELL_H__
