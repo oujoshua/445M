@@ -190,12 +190,8 @@ unsigned long myId = OS_Id();
   ADC_Collect(0, 32, &Producer); // start ADC sampling, channel 0, 1000 Hz
 //   NumCreated += OS_AddThread(&Display,128,0); 
   while(1 /* NumSamples < RUNLENGTH */) {
-// 		printf("A\n");
 		data = OS_Fifo_Get();
-//     printf("B\n");
-//     sprintf(strbuf, "%d", data);
 		((unsigned long*)netBuffer)[0] = data;
-//     printf("consumer sending\n");
 		OS_EthernetMailBox_Send(netBuffer, 46);
 		/*
     for(t = 0; t < 64; t++){   // collect 64 ADC samples
