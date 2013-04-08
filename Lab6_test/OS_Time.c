@@ -64,7 +64,7 @@ void Timer2B_Init(int priority) {
 
 /* Adds a new task to the Timer2A interrupt thread scheduler
  * param: void (*task)(void), function pointer of task to be called
- * param: unsigned long period, period of task
+ * param: unsigned long period, period of task in units of ms
  * param: unsigned long priority, priority of task
  * return: 0 if task successfully added to thread scheduler,
 					 -1 if maximum threads already queued.

@@ -71,7 +71,7 @@ int main(void)
   
   // testing/debugging stuff
   OS_Add_Periodic_Thread(&disk_timerproc,10,0);   // time out routines for disk
-  OS_Add_Periodic_Thread(&PingTriggerPD56, 500, 0);
+  OS_Add_Periodic_Thread(&PingTriggerPD56, 100, 0);
   OS_AddButtonTask(&ButtonPush, 1);
   OS_AddDownTask(&ButtonPush, 1);
   //NumCreated += OS_AddThread(&PID, 128, 1);
@@ -99,24 +99,6 @@ void enetTest(void) {
     OS_Sleep(2000);
   }
 }
-
-//------------------Task 1--------------------------------
-// 2 kHz sampling ADC channel 1, using software start trigger
-// background thread executed at 2 kHz
-// 60-Hz notch IIR filter, assuming fs=2000 Hz
-// y(n) = (256x(n) -503x(n-1) + 256x(n-2) + 498y(n-1)-251y(n-2))/256
-short Filter(short data){
-static short x[6]; // this MACQ needs twice
-static short y[6];
-static unsigned int n=3;   // 3, 4, or 5
-  n++;
-  if(n==6) n=3;     
-  x[n] = x[n-3] = data;  // two copies of new data
-  y[n] = (256*(x[n]+x[n-2])-503*x[1]+498*y[1]-251*y[n-2]+128)/256;
-  y[n-3] = y[n];         // two copies of filter outputs too
-  return y[n];
-} 
-
 
 //------------------Task 2--------------------------------
 // background thread executes with select button
@@ -205,7 +187,7 @@ unsigned long data /*,DCcomponent*/; // 10-bit raw ADC sample, 0 to 1023
 unsigned long myId = OS_Id();
 //   unsigned long avg, std_dev, max_dev;
 //   int i;
-  ADC_Collect(0, 500, &Producer); // start ADC sampling, channel 0, 1000 Hz
+  ADC_Collect(0, 32, &Producer); // start ADC sampling, channel 0, 1000 Hz
 //   NumCreated += OS_AddThread(&Display,128,0); 
   while(1 /* NumSamples < RUNLENGTH */) {
 // 		printf("A\n");
@@ -297,37 +279,3 @@ unsigned long data;
   OS_Delay(OS_ARBITRARY_DELAY);
 }
 
-//--------------end of Task 3-----------------------------
-
-//------------------Task 4--------------------------------
-// foreground thread that runs without waiting or sleeping
-// it executes a digital controller 
-//******** PID *************** 
-// foreground thread, runs a PID controller
-// never blocks, never sleeps, never dies
-// inputs:  none
-// outputs: none
-short IntTerm;     // accumulated error, RPM-sec
-short PrevError;   // previous error, RPM
-short Coeff[3];    // PID coefficients
-short Actuator;
-void PID(void){ 
-  short err;  // speed error, range -100 to 100 RPM
-  unsigned long myId = OS_Id();
-  PIDWork = 0;
-  IntTerm = 0;
-  PrevError = 0;
-  Coeff[0] = 384;   // 1.5 = 384/256 proportional coefficient
-  Coeff[1] = 128;   // 0.5 = 128/256 integral coefficient
-  Coeff[2] = 64;    // 0.25 = 64/256 derivative coefficient*
-  while(NumSamples < RUNLENGTH) {
-    for(err = -1000; err <= 1000; err++){    // made-up data
-      Actuator = PID_stm32(err,Coeff)/256;
-    }
-    PIDWork++;        // calculation finished
-  }
-  OS_Kill();
-  for(;;){OS_Suspend();}          // done
-}
-
-//--------------end of Task 4-----------------------------
