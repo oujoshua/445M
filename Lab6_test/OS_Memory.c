@@ -10,6 +10,7 @@ typedef struct _OS_block {
 static unsigned char _OS_Heap[_OS_HEAP_SIZE]; // ideally equal to max_threads * max_stack_size * sizeof(long) + max_threads * sizeof(_OS_block)
 static _OS_block *freeList = (_OS_block*)_OS_Heap;
 static OS_SemaphoreType allocSem, freeSem;
+static int freeChange = 0;
 
 void OS_MemoryInit(void)
 {
@@ -88,12 +89,16 @@ void OS_free(void* ptr)
 	if(temp->next == NULL)
 		temp->next = b;
 	
+	freeChange = 1;
 	OS_bSignal(&freeSem);
 }
 
 void OS_mergeFreeList(void)
 {
 	_OS_block* b;
+	// need a O(1) method of testing semaphore values; cannot block when waiting for them
+	if(!freeChange || !allocSem.value || !freeSem.value)
+		return;
 	for(b = freeList->next; b != NULL && b->next != NULL; b = b->next)
 	{
 		if(b->buffer + b->size == (unsigned char*)b->next)
@@ -102,4 +107,5 @@ void OS_mergeFreeList(void)
 			b->next = b->next->next;
 		}
 	}
+	freeChange = 0;
 }

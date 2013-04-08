@@ -223,7 +223,7 @@ unsigned long myId = OS_Id();
     DCcomponent = y[0]&0xFFFF; // Real part at frequency 0, imaginary part should be zero
     OS_MailBox_Send(DCcomponent);
 		*/
-    
+
   }
   /*printf("Consumer dead\n");
 //   OLED_Out(BOTTOM, "CONSUMER DONE");
