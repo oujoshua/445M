@@ -86,7 +86,7 @@ int main(void)
 }
 
 void enetTest(void) {
-  unsigned char str[8];
+  char str[8];
 //   while(!Ethernet_okToSend) {
 //       OS_Sleep(50);
 //   }
@@ -94,7 +94,7 @@ void enetTest(void) {
     memset(str, 0, 8);
     sprintf(str, "%d", DataLost);
     printf("attempting to send %s\n", str);
-    OS_EthernetMailBox_Send(str, 8);
+    OS_EthernetMailBox_Send((unsigned char*)str, 8);
     printf("sent %s\n", str);
     OS_Sleep(2000);
   }
@@ -225,10 +225,10 @@ unsigned long myId = OS_Id();
 		*/
     
   }
-  printf("Consumer dead\n");
+  /*printf("Consumer dead\n");
 //   OLED_Out(BOTTOM, "CONSUMER DONE");
   OS_Kill();  // done
-  OS_Delay(OS_ARBITRARY_DELAY);
+  OS_Delay(OS_ARBITRARY_DELAY);*/
 }
 
 static unsigned long voltage;

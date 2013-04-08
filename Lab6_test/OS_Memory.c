@@ -27,6 +27,7 @@ void OS_MemoryInit(void)
 	b->next = NULL;
 	b->buffer = ((unsigned char*)b) + sizeof(_OS_block);
 	// create periodic free space merger thread
+	OS_Add_Periodic_Thread(&OS_mergeFreeList, 100, 7);
 }
 
 // implementation of void* calloc(size_t size);
@@ -61,7 +62,7 @@ void* OS_alloc(size_t size)
 
 void OS_free(void* ptr)
 {
-	_OS_block* b;
+	_OS_block* b, * temp;
 	unsigned char* p = ptr;
 	OS_bWait(&freeSem);
 	
@@ -74,8 +75,31 @@ void OS_free(void* ptr)
 	}
 	// erase data
 	memset(b->buffer, 0xCC, b->size);
-	// add to start of freeList
-	b->next = freeList->next;
-	freeList->next = b;
+	// add to correct place in freeList
+	for(temp = b; temp->next != NULL; temp = temp->next)
+	{
+		// insert b before temp's next if b's buffer pointer is less
+		if(temp->next->buffer > b->buffer)
+		{
+			b->next = temp->next;
+			temp->next = b;
+		}
+	}
+	if(temp->next == NULL)
+		temp->next = b;
+	
 	OS_bSignal(&freeSem);
+}
+
+void OS_mergeFreeList(void)
+{
+	_OS_block* b;
+	for(b = freeList->next; b != NULL && b->next != NULL; b = b->next)
+	{
+		if(b->buffer + b->size == (unsigned char*)b->next)
+		{
+			b->size += b->next->size;
+			b->next = b->next->next;
+		}
+	}
 }

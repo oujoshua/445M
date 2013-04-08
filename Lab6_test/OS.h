@@ -314,6 +314,7 @@ unsigned long sqrt(unsigned long s);
 void OS_MemoryInit(void);
 void* OS_alloc(size_t size);
 void OS_free(void*);
+void OS_mergeFreeList(void);
 
 void DisableInterrupts(void);
 void EnableInterrupts(void);
