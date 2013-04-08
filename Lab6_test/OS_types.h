@@ -60,4 +60,9 @@ typedef struct OS_GlobalState {
   unsigned long ping;
 } OS_GlobalState;
 
+typedef union Ethernet_State { 
+  OS_GlobalState state;
+  unsigned char byteArr[sizeof(OS_GlobalState)];
+} Ethernet_State;
+
 #endif

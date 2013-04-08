@@ -192,7 +192,7 @@ unsigned long myId = OS_Id();
   while(1 /* NumSamples < RUNLENGTH */) {
 		data = OS_Fifo_Get();
 		((unsigned long*)netBuffer)[0] = data;
-		OS_EthernetMailBox_Send(netBuffer, 46);
+// 		OS_EthernetMailBox_Send(netBuffer, 46);
 		/*
     for(t = 0; t < 64; t++){   // collect 64 ADC samples
       data = OS_Fifo_Get();    // get from producer

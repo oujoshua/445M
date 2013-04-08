@@ -23,6 +23,12 @@ unsigned char All[6] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 OS_EthernetMailbox _OS_EthernetMailbox;
 unsigned char Ethernet_okToSend = 0;
 
+Ethernet_State myState, hisState;
+extern unsigned long IC_buffer[];
+extern unsigned long PingBuff[];
+extern unsigned long IR_Buff[];
+
+
 #pragma O0
 void OS_EthernetInit(void) {
   volatile unsigned long delay;
@@ -57,7 +63,7 @@ void OS_EthernetInit(void) {
   
   OS_AddThread(&OS_EthernetListener, 128, 4);
   OS_AddThread(&OS_EthernetSender, 128, 4);
-//     OS_AddThread(&EthernetTest, 128, 0);
+  OS_AddThread(&EthernetTest, 128, 4);
   
 	printf("Ethernet connected\n");
   Ethernet_okToSend = 1;
@@ -73,7 +79,8 @@ void OS_EthernetListener(void) {
     size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
     if(size){
       RcvCount++;
-      // if an SD card is available, dump messages to disk; otherwise print to UART
+      // if an SD card is available, dump messages to disk; otherwise print to OLED
+      memcpy(hisState.byteArr, RcvMessage + 14, sizeof(OS_GlobalState));
       if(eFile_WOpen(LOG_FILE) == 0) {
         for(i = 14; i < size; i++) {
 					if(RcvMessage[i])
@@ -85,7 +92,8 @@ void OS_EthernetListener(void) {
       else {
         OLED_Init(15);  // repeated calls just return immediately
         i = (i + 1) % 5;
-        sprintf(str, "%d %s\n",size,RcvMessage+14);
+//         sprintf(str, "%d %s\n",size,RcvMessage+14);
+        sprintf(str, "%d, %d, %d", hisState.state.tacho, hisState.state.ping, hisState.state.IR);
         _OLED_Message(TOP, i, str, 15);
       }
     }
@@ -106,15 +114,21 @@ void OS_EthernetSender(void) {
 
 
 void EthernetTest(void) {
-  int i = 0;
+//   int i = 0;
   while(1) {
-    if(i++ % 2) {
-      OS_EthernetMailBox_Send("testtesttesttest", 17);
-    }
-    else {
-      OS_EthernetMailBox_Send("foofoofoofoo", 13);
-    }
-     OS_Sleep(1000);
+    myState.state.tacho = IC_buffer[0];
+    myState.state.ping = PingBuff[0];
+    myState.state.IR =  IR_Buff[0];
+    OS_EthernetMailBox_Send(myState.byteArr, sizeof(OS_GlobalState));
+    printf("Sent %d, %d, %d\n", myState.state.tacho, myState.state.ping, myState.state.IR);
+    OS_Sleep(1000);
+//     if(i++ % 2) {
+//       OS_EthernetMailBox_Send("testtesttesttest", 17);
+//     }
+//     else {
+//       OS_EthernetMailBox_Send("foofoofoofoo", 13);
+//     }
+//      OS_Sleep(1000);
   }
 }
 

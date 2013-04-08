@@ -136,6 +136,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>4</TargetSelection>
@@ -489,11 +490,6 @@
               <FileName>cr4_fft_64_stm32.s</FileName>
               <FileType>2</FileType>
               <FilePath>.\cr4_fft_64_stm32.s</FilePath>
-            </File>
-            <File>
-              <FileName>PID_stm32.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\PID_stm32.s</FilePath>
             </File>
             <File>
               <FileName>OS_Ethernet.c</FileName>
