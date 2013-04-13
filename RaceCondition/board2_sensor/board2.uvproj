@@ -502,11 +502,6 @@
               <FilePath>..\..\src\ADC.c</FilePath>
             </File>
             <File>
-              <FileName>InputCapture.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\InputCapture.c</FilePath>
-            </File>
-            <File>
               <FileName>IR.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\src\IR.c</FilePath>
