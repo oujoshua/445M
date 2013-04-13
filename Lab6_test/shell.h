@@ -70,5 +70,6 @@ static int _SH_Tacho(void);
 static int _SH_Ping(void);
 static int _SH_IR(void);
 static int _SH_Performance(void);
+static int SH_ADC(void);
 
 #endif //__SHELL_H__

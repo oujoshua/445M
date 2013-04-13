@@ -48,6 +48,7 @@ static _SH_CommandPtr _SH_CommandList[] = {
   {"ping", &_SH_Ping},
   {"ir", &_SH_IR},
   {"performance", &_SH_Performance},
+  {"adc", &SH_ADC},
 	{"",0}
 };
 
@@ -706,5 +707,16 @@ extern unsigned long NumSamples;
 static int _SH_Performance(void) {
   printf("%d Sampples \n", NumSamples);
   printf("%d Data Lost\n", DataLost);
+  return 0;
+}
+
+static int SH_ADC(void) {
+  if(strcmp(_SH_cmd.args[0], "-r") == 0) {
+    ADC_ResetLog();
+    printf("Reset ADC buffers\n");
+  }
+  else {
+    ADC_Dump();
+  }
   return 0;
 }

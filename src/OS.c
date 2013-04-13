@@ -110,7 +110,7 @@ void OS_Init(void) {
   Timer2B_Init(0);
   
   // initialize input capture
-  TimerCapture_Init(); 
+  // TimerCapture_Init(); 
   
   /* Add default thread in case all threads killed */
   OS_AddThread(&_OS_Default_Thread, 0, 7); // should be lowest priority

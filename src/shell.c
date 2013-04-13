@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "using.h"  // define what sensors are being used
+
 #define memcpy memmove
 
 extern _OS_Event _eventLog[_OS_MAX_EVENTS]; // log timestamp data for events
@@ -665,6 +667,7 @@ static int _SH_ChangeDirectory(void)
 // dump the tachometer (input capture) data.
 // if the -r flag is specified, reset tacho measurements
 static int _SH_Tacho(void) {
+  #if (USING_TACHO == 1)
   if(strcmp(_SH_cmd.args[0], "-r") == 0) {
     IC_Reset();
     printf("Reset InputCapture buffer\n");
@@ -672,12 +675,14 @@ static int _SH_Tacho(void) {
   else {
     IC_Calc();
   }
+  #endif
   return 0;
 }
 
 // dump the ping distance sensor data.
 // if the -r flag is specified, reset buffer
 static int _SH_Ping(void) {
+  #if (USING_PING == 1)
   if(strcmp(_SH_cmd.args[0], "-r") == 0) {
     Ping_Reset();
     printf("Reset Ping buffer\n");
@@ -685,12 +690,14 @@ static int _SH_Ping(void) {
   else {
     Ping_Dump();
   }
+  #endif
   return 0;
 }
 
 // dump the IR distance sensor data.
 // if the -r flag is specified, reset the buffer
 static int _SH_IR(void) {
+  #if (USING_IR == 1)
   if(strcmp(_SH_cmd.args[0], "-r") == 0) {
     IR_Reset();
     printf("Reset IR buffer\n");
@@ -698,6 +705,7 @@ static int _SH_IR(void) {
   else {
     IR_Dump();
   }
+  #endif
   return 0;
 }
 
@@ -705,12 +713,13 @@ extern unsigned long DataLost;
 extern unsigned long NumSamples;
 // dump performance metrics (DataLost)
 static int _SH_Performance(void) {
-  printf("%d Sampples \n", NumSamples);
-  printf("%d Data Lost\n", DataLost);
+//   printf("%d Sampples \n", NumSamples);
+//   printf("%d Data Lost\n", DataLost);
   return 0;
 }
 
 static int SH_ADC(void) {
+  #if (USING_ADC == 1)
   if(strcmp(_SH_cmd.args[0], "-r") == 0) {
     ADC_ResetLog();
     printf("Reset ADC buffers\n");
@@ -718,5 +727,6 @@ static int SH_ADC(void) {
   else {
     ADC_Dump();
   }
+  #endif
   return 0;
 }

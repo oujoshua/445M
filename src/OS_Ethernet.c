@@ -63,7 +63,7 @@ void OS_EthernetInit(void) {
   
   OS_AddThread(&OS_EthernetListener, 128, 4);
   OS_AddThread(&OS_EthernetSender, 128, 4);
-  OS_AddThread(&EthernetTest, 128, 4);
+//   OS_AddThread(&EthernetTest, 128, 4);
   
 	printf("Ethernet connected\n");
   Ethernet_okToSend = 1;
@@ -116,12 +116,12 @@ void OS_EthernetSender(void) {
 void EthernetTest(void) {
 //   int i = 0;
   while(1) {
-    myState.state.tacho = IC_buffer[0];
-    myState.state.ping = PingBuff[0];
-    myState.state.IR =  IR_Buff[0];
-    OS_EthernetMailBox_Send(myState.byteArr, sizeof(OS_GlobalState));
-    printf("Sent %d, %d, %d\n", myState.state.tacho, myState.state.ping, myState.state.IR);
-    OS_Sleep(1000);
+//     myState.state.tacho = IC_buffer[0];
+//     myState.state.ping = PingBuff[0];
+//     myState.state.IR =  IR_Buff[0];
+//     OS_EthernetMailBox_Send(myState.byteArr, sizeof(OS_GlobalState));
+//     printf("Sent %d, %d, %d\n", myState.state.tacho, myState.state.ping, myState.state.IR);
+//     OS_Sleep(1000);
 //     if(i++ % 2) {
 //       OS_EthernetMailBox_Send("testtesttesttest", 17);
 //     }

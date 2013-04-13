@@ -18,6 +18,10 @@ unsigned short ADC_In(unsigned int channelNum);
 
 int ADC_Collect(unsigned int channelNum, unsigned int fs, void(*task)(unsigned short));
 
+void ADC_ResetLog(void);
+
+void ADC_Dump(void);
+
 //int ADC_ChangeTriggerMode(void);
 
 //int ADC_ChangeScopeMode(void);

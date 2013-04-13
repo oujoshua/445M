@@ -129,6 +129,9 @@ int ADC_Collect(unsigned int channelNum, unsigned int fs, void(*task)(unsigned s
   return 1;
 }
 
+unsigned short ADC_Log[4] = {0};
+int ADC_LogIndex = 0;
+
 void ADC1_Handler(void) {
   int i;
   unsigned short data;
@@ -140,13 +143,33 @@ void ADC1_Handler(void) {
     data = ADC_SSFIFO1_R & ADC_SSFIFO1_DATA_M;
     ADCMailBox[i] = data;
     ADCHasData[i] = TRUE;
+    ADC_Log[i] = data;
+//     if(ADC_LogIndex < 16) {
+//       ADC_Log[i][ADC_LogIndex] = data;
+//     }
     if(_ADC_tasks[i] != NULL) {
       _ADC_tasks[i](data);
     }
+    ADC_LogIndex = (ADC_LogIndex < 16) ?  ADC_LogIndex + 1 : ADC_LogIndex;
   }
   #if DEBUG == 1
     GPIO_PORTB_DATA_R &= ~0x02;
   #endif
+}
+
+void ADC_ResetLog(void) {
+  ADC_LogIndex = 0;
+}
+
+void ADC_Dump(void) {
+  printf("ADC Channels 0-3: %d, %d, %d, %d\n", ADC_Log[0], ADC_Log[1], ADC_Log[2], ADC_Log[3]);
+//   int i, j;
+//   for(i = 0; i < 4; i++) {
+//     printf("ADC%d:\n", i);
+//     for(j = 0; j < ADC_LogIndex; j++) {
+//       printf("%d\n", ADC_Log[i][j]);
+//     }
+//   }
 }
 
 
