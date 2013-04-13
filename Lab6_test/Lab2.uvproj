@@ -521,6 +521,11 @@
               <FileType>1</FileType>
               <FilePath>.\PID.c</FilePath>
             </File>
+            <File>
+              <FileName>FlexibleTimer0APWM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FlexibleTimer0APWM.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

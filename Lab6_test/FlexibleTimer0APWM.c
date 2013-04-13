@@ -21,6 +21,7 @@
  http://users.ece.utexas.edu/~valvano/
  */
 
+/*
 #define TIMER0_CFG_R            (*((volatile unsigned long *)0x40030000))
 #define TIMER0_TAMR_R           (*((volatile unsigned long *)0x40030004))
 #define TIMER0_CTL_R            (*((volatile unsigned long *)0x4003000C))
@@ -44,6 +45,11 @@
 #define SYSCTL_RCGC2_R          (*((volatile unsigned long *)0x400FE108))
 #define SYSCTL_RCGC1_TIMER0     0x00010000  // timer 0 Clock Gating Control
 #define SYSCTL_RCGC2_GPIOD      0x00000008  // port D Clock Gating Control
+*/
+
+#include "os.h"
+#include "hw_types.h"
+#include "lm3s8962.h"
 
 void WaitForInterrupt(void);  // low power mode
 
@@ -68,7 +74,7 @@ void PWOut_Init2(unsigned short high, unsigned short low){
 }
 
 //debug code
-int main(void){
+int pwmmain(void){
   PWOut_Init2(8000, 2000);         // initialize timer0A in PWM mode (600 Hz, 80% duty) (Figure 6.17 top)
 //  PWOut_Init2(5000, 5000);         // initialize timer0A in PWM mode (600 Hz, 50% duty) (Figure 6.17 middle)
 //  PWOut_Init2(2000, 8000);         // initialize timer0A in PWM mode (600 Hz, 20% duty) (Figure 6.17 bottom)
