@@ -12,8 +12,8 @@
 #include <stdio.h>
 
 
-
 volatile unsigned long period7, period5; //periods in units of 5 us
+volatile unsigned long speed7, speed5; //speed of wheel rotation in units of .01 ticks per second (8 ticks per 1 wheel rotation)
 unsigned long first7, first5;  //initial measurement times
 volatile unsigned char Done7, Done5;    //set on each rising edge of PC5,7
 char *DEBUG[64];
@@ -78,14 +78,16 @@ GPIOPortC_Handler(){unsigned long newTime;
 	newTime = tacho_Get_Time();
 	if((GPIO_PORTC_MIS_R&0x80)){//if masked interrupt status pin 7 is high, it caused the trigger
 			GPIO_PORTC_ICR_R |= 0x80; //clear PC7 interrupt
-		  period7 = tacho_Time_Diff(first7, newTime);
+		  period7 = (tacho_Time_Diff(first7, newTime))/250;
+		  speed7 = 20000000/period7;
 		  first7 = newTime;
 		  Done7 = 0xFF;
 	}
 	
 	if((GPIO_PORTC_MIS_R&0x20)){//if interrupted because of pin 5
 			GPIO_PORTC_ICR_R |= 0x20; //clear PC5 interrupt
-		  period5 = tacho_Time_Diff(first5, newTime);
+		  period5 = (tacho_Time_Diff(first5, newTime))/250;
+		  speed5 = 20000000/period5;
 		  first5 = newTime;
 		  Done5 = 0xFF;
 	}
@@ -96,30 +98,35 @@ GPIOPortC_Handler(){unsigned long newTime;
 
 void tachoRead(void){unsigned long i;
 	eFile_Init();
-	eFile_RedirectToFile("tachLog");
+	eFile_Delete("tachLog.txt");
+	eFile_RedirectToFile("tachLog.txt");
 	i = 0;
-	while(i < 2){
+	while(i < 5){
 		while(!(Done7&Done5)){}
-			printf("tacho7 P=%d T=%d\n", period7, OS_Time());
-			printf("tacho5 P=%d T=%d\n", period5, OS_Time());
+			printf("tacho7 P=%d T=%d\r\n", period7, OS_Time());
+			printf("tacho5 P=%d T=%d\r\n", period5, OS_Time());
 			Done5 = 0; Done7 = 0;
 			
 		i++;
 	}
+	printf("DONE\r\n\r\n\r\n");
 	eFile_EndRedirectToFile();
 	
-	while(1){}
+
 	OS_Kill();
+	OS_Delay(OS_ARBITRARY_DELAY);
 	
 }
 
 //tachometer test code
-int main(void){
+int testmain(void){
 	OS_Init();
 		
 	tacho_Init();
 	
 	OS_Add_Periodic_Thread(&disk_timerproc,10,0);   // time out routines for disk
   OS_AddThread(&tachoRead, 128, 0);
-  OS_Launch(TIME_2MS);	
+  OS_Launch(TIME_2MS);
+	
+	return 0;
 }

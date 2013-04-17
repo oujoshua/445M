@@ -521,6 +521,26 @@
               <FileType>1</FileType>
               <FilePath>..\..\src\ADC.c</FilePath>
             </File>
+            <File>
+              <FileName>tachometerTimer1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tachometerTimer1.c</FilePath>
+            </File>
+            <File>
+              <FileName>PWM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\PWM.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\pwm.h</FilePath>
+            </File>
+            <File>
+              <FileName>PID.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\PID.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

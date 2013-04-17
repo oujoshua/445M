@@ -7,6 +7,7 @@
 //Done variables get set when new values are calculated
 //Period variables contain most recent time between rising edges of tachometer inputs
 extern volatile unsigned long period7, period5; //periods in units of 5 us: time between last 2 rising edges
+extern volatile unsigned long speed7, speed5;   //speed in units of .01 ticks per second (8 ticks per rotation)
 extern volatile unsigned char Done7, Done5;    //set on each rising edge of PC5,7
 
 //tacho_Init

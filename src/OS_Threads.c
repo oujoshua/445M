@@ -152,7 +152,7 @@ void OS_Sleep(unsigned long sleepTime) {
   OS_Suspend(); // trigger thread switch
 }
 
-#pragma O3
+#pragma O0
 // during a context switch, index _RunPt to the first non-sleeping/blocked thread
 void OS_FindNextThread(void)
 {

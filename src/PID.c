@@ -1,8 +1,8 @@
 
 #include "os.h"
 
-#define OUT_MIN 0
-#define OUT_MAX 255
+#define OUT_MIN 200
+#define OUT_MAX 49999
 #define MAX_USRS 2
 #define ON 1
 #define OFF 0
@@ -18,7 +18,7 @@ unsigned long LastInput[MAX_USRS] = {0, };
 unsigned long LastTime[MAX_USRS] = {0, };
 
 // integral term for each controller
-int Integral[MAX_USRS] = {0, };
+int Integral[MAX_USRS] = {10000, };
 
 // keep track of last output, for use when turning PID on/off
 unsigned long LastOutput[MAX_USRS] = {0, };
@@ -30,7 +30,7 @@ int Target[MAX_USRS] = {0, };
 char Enabled[MAX_USRS] = {ON, };
 
 
-
+#pragma O0
 long PID_Compute(unsigned long input, int id) {
   static int first = -1;  // each bit is one if this is the first time a value is being calculated (LastInput is invalid)
   int error, derTerm;
@@ -58,8 +58,10 @@ long PID_Compute(unsigned long input, int id) {
     Integral[id] = OUT_MIN;
   }
   // comput output
-  output = Kp[id] * error + Ki[id] * Integral[id] - Kd[id] * derTerm;
-  // bounds check output
+  //output = Kp[id] * error + Ki[id] * Integral[id] - Kd[id] * derTerm;
+  //without the D
+	output = Kp[id] * error + Ki[id]*Integral[id];
+	// bounds check output
   output = (output > OUT_MAX) ? OUT_MAX : (output < OUT_MIN) ? OUT_MIN : output;
   
   // remember values for next call
