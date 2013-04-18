@@ -7,13 +7,13 @@
 
   <Targets>
     <Target>
-      <TargetName>OLED</TargetName>
+      <TargetName>PI</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
           <Device>LM3S8962</Device>
-          <Vendor>Luminary Micro</Vendor>
+          <Vendor>Texas Instruments</Vendor>
           <Cpu>IRAM(0x20000000-0x2000FFFF) IROM(0-0x3FFFF) CLOCK(8000000) CPUTYPE("Cortex-M3")</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"STARTUP\Luminary\Startup.s" ("Luminary Startup Code")</StartupFile>
@@ -29,7 +29,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile></SFDFile>
+          <SFDFile>SFD\Luminary\LM3S8962.SFR</SFDFile>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
           <IncludePath></IncludePath>
@@ -44,7 +44,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\</OutputDirectory>
-          <OutputName>OLED</OutputName>
+          <OutputName>PI</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -117,7 +117,7 @@
             <Oh166RecLen>16</Oh166RecLen>
           </OPTHX>
           <Simulator>
-            <UseSimulator>1</UseSimulator>
+            <UseSimulator>0</UseSimulator>
             <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
             <RunToMain>1</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
@@ -128,7 +128,7 @@
             <LimitSpeedToRealTime>0</LimitSpeedToRealTime>
           </Simulator>
           <Target>
-            <UseTarget>0</UseTarget>
+            <UseTarget>1</UseTarget>
             <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
             <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
@@ -139,7 +139,7 @@
             <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>3</TargetSelection>
+          <TargetSelection>4</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -161,12 +161,12 @@
             <UseTargetDll>1</UseTargetDll>
             <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
-            <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
+            <UpdateFlashBeforeDebugging>0</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
             <DriverSelection>4097</DriverSelection>
           </Flash1>
           <Flash2>BIN\lmidk-agdi.dll</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
         </Utilities>
         <TargetArmAds>
@@ -183,8 +183,8 @@
             <ldmm>1</ldmm>
             <ldXref>1</ldXref>
             <BigEnd>0</BigEnd>
-            <AdsALst>0</AdsALst>
-            <AdsACrf>0</AdsACrf>
+            <AdsALst>1</AdsALst>
+            <AdsACrf>1</AdsACrf>
             <AdsANop>0</AdsANop>
             <AdsANot>0</AdsANot>
             <AdsLLst>1</AdsLLst>
@@ -334,7 +334,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>3</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
@@ -350,7 +350,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..;..\..\..;..\driverlib;..\inc</IncludePath>
+              <IncludePath>..;..\..\..</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -389,7 +389,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Sources</GroupName>
+          <GroupName>Source Code</GroupName>
           <Files>
             <File>
               <FileName>Startup.s</FileName>
@@ -397,144 +397,14 @@
               <FilePath>.\Startup.s</FilePath>
             </File>
             <File>
-              <FileName>Output.c</FileName>
+              <FileName>PI.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Output.c</FilePath>
+              <FilePath>.\PI.c</FilePath>
             </File>
             <File>
-              <FileName>rit128x96x4.c</FileName>
+              <FileName>PWM.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\rit128x96x4.c</FilePath>
-            </File>
-            <File>
-              <FileName>OS_Critical.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\OS_Critical.c</FilePath>
-            </File>
-            <File>
-              <FileName>shell.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\shell.c</FilePath>
-            </File>
-            <File>
-              <FileName>UART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\UART.c</FilePath>
-            </File>
-            <File>
-              <FileName>osasm.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\osasm.s</FilePath>
-            </File>
-            <File>
-              <FileName>OS_Buttons.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\OS_Buttons.c</FilePath>
-            </File>
-            <File>
-              <FileName>OS_DataStructures.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\OS_DataStructures.c</FilePath>
-            </File>
-            <File>
-              <FileName>OS_Threads.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\OS_Threads.c</FilePath>
-            </File>
-            <File>
-              <FileName>OS_Time.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\OS_Time.c</FilePath>
-            </File>
-            <File>
-              <FileName>OS.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\OS.c</FilePath>
-            </File>
-            <File>
-              <FileName>ADC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\ADC.c</FilePath>
-            </File>
-            <File>
-              <FileName>sqrt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\sqrt.c</FilePath>
-            </File>
-            <File>
-              <FileName>edisk.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\edisk.c</FilePath>
-            </File>
-            <File>
-              <FileName>eFile.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\eFile.c</FilePath>
-            </File>
-            <File>
-              <FileName>Retarget.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Retarget.c</FilePath>
-            </File>
-            <File>
-              <FileName>Lab2Main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Lab2Main.c</FilePath>
-            </File>
-            <File>
-              <FileName>MAC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\MAC.c</FilePath>
-            </File>
-            <File>
-              <FileName>cr4_fft_64_stm32.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\cr4_fft_64_stm32.s</FilePath>
-            </File>
-            <File>
-              <FileName>OS_Ethernet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\OS_Ethernet.c</FilePath>
-            </File>
-            <File>
-              <FileName>InputCapture.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\InputCapture.c</FilePath>
-            </File>
-            <File>
-              <FileName>InputCapture.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\InputCapture.h</FilePath>
-            </File>
-            <File>
-              <FileName>PingMeasure.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\PingMeasure.c</FilePath>
-            </File>
-            <File>
-              <FileName>IR.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\IR.c</FilePath>
-            </File>
-            <File>
-              <FileName>PID.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\PID.c</FilePath>
-            </File>
-            <File>
-              <FileName>FlexibleTimer0APWM.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FlexibleTimer0APWM.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Libraries</GroupName>
-          <Files>
-            <File>
-              <FileName>driverlib.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\driverlib\rvmdk\driverlib.lib</FilePath>
+              <FilePath>.\PWM.c</FilePath>
             </File>
           </Files>
         </Group>

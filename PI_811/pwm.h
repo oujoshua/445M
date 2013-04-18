@@ -26,8 +26,3 @@
 // PWM clock rate = processor clock rate/SYSCTL_RCC_PWMDIV
 //                = 6 MHz/2 = 3 MHz (in this example)
 void PWM0_Init(unsigned short period, unsigned short duty);
-
-
-// newDuty is number of PWM clock cycles output is high  (2<=duty<=period-1)
-void PWM0_SetADuty(unsigned short newDuty);
-void PWM0_SetBDuty(unsigned short newDuty);
