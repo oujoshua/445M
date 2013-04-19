@@ -10,12 +10,41 @@
 // board controlling the two motors
 #define PWMPERIODMAX 24999
 #define PWMPERIODMIN 3
+
+// duty cycles
+#define PWM_FAST 40000 
+#define PWM_MED  30000
+#define PWM_SLOW 20000
+
+// time it takes to rotate 90 degrees
+#define TURN_90 500
+
 short LeftDuty;
 short rightDuty;
 unsigned long TargetSpdLft;
 unsigned long TargetSpdRgt;
 
 void stupid_thread(void);
+
+void GoStraight(void) {
+  PWM0_SetADuty(PWM_FAST);
+  PWM0_SetBDuty(PWM_FAST);
+}
+
+void TurnRight(void) {
+  PWM0_SetADuty(PWM_FAST);
+  PWM0_SetBDuty(PWM_SLOW);
+}
+
+void TurnLeft(void) {
+  PWM0_SetADuty(PWM_SLOW);
+  PWM0_SetBDuty(PWM_FAST);
+}
+
+void Stop() {
+  PWM0_SetADuty(0);
+  PWM0_SetBDuty(0);
+}
 
 void PID_Controller(void){unsigned long newPWM5, newPWM7;
 	//if(Done5){
@@ -59,7 +88,7 @@ void moveThread(void){
 	PWM0_SetBDuty(30000);
 	//PID_SetTarget(0, 0);
 	//PID_SetTarget(0,1);
-	OS_Sleep
+	OS_Sleep(1000);
 	eFile_EndRedirectToFile();
 	while(1){}
 	
@@ -84,6 +113,25 @@ int main (void) {
   OS_Launch(TIME_2MS);
 	
 	return 0;
+}
+
+void stupid_move_thread(void) {
+  
+  GoStraight();
+  OS_Sleep(4000);
+  TurnLeft();
+  OS_Sleep(TURN_90);
+  GoStraight();
+  OS_Sleep(1000);
+  TurnRight();
+  OS_Sleep(TURN_90);
+  GoStraight();
+  OS_Sleep(2000);
+  Stop();
+  
+  while(1) {
+    ;
+  }
 }
 
 
