@@ -594,7 +594,10 @@ int eFile_RedirectToFile(const char *name)
 	CHECK_DISK // check disk state
 	
   if(eFile_WOpen(name)) // creates file if doesn't exist
+	{
+		printf("Cannot open file\n");
 		return 1;  // cannot open file
+	}
 	RT_StreamToFile(1);
   return 0;
 }

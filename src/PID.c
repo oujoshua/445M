@@ -1,7 +1,7 @@
 
 #include "os.h"
 
-#define OUT_MIN 200
+#define OUT_MIN 5
 #define OUT_MAX 49999
 #define MAX_USRS 2
 #define ON 1
@@ -60,7 +60,7 @@ long PID_Compute(unsigned long input, int id) {
   // comput output
   //output = Kp[id] * error + Ki[id] * Integral[id] - Kd[id] * derTerm;
   //without the D
-	output = Kp[id] * error + Ki[id]*Integral[id];
+	output = Kp[id] * error + Integral[id];
 	// bounds check output
   output = (output > OUT_MAX) ? OUT_MAX : (output < OUT_MIN) ? OUT_MIN : output;
   
