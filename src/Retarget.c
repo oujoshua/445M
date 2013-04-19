@@ -26,9 +26,9 @@ int fputc(int c, FILE *f) {
 		}
 		return 0; // success writing
 	}
-	/*if(c == '\n')
+	if(c == '\n')
 		UART_OutChar('\r');
-  UART_OutChar(c);*/
+  UART_OutChar(c);
 	return 0;
 }
 
