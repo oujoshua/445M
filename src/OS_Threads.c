@@ -163,7 +163,10 @@ void OS_FindNextThread(void)
     _RunPt->run = 1; // mark as having executed
     //_OS_RemoveFromLL(_RunPt);
     //_OS_InsertThread(_RunPt);
-		_OS_ReinsertLL(_RunPt);
+    // if there's only 1 thread, don't remove it from LL
+    if(!(_RunPt->next == NULL && _RunPt->prev == NULL)) {
+      _OS_ReinsertLL(_RunPt);
+    }
   }
   // find the next thread to execute
 	temp = _TCBHead;
@@ -253,8 +256,11 @@ void OS_IncPriority(void)
 					break;
 				}
 			}*/
-      _OS_RemoveFromLL(temp);
-      _OS_InsertThread(temp);
+      // if there's only one thread, removing it from the LL will result in a null pointer exception
+      if(!(temp->prev == NULL && temp->next == NULL)) {
+        _OS_RemoveFromLL(temp);
+        _OS_InsertThread(temp);
+      }
     }
 		temp->run = 0;
 	}
