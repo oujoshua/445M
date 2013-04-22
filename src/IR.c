@@ -73,3 +73,17 @@ void IR_Dump(void) {
 void IR_Reset(void) {
   IR_BuffIdx = 0;
 }
+
+// thread for monitoring all 4 ADC channels
+unsigned short raw_samples[CHANNELS];
+long dist_cm[CHANNELS];
+void IR_MasterThread(void) {
+  int i;
+  while(1) {
+    ADC_Mailbox_Receive(raw_samples);
+    // convert each sample to centimeters
+    for(i = 0; i < CHANNELS; i++) {
+      dist_cm[i] = IR_Distance(raw_samples[i]);
+    }
+  }
+}

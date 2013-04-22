@@ -32,6 +32,8 @@
 #define ATTR_ARCHIVE 0x20
 #define ATTR_DIR 0x10
 #define ABS(x) ((x < 0) ? -x : x)
+#define CHANNELS 4
+#define ADC_FIFO_SIZE 32
 
 #include "OS_types.h"
 #include <stddef.h>
@@ -308,6 +310,13 @@ void OS_EthernetMailBox_Send(unsigned char* buffer, unsigned long size);
 // This function will be called from a foreground thread
 // It will spin/block if the MailBox is empty 
 void OS_EthernetMailBox_Recv(void);
+
+void ADC_Mailbox_Init(void);
+
+int ADC_Mailbox_Send(unsigned short samples[CHANNELS]);
+
+void ADC_Mailbox_Receive(unsigned short samples[CHANNELS]);
+
 
 unsigned long sqrt(unsigned long s);
 

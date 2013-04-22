@@ -1,4 +1,5 @@
 
+#include "os.h"
 #include "ADC.h"
 #include "inc/hw_types.h"
 #include "driverlib/adc.h"
@@ -16,7 +17,7 @@
 #endif
 
 #define ADC_NVIC_PRIORITY 3
-#define PRESCALE 49 // constant prescale value, 1 us ticks
+#define PRESCALE 249 // constant prescale value, 5 us ticks
 #define TIMER_RATE 5000000
 
 static void _ADC_SetTimer1APeriod(unsigned int fs);
@@ -33,14 +34,12 @@ void EndCritical(long sr);    // restore I bit to previous value
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
 
-// mailbox and flag for each ADC channel
-int ADCHasData[4] = {FALSE, FALSE, FALSE, FALSE};
-unsigned short ADCMailBox[4];
+
 static void(*_ADC_tasks[4])(unsigned short) = {NULL};
+ADC_MailBox_Type _ADC_Mailbox;
 
 void ADC_Init(unsigned int fs) {
   volatile unsigned long delay;
-  DisableInterrupts();
   SYSCTL_RCGC0_R |= SYSCTL_RCGC0_ADC;       // activate ADC
   SYSCTL_RCGC0_R &= ~SYSCTL_RCGC0_ADCSPD_M; // clear ADC sample speed field
   SYSCTL_RCGC0_R += SYSCTL_RCGC0_ADCSPD500K;// configure for 500K ADC max sample rate
@@ -61,21 +60,12 @@ void ADC_Init(unsigned int fs) {
   ADC_IM_R |= ADC_IM_MASK1;                // enable SS1 interrupts
   ADC_ACTSS_R |= ADC_ACTSS_ASEN1;           // enable sample sequencer 1
   
+  ADC_TimerInit(fs);
+  
   NVIC_EN0_R |= NVIC_EN0_INT15;           // enable NVIC int 15 (SS 1)
   NVIC_PRI3_R = (NVIC_PRI3_R&0x0FFFFFFF)|(ADC_NVIC_PRIORITY << 29); // bits 29-31
   
-//   _ADC_SetNIVCPriority(0, ADC_NVIC_PRIORITY);
-//   _ADC_EnableNVICInterrupt(0);
-  // map ADC0-3 handlers to port D pins 0-3 for profiling
-  #if DEBUG == 1
-    SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOB;
-    delay = SYSCTL_RCGC2_R;
-    GPIO_PORTB_DIR_R |= 0x0F;             // make PB0-3 out
-    GPIO_PORTB_DEN_R |= 0x0F;             // enable digital I/O on PB0-3
-    GPIO_PORTB_DATA_R &= ~0x0F;           // clear PB0-3
-  #endif
-  ADC_TimerInit(fs);
-//  EnableInterrupts();
+  ADC_Mailbox_Init();
 }
 
 // fs in kHz
@@ -95,8 +85,7 @@ void ADC_TimerInit(unsigned int fs) {
 
 // fs in Hz
 // rate is (clock period)*(prescale + 1)(period + 1)
-static void _ADC_SetTimer1APeriod(unsigned int fs) {
-  unsigned int period =  fs;// * 1000; // 1000 us per msTIMER_RATE / fs;
+static void _ADC_SetTimer1APeriod(unsigned int period) {
   TIMER1_TAILR_R = period;                  // start value for trigger
 }
 
@@ -107,16 +96,7 @@ int ADC_Open(int channelNum) {
 }  
 
 unsigned short ADC_In(unsigned int channelNum) {
-  unsigned short data;
-  long sr;
-  while(!ADCHasData[channelNum]) {
-    ;
-  }
-  sr = StartCritical();
-  data = ADCMailBox[channelNum];
-  ADCHasData[channelNum] = FALSE;
-  EndCritical(sr);
-  return data;
+  return 0;
 }
 
 int ADC_Collect(unsigned int channelNum, unsigned int fs, void(*task)(unsigned short)) {
@@ -129,33 +109,44 @@ int ADC_Collect(unsigned int channelNum, unsigned int fs, void(*task)(unsigned s
   return 1;
 }
 
-unsigned short ADC_Log[4] = {0};
+unsigned short ADC_Log[CHANNELS] = {0};
 int ADC_LogIndex = 0;
 
 void ADC1_Handler(void) {
   int i;
-  unsigned short data;
-  #if DEBUG == 1
-    GPIO_PORTB_DATA_R |= 0x02;
-  #endif
+  unsigned short data[CHANNELS];
   ADC_ISC_R |= ADC_ISC_IN1;             // acknowledge ADC sequence 1 completion
-  for(i = 0; i < 4; i++) {
-    data = ADC_SSFIFO1_R & ADC_SSFIFO1_DATA_M;
-    ADCMailBox[i] = data;
-    ADCHasData[i] = TRUE;
-    ADC_Log[i] = data;
+  for(i = 0; i < CHANNELS; i++) {
+    data[i] = ADC_SSFIFO1_R & ADC_SSFIFO1_DATA_M;
+    ADC_Log[i] = data[i];
 //     if(ADC_LogIndex < 16) {
 //       ADC_Log[i][ADC_LogIndex] = data;
 //     }
     if(_ADC_tasks[i] != NULL) {
-      _ADC_tasks[i](data);
+      _ADC_tasks[i](data[i]);
     }
     ADC_LogIndex = (ADC_LogIndex < 16) ?  ADC_LogIndex + 1 : ADC_LogIndex;
   }
-  #if DEBUG == 1
-    GPIO_PORTB_DATA_R &= ~0x02;
-  #endif
+  ADC_Mailbox_Send(data);
 }
+
+void ADC_Mailbox_Init(void) {
+  OS_InitSemaphore(&_ADC_Mailbox.hasData, 0); // initialize to empty
+}
+
+// returns 0 if successful, 1 if a previous set of samples was overwritten
+int ADC_Mailbox_Send(unsigned short samples[CHANNELS]) {
+  int existingSample = _ADC_Mailbox.hasData.value > 0;
+  memcpy(_ADC_Mailbox.samples, samples, sizeof(unsigned short) * CHANNELS);
+  OS_Signal(&_ADC_Mailbox.hasData);
+  return existingSample;
+}
+
+void ADC_Mailbox_Receive(unsigned short samples[CHANNELS]) {
+  OS_Wait(&_ADC_Mailbox.hasData);
+  memcpy(samples, _ADC_Mailbox.samples, sizeof(unsigned short) * CHANNELS);
+}
+
 
 void ADC_ResetLog(void) {
   ADC_LogIndex = 0;
@@ -171,28 +162,3 @@ void ADC_Dump(void) {
 //     }
 //   }
 }
-
-
-#define FILTER_LEN 51
-
-/*extern int FilterEn;
-extern int ScopeMode;
-extern long FFT_in[64], FFT_out[64];
-extern unsigned long X[FILTER_LEN], Y[FILTER_LEN];
-
-int ADC_ChangeScopeMode(void)
-{
-	ScopeMode ^= 1;
-// 	memset(FFT_in, 0, sizeof(long)*64);
-// 	memset(FFT_out, 0, sizeof(long)*64);
-	return 0;
-}
-
-int ADC_ToggleFilter(void)
-{
-	FilterEn ^= 1;
-	memset(X, 0, FILTER_LEN * sizeof(unsigned long));
-	memset(Y, 0, FILTER_LEN * sizeof(unsigned long));
-	RIT128x96x4PlotReClear();
-	return 0;
-}*/

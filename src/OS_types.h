@@ -65,4 +65,9 @@ typedef union Ethernet_State {
   unsigned char byteArr[sizeof(OS_GlobalState)];
 } Ethernet_State;
 
+typedef struct ADC_MailBox_Type {
+  unsigned short samples[CHANNELS];
+  OS_SemaphoreType hasData;
+} ADC_MailBox_Type;
+
 #endif
