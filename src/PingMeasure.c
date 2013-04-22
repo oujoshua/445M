@@ -67,7 +67,6 @@ unsigned long PingBuff[PING_BUFF] = {0,};
 int PingBuff_Idx = 0;
 
 
-
 #pragma O0
 void PingMeasurePB01_Init(void(*task)(unsigned long distance, int id)){
                                    // activate port C

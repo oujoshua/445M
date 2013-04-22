@@ -16,3 +16,6 @@ void IR_Dump(void);
 
 // reset IR buffer
 void IR_Reset(void);
+
+// thread for monitoring all 4 ADC channels
+void IR_MasterThread(void);

@@ -21,13 +21,6 @@
 #define TIMER_RATE 5000000
 
 static void _ADC_SetTimer1APeriod(unsigned int fs);
-// static int _ADC_EnableNVICInterrupt(int channelNum);
-// static int _ADC_DisableNVICInterrupt(int channelNum);
-// static int _ADC_SetNIVCPriority(int channelNum, unsigned int priority);
-// static void _ADC_ADC0_Init(void);
-// static void _ADC_ADC1_Init(void);
-// static void _ADC_ADC2_Init(void);
-// static void _ADC_ADC3_Init(void);
 
 long StartCritical (void);    // previous I bit, disable interrupts
 void EndCritical(long sr);    // restore I bit to previous value
@@ -38,6 +31,7 @@ void EnableInterrupts(void);  // Enable interrupts
 static void(*_ADC_tasks[4])(unsigned short) = {NULL};
 ADC_MailBox_Type _ADC_Mailbox;
 
+#pragma O0
 void ADC_Init(unsigned int fs) {
   volatile unsigned long delay;
   SYSCTL_RCGC0_R |= SYSCTL_RCGC0_ADC;       // activate ADC
@@ -68,7 +62,7 @@ void ADC_Init(unsigned int fs) {
   ADC_Mailbox_Init();
 }
 
-// fs in kHz
+#pragma O0
 void ADC_TimerInit(unsigned int fs) {
   volatile unsigned long delay;
   SYSCTL_RCGC1_R |= SYSCTL_RCGC1_TIMER1;    // activate timer1
