@@ -7,6 +7,8 @@
 #include "pid.h"
 #include "shell.h"
 #include "stdio.h"
+#include "commands.h"
+#include "OS_ethernet.h"
 // board controlling the two motors
 #define PWMPERIODMAX 24999
 #define PWMPERIODMIN 3
@@ -21,6 +23,8 @@
 
 short LeftDuty;
 short rightDuty;
+Command MoveCmd;
+OS_SemaphoreType CmdReady;
 unsigned long TargetSpdLft;
 unsigned long TargetSpdRgt;
 
@@ -69,8 +73,12 @@ void PID_Controller(void){unsigned long newPWM5, newPWM7;
 }
 
 
-void moveThread(void){
+void moveThread(void){unsigned long stoptime;
+	
+	stoptime = OS_MsTime() + (1000)*(180); //stop after 3 minutes(180 seconds)
 	eFile_RedirectToFile("PIDlog.txt");
+	
+	/*
 	OS_Sleep(2000);
 	PWM0_SetADuty(30000);
 	PWM0_SetBDuty(30000);
@@ -89,21 +97,83 @@ void moveThread(void){
 	//PID_SetTarget(0, 0);
 	//PID_SetTarget(0,1);
 	OS_Sleep(1000);
+	
+	*/
+	
+	while(OS_MsTime() < stoptime){
+ //wait for new instruction
+   OS_bWait(&CmdReady);
+ 
+		//set target motor speeds based on instruction
+		//probably with case statement
+		switch (MoveCmd){
+			case FWD:{
+				PID_SetTarget(2000, 0);
+				PID_SetTarget(2000, 1);
+				break;
+			}
+			case HARDLEFT:{
+				PID_SetTarget(1000, 0);
+				PID_SetTarget(2000, 1);
+				break;
+			}
+			case HARDRIGHT:{
+				PID_SetTarget(2000, 0);
+				PID_SetTarget(1000, 1);
+				break;
+			}
+			case SOFTLEFT:{
+				PID_SetTarget(1800, 0);
+				PID_SetTarget(2000, 1);
+				break;
+			}
+			case SOFTRIGHT:{
+				PID_SetTarget(2000, 0);
+				PID_SetTarget(1800, 1);
+				break;
+			}
+			case MEDLEFT:{
+				PID_SetTarget(1500, 0);
+				PID_SetTarget(2000, 1);
+				break;
+			}
+			case MEDRIGHT:{
+				PID_SetTarget(2000, 0);
+				PID_SetTarget(1500, 1);
+				break;
+			}
+			case STOP:{
+				PID_SetTarget(0, 0);
+				PID_SetTarget(0, 1);
+				break;				
+			}
+			default:{
+				
+				break;
+			}
+			
+		}
+		
+		
+	}
+	//stop running when time is up
+	Stop();
 	eFile_EndRedirectToFile();
 	while(1){}
 	
 }
-
 int main (void) {
   OS_Init();
 	eFile_Init();
 	//SH_Init();
-	
+	OS_EthernetInit();
+  OS_InitSemaphore(&CmdReady, 1);
 	TargetSpdLft = 2000;
   TargetSpdRgt = 2000;	
   PWM0_Init(50000,100);
 	tacho_Init();
 	OS_AddThread(&moveThread, 128, 3);
+	OS_AddThread(&OS_EthernetListener, 128, 3);
   PID_SetConstants(1, 0, 2, 0);
 	PID_SetConstants(1, 0, 2 , 1);
  	PID_SetTarget(1500, 0);

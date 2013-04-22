@@ -541,6 +541,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\src\PID.c</FilePath>
             </File>
+            <File>
+              <FileName>commands.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\commands.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

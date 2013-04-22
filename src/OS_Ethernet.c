@@ -2,11 +2,11 @@
 #include "mac.h"
 #include "lm3s8962.h"
 #include "eFile.h"
+#include "commands.h"
 #include "OS_Ethernet.h"
 #include "rit128x96x4.h"
 #include <stdio.h>
 #include <string.h>
-
 #define LOG_FILE "enet.txt"
 
 // void OS_EthernetListener(void);
@@ -78,6 +78,9 @@ void OS_EthernetListener(void) {
   while(1) {
     size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
     if(size){
+			
+			
+			
       RcvCount++;
       // if an SD card is available, dump messages to disk; otherwise print to OLED
       memcpy(hisState.byteArr, RcvMessage + 14, sizeof(OS_GlobalState));
@@ -96,6 +99,13 @@ void OS_EthernetListener(void) {
         sprintf(str, "%d, %d, %d", hisState.state.tacho, hisState.state.ping, hisState.state.IR);
         _OLED_Message(TOP, i, str, 15);
       }
+			
+			//recieve instruction
+			//send instruction to controller (through FIFO? mailbox?)
+			MoveCmd = *(Command*)(RcvMessage + 14);
+			OS_bSignal(&CmdReady);
+			
+			
     }
   }
 }
