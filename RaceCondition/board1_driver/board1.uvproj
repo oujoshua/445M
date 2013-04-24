@@ -522,11 +522,6 @@
               <FilePath>..\..\src\ADC.c</FilePath>
             </File>
             <File>
-              <FileName>tachometerTimer1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\tachometerTimer1.c</FilePath>
-            </File>
-            <File>
               <FileName>PWM.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\src\PWM.c</FilePath>
@@ -545,6 +540,21 @@
               <FileName>commands.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\src\commands.h</FilePath>
+            </File>
+            <File>
+              <FileName>PingMeasure.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\PingMeasure.c</FilePath>
+            </File>
+            <File>
+              <FileName>PingMeasure.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\PingMeasure.h</FilePath>
+            </File>
+            <File>
+              <FileName>IR.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\IR.c</FilePath>
             </File>
           </Files>
         </Group>

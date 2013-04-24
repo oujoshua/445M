@@ -236,7 +236,7 @@ void PingMeasurePD56_Init(void(*task)(unsigned long distance, int id)){
 	GPIO_PORTD_IBE_R &= ~0x20; //interrupt rising edige
 	GPIO_PORTD_IEV_R |= 0x20;
 	GPIO_PORTD_ICR_R |= 0x20; //clear interrupt flag
-	GPIO_PORTD_IM_R &= ~0x20; //disable interrupts
+	GPIO_PORTD_IM_R  |= 0x20; //disable interrupts
 	
 	//port D: interrupt 3
   NVIC_PRI0_R = (NVIC_PRI0_R&0x00FFFFFF)|0x00000000; // top 3 bits

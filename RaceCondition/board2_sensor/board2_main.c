@@ -20,7 +20,7 @@ void DecisionMaker(void);
 
 int main(void) {
   OS_Init();
-	OS_EthernetInit();
+// 	OS_EthernetInit();
   SH_Init();
   ADC_Init(ADC_PERIOD);
 	PingMeasurePD56_Init(&PingHandler);
@@ -29,7 +29,7 @@ int main(void) {
 	OS_Add_Periodic_Thread(&PingTriggerPD56, 200, 1);
   OS_AddThread(&IR_MasterThread, 128, IR_PRIORITY);
   OS_AddThread(&DecisionMaker, 128, DECISION_PRIORITY);
-	OS_AddThread(&OS_EthernetSender, 128, NET_PRIORITY);
+// 	OS_AddThread(&OS_EthernetSender, 128, NET_PRIORITY);
 	OS_AddThread(&SH_Shell, 128, 6);
   OS_Launch(TIME_2MS);
   
