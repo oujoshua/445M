@@ -31,3 +31,7 @@ void PWM0_Init(unsigned short period, unsigned short duty);
 // newDuty is number of PWM clock cycles output is high  (2<=duty<=period-1)
 void PWM0_SetADuty(unsigned short newDuty);
 void PWM0_SetBDuty(unsigned short newDuty);
+
+void PWM1_Init(unsigned short period, unsigned short duty);
+void PWM1_SetADuty(unsigned short newDuty);
+void PWM1_SetBDuty(unsigned short newDuty);
