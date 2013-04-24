@@ -23,8 +23,6 @@
 
 short LeftDuty;
 short rightDuty;
-Command MoveCmd;
-OS_SemaphoreType CmdReady;
 unsigned long TargetSpdLft;
 unsigned long TargetSpdRgt;
 

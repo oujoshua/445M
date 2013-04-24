@@ -12,7 +12,8 @@
 // void OS_EthernetListener(void);
 // void OS_EthernetSender(void);
 // void EthernetTest(void);
-
+Command MoveCmd;
+OS_SemaphoreType CmdReady;
 unsigned char RcvMessage[MAXBUF];
 unsigned char SendBuff[MAXBUF];
 unsigned long ulUser0, ulUser1;
