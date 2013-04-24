@@ -7,6 +7,7 @@
 #define PING_BUFF 16
 
 #define PD56ID 0
+#define FWDPING 0
 #define PC57ID 1
 #define PB01ID 2
 

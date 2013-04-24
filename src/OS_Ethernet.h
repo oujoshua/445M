@@ -2,7 +2,7 @@
 
 void OS_EthernetInit(void);
 
-
+//Meant to run in a foreground thread. Whenever an ethernet message
 void OS_EthernetListener(void);
 
 
