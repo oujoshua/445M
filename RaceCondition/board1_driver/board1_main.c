@@ -84,29 +84,7 @@ void moveThread(void){
 void moveThread(void){unsigned long stoptime;
 	
 	stoptime = OS_MsTime() + (1000)*(180); //stop after 3 minutes(180 seconds)
-	eFile_RedirectToFile("PIDlog.txt");
-	
-	/*
-	OS_Sleep(2000);
-	PWM0_SetADuty(30000);
-	PWM0_SetBDuty(30000);
-	//PID_SetTarget(500, 1);
-	OS_Sleep(500);
-	PWM0_SetADuty(20000);
-	//PID_SetTarget(1500, 1);
-	OS_Sleep(750);
-	PWM0_SetADuty(30000);
-	//PID_SetTarget(500, 0);
-	OS_Sleep(500);
-	//PID_SetTarget(1500,0);
-	PWM0_SetBDuty(20000);
-	OS_Sleep(2000);
-	PWM0_SetBDuty(30000);
-	//PID_SetTarget(0, 0);
-	//PID_SetTarget(0,1);
-	OS_Sleep(1000);
-	
-	*/
+//	eFile_RedirectToFile("PIDlog.txt");
 	
 	while(OS_MsTime() < stoptime){
  //wait for new instruction
@@ -166,8 +144,7 @@ void moveThread(void){unsigned long stoptime;
 	}
 	//stop running when time is up
 	Stop();
-	eFile_EndRedirectToFile();
->>>>>>> 2a3255b8a8726b7f784dfe24bdf7e4fc4ea34da8
+// 	eFile_EndRedirectToFile();
 	while(1){}
 	
 }
