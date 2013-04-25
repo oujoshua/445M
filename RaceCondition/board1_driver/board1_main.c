@@ -17,9 +17,9 @@
 #define PWMPERIODMIN 3
 
 // duty cycles
-#define PWM_FAST 40000 
-#define PWM_MED  30000
-#define PWM_SLOW 20000
+#define PWM_FAST 30000
+#define PWM_MED  16000
+#define PWM_SLOW 12000
 
 #define LEFT 0
 #define RIGHT 1
@@ -189,25 +189,45 @@ void sendCMDS(void){
 }
 
 unsigned short IR_Samples[4] = {0,};
-long IR_Dist = 200;
+long IR_Dist[4] = {200, };
 
 #pragma O0
 void pingAction(unsigned long dist, int id){
-  if(dist < 70 || (IR_Dist > 10 && IR_Dist < 25)){
-    PWM1_SetADuty(9000);
-    PWM1_SetBDuty(35000);
+  if(dist < 90) {
+    // turn whichever direction is more open
+    if(IR_Dist[0] > IR_Dist[1]) {
+      TurnRight();
+    }
+    else {
+      TurnLeft();
+    }
+  }
+  else if(IR_Dist[0] > 10 && IR_Dist[0] < 20) {
+    TurnLeft();
+  }
+  else if(IR_Dist[1] > 10 && IR_Dist[1] < 20) {
+    TurnRight();
   }
   else {
-    PWM1_SetADuty(30000);
-    PWM1_SetBDuty(30000);
+    GoStraight();
   }
+//   if(dist < 70 || (IR_Dist > 10 && IR_Dist < 25)){
+//     PWM1_SetADuty(12000);
+//     PWM1_SetBDuty(35000);
+//   }
+//   else {
+//     PWM1_SetADuty(30000);
+//     PWM1_SetBDuty(29500);
+//   }
 }
 
-
+// ADC0 is the (angle) right IR
+// ADC1 is the (angle) left IR
 void IR_Listener(void) {
   while(1) {
     ADC_Mailbox_Receive(IR_Samples);
-    IR_Dist = IR_Distance(IR_Samples[0]);
+    IR_Dist[0] = IR_Distance(IR_Samples[0]);
+    IR_Dist[1] = IR_Distance(IR_Samples[1]);
   }
 }
 
