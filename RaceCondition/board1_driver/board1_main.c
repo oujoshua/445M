@@ -43,8 +43,9 @@ void sendCMDS(void){
 unsigned short IR_Samples[4] = {0,};
 long IR_Dist[4] = {200, };
 
+char DEBUGDATA[60];
 void pingAction(unsigned long dist, int id)
-{  char DEBUGDATA[60];
+{  
   if(dist < 60)
 	{
     // turn whichever direction is more open
