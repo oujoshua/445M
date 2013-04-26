@@ -44,35 +44,51 @@ unsigned short IR_Samples[4] = {0,};
 long IR_Dist[4] = {200, };
 
 void pingAction(unsigned long dist, int id)
-{
+{  char DEBUGDATA[60];
   if(dist < 90)
 	{
     // turn whichever direction is more open
-    if(IR_Dist[0] > IR_Dist[1])
+    if(IR_Dist[0] > IR_Dist[1]){
       TurnRight(HARD);
-    else
+		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardRight", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+		}
+    else{
       TurnLeft(HARD);
+		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardLeft", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+		}
   }
 	else if(IR_Dist[IR_FRIGHT] > 10 && IR_Dist[IR_FRIGHT] < 20)
 	{
     TurnLeft(SOFT);
+		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
   else if(IR_Dist[IR_FLEFT] > 10 && IR_Dist[IR_FLEFT] < 20)
 	{
     TurnRight(SOFT);
+		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
 	else if(IR_Dist[IR_RIGHT] > 10 && IR_Dist[IR_RIGHT] < 20)
 	{
     TurnLeft(SOFT);
+		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
   else if(IR_Dist[IR_LEFT] > 10 && IR_Dist[IR_LEFT] < 20)
 	{
     TurnRight(SOFT);
+		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
   else
 	{
     GoStraight();
   }
+	
+	OS_EthernetMailBox_Send(DEBUGDATA,60);
 }
 
 // ADC0 is the (angle) right IR
@@ -87,21 +103,18 @@ void IR_Listener(void) {
 
 int main (void) {
   OS_Init();
-	eFile_Init();
+	//eFile_Init();
 	//SH_Init();
-	//OS_EthernetInit();
+	OS_EthernetInit();
   ADC_Init(10000);
-  //OS_InitSemaphore(&CmdReady, 1);
   PingMeasurePD56_Init(&pingAction);
 	TargetSpdLft = 2000;
   TargetSpdRgt = 2000;	
   PWM1_Init(50000,100);
-	//tacho_Init();
 	OS_AddThread(&moveThread, 128, 3);
   OS_AddThread(&IR_Listener, 128, 3);
-	//OS_AddThread(&OS_EthernetListener, 128, 3);
-	//OS_AddThread(&sendCMDS, 128, 3);
-	OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
+	OS_AddThread(&OS_EthernetSender, 128, 4);
+	//OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
   OS_Add_Periodic_Thread(&PingTriggerPD56, 80, 3);
   OS_Launch(TIME_2MS);
 	

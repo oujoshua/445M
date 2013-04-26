@@ -1,10 +1,11 @@
 #include "OS.h"
-#include "shell.h"
 #include "PingMeasure.h"
 #include "src/ADC.h"
 #include "IR.h"
 #include "OS_Ethernet.h"
 #include "commands.h"
+#include "eFile.h"
+#include "eDisk.h"
 #define ADC_PERIOD 10000 // configure for 20 Hz fs, ADC prescale is 5us
 #define IR_PRIORITY 1
 #define DECISION_PRIORITY 2
@@ -20,17 +21,10 @@ void DecisionMaker(void);
 
 int main(void) {
   OS_Init();
-// 	OS_EthernetInit();
-  SH_Init();
-  ADC_Init(ADC_PERIOD);
-	PingMeasurePD56_Init(&PingHandler);
-	//PingMeasurePC57_Init(&PingHandler);
-	//PingMeasurePB01_Init(&PingHandler);
-	OS_Add_Periodic_Thread(&PingTriggerPD56, 200, 1);
-  OS_AddThread(&IR_MasterThread, 128, IR_PRIORITY);
-  OS_AddThread(&DecisionMaker, 128, DECISION_PRIORITY);
-// 	OS_AddThread(&OS_EthernetSender, 128, NET_PRIORITY);
-	OS_AddThread(&SH_Shell, 128, 6);
+ 	OS_EthernetInit();
+	eFile_Init();
+  OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
+ 	OS_AddThread(&OS_EthernetListener, 128, NET_PRIORITY);
   OS_Launch(TIME_2MS);
   
   while(1) {
