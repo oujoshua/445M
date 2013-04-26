@@ -1,6 +1,9 @@
 
 #define IR_BUFFLEN 16
-
+#define IR_FLEFT 1
+#define IR_FRIGHT 0
+#define IR_LEFT 2
+#define IR_RIGHT 3
 void IR_Init(void);
 
 long IR_Distance(long x);

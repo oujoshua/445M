@@ -52,11 +52,19 @@ void pingAction(unsigned long dist, int id)
     else
       TurnLeft(HARD);
   }
-	else if(IR_Dist[0] > 10 && IR_Dist[0] < 20)
+	else if(IR_Dist[IR_FRIGHT] > 10 && IR_Dist[IR_FRIGHT] < 20)
 	{
     TurnLeft(SOFT);
   }
-  else if(IR_Dist[1] > 10 && IR_Dist[1] < 20)
+  else if(IR_Dist[IR_FLEFT] > 10 && IR_Dist[IR_FLEFT] < 20)
+	{
+    TurnRight(SOFT);
+  }
+	else if(IR_Dist[IR_RIGHT] > 10 && IR_Dist[IR_RIGHT] < 20)
+	{
+    TurnLeft(SOFT);
+  }
+  else if(IR_Dist[IR_LEFT] > 10 && IR_Dist[IR_LEFT] < 20)
 	{
     TurnRight(SOFT);
   }

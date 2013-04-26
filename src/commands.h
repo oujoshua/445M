@@ -22,16 +22,11 @@
 typedef enum {FWD, HARDLEFT, HARDRIGHT, SOFTLEFT, SOFTRIGHT, STOP, MEDLEFT, MEDRIGHT,
               BACK, BACKHLEFT, BACKHRIGHT, BACKSLEFT, BACKSRIGHT, BACKMLEFT, BACKMRIGHT} Command;
 
-extern Command MoveCmd;
-extern OS_SemaphoreType CmdReady;
-
 void GoStraight(void);
-
 void TurnRight(int speed);
-
 void TurnLeft(int speed);
-
 void Stop(void);
+void dataHandler(EthernetFrame* frame);
 
 #endif
 
