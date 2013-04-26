@@ -48,39 +48,39 @@ void pingAction(unsigned long dist, int id)
   if(dist < 90)
 	{
     // turn whichever direction is more open
-    if(IR_Dist[0] > IR_Dist[1]){
+    if(IR_Dist[IR_RIGHT] > IR_Dist[IR_LEFT]){
       TurnRight(HARD);
-		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardRight", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		}
     else{
       TurnLeft(HARD);
-		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardLeft", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		}
   }
 	else if(IR_Dist[IR_FRIGHT] > 10 && IR_Dist[IR_FRIGHT] < 20)
 	{
     TurnLeft(SOFT);
-		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
   else if(IR_Dist[IR_FLEFT] > 10 && IR_Dist[IR_FLEFT] < 20)
 	{
     TurnRight(SOFT);
-		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
 	else if(IR_Dist[IR_RIGHT] > 10 && IR_Dist[IR_RIGHT] < 20)
 	{
     TurnLeft(SOFT);
-		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
   else if(IR_Dist[IR_LEFT] > 10 && IR_Dist[IR_LEFT] < 20)
 	{
     TurnRight(SOFT);
-		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
   else

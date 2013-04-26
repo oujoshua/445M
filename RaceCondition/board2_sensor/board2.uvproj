@@ -497,6 +497,16 @@
           <GroupName>drivers</GroupName>
           <Files>
             <File>
+              <FileName>OS_Ethernet.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\OS_Ethernet.c</FilePath>
+            </File>
+            <File>
+              <FileName>commands.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\commands.h</FilePath>
+            </File>
+            <File>
               <FileName>ADC.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\src\ADC.c</FilePath>
@@ -510,21 +520,6 @@
               <FileName>PingMeasure.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\src\PingMeasure.c</FilePath>
-            </File>
-            <File>
-              <FileName>OS_Ethernet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\OS_Ethernet.c</FilePath>
-            </File>
-            <File>
-              <FileName>OS_Ethernet.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\OS_Ethernet.h</FilePath>
-            </File>
-            <File>
-              <FileName>commands.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\commands.h</FilePath>
             </File>
           </Files>
         </Group>
