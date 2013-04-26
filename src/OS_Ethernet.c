@@ -97,8 +97,8 @@ void OS_EthernetListener(void) {
         OLED_Init(15);  // repeated calls just return immediately
         i = (i + 1) % 5;
 //         sprintf(str, "%d %s\n",size,RcvMessage+14);
-        sprintf(str, "%d, %d, %d", hisState.state.tacho, hisState.state.ping, hisState.state.IR);
-        _OLED_Message(TOP, i, str, 15);
+        
+        _OLED_Message(TOP, i, RcvMessage+14, 15);
       }
 			
 			//recieve instruction

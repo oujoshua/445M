@@ -6,6 +6,7 @@
 #include "commands.h"
 #include "eFile.h"
 #include "eDisk.h"
+#include "rit128x96x4.h"
 #define ADC_PERIOD 10000 // configure for 20 Hz fs, ADC prescale is 5us
 #define IR_PRIORITY 1
 #define DECISION_PRIORITY 2
@@ -22,8 +23,9 @@ void DecisionMaker(void);
 int main(void) {
   OS_Init();
  	OS_EthernetInit();
-	eFile_Init();
-  OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
+	OLED_Init(15);
+	//eFile_Init();
+  //OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
  	OS_AddThread(&OS_EthernetListener, 128, NET_PRIORITY);
   OS_Launch(TIME_2MS);
   

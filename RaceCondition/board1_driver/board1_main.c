@@ -45,7 +45,7 @@ long IR_Dist[4] = {200, };
 
 void pingAction(unsigned long dist, int id)
 {  char DEBUGDATA[60];
-  if(dist < 90)
+  if(dist < 60)
 	{
     // turn whichever direction is more open
     if(IR_Dist[IR_RIGHT] > IR_Dist[IR_LEFT]){
@@ -59,25 +59,25 @@ void pingAction(unsigned long dist, int id)
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		}
   }
-	else if(IR_Dist[IR_FRIGHT] > 10 && IR_Dist[IR_FRIGHT] < 20)
+	else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 20)
 	{
     TurnLeft(SOFT);
 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
-  else if(IR_Dist[IR_FLEFT] > 10 && IR_Dist[IR_FLEFT] < 20)
+  else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 20)
 	{
     TurnRight(SOFT);
 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
-	else if(IR_Dist[IR_RIGHT] > 10 && IR_Dist[IR_RIGHT] < 20)
+	else if(IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20)
 	{
     TurnLeft(SOFT);
 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
-  else if(IR_Dist[IR_LEFT] > 10 && IR_Dist[IR_LEFT] < 20)
+  else if(IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20)
 	{
     TurnRight(SOFT);
 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
@@ -113,7 +113,6 @@ int main (void) {
   PWM1_Init(50000,100);
 	OS_AddThread(&moveThread, 128, 3);
   OS_AddThread(&IR_Listener, 128, 3);
-	OS_AddThread(&OS_EthernetSender, 128, 4);
 	//OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
   OS_Add_Periodic_Thread(&PingTriggerPD56, 80, 3);
   OS_Launch(TIME_2MS);
