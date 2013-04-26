@@ -26,7 +26,7 @@ void GoStraight(void);
 void TurnRight(int speed);
 void TurnLeft(int speed);
 void Stop(void);
-void dataHandler(EthernetFrame* frame);
+//void dataHandler(EthernetFrame* frame);
 
 #endif
 

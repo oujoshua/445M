@@ -25,6 +25,7 @@ void moveThread(void){
 // 	eFile_EndRedirectToFile();
 }
 
+/*
 void sendCMDS(void){
   MoveCmd = FWD;
   OS_bSignal(&CmdReady);
@@ -38,7 +39,7 @@ void sendCMDS(void){
   MoveCmd = STOP; 
   OS_Kill();
 }
-
+*/
 unsigned short IR_Samples[4] = {0,};
 long IR_Dist[4] = {200, };
 
@@ -90,7 +91,7 @@ int main (void) {
 	//SH_Init();
 	//OS_EthernetInit();
   ADC_Init(10000);
-  OS_InitSemaphore(&CmdReady, 1);
+  //OS_InitSemaphore(&CmdReady, 1);
   PingMeasurePD56_Init(&pingAction);
 	TargetSpdLft = 2000;
   TargetSpdRgt = 2000;	

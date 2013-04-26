@@ -26,6 +26,7 @@ void Stop(void) {
 }
 
 // needs to be updated for multiple sensors
+/*
 void dataHandler(EthernetFrame* frame)
 { 
 	unsigned long *dist = frame->Ping_data, *IR_Dist = frame->IR_data;
@@ -60,4 +61,4 @@ void dataHandler(EthernetFrame* frame)
 		printf("Straight\n");
   }
 	eFile_EndRedirectToFile();
-}
+}*/
