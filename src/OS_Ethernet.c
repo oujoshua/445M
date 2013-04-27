@@ -186,7 +186,7 @@ void OS_EthernetMailBox_Send(unsigned char* buffer, unsigned long size) {
   size = (size > MAXBUF) ? MAXBUF : size;
   _OS_EthernetMailbox.size = size;
   memcpy(SendBuff, buffer, size);
-  OS_bSignal(&_OS_EthernetMailbox.hasData);  
+  OS_bSignal(&_OS_EthernetMailbox.hasData);
 }
 
 // ******** OS_EthernetMailBox_Recv ************

@@ -7,8 +7,8 @@
 #define PWMPERIODMIN 3
 
 // duty cycles
-#define PWM_FAST	32000
-#define PWM_MED		18000
+#define PWM_FAST	48000
+#define PWM_MED		25000
 #define PWM_SLOW	10000
 #define HARD			PWM_SLOW
 #define SOFT			PWM_MED

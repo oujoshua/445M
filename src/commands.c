@@ -6,17 +6,17 @@
 
 
 void GoStraight(void) {
-  PWM1_SetADuty(PWM_FAST);
+  PWM1_SetADuty(PWM_FAST-2200);
   PWM1_SetBDuty(PWM_FAST);
 }
 
 void TurnRight(int speed) {
-  PWM1_SetADuty(PWM_FAST);
+  PWM1_SetADuty(PWM_FAST-2200);
   PWM1_SetBDuty(speed);
 }
 
 void TurnLeft(int speed) {
-  PWM1_SetADuty(speed);
+  PWM1_SetADuty(speed-2200);
   PWM1_SetBDuty(PWM_FAST);
 }
 
