@@ -49,7 +49,7 @@ char DEBUGDATA[60];
 void pingAction(unsigned long dist, int id)
 {
   Ping_Dist = dist;
-  if(dist < 40)
+  if(dist < 40 || IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 25 && IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 25)
 	{
     // turn whichever direction is more open
     if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 20 && IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20 &&
@@ -60,67 +60,37 @@ void pingAction(unsigned long dist, int id)
     else if(IR_Dist[IR_RIGHT] > IR_Dist[IR_LEFT]){
       TurnRight(HARD);
       Decision = HARDRIGHT;
-//         sprintf(DEBUGDATA, "Hard Right");
     }
     else{
       TurnLeft(HARD);
       Decision = HARDLEFT;
-//         sprintf(DEBUGDATA, "Hard Left");
-// 		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-// 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
     }
   }
-	else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 15 && IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20)
+	else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 15 && IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 18)
 	{
     TurnLeft(HARD);
     Decision = HARDLEFT;
   }
-  else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 15 && IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20)
+  else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 15 && IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 18)
 	{
     TurnRight(HARD);
     Decision = HARDRIGHT;
   }
-  //
-	else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 20)
-	{
-    TurnLeft(SOFT);
-//     sprintf(DEBUGDATA, "Soft Left");
-    Decision = SOFTLEFT;
-// 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-// 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
-  }
-  else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 20)
-	{
-    TurnRight(SOFT);
-    Decision = SOFTRIGHT;
-//     sprintf(DEBUGDATA, "Soft Right");
-// 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-// 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
-  }
-/*	else if(IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20)
+	else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 25)
 	{
     TurnLeft(SOFT);
     Decision = SOFTLEFT;
-//     sprintf(DEBUGDATA, "Soft Left");
-// 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-// 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
-  else if(IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20)
+  else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 25)
 	{
     TurnRight(SOFT);
     Decision = SOFTRIGHT;
-//     sprintf(DEBUGDATA, "Soft Right");
-// 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-// 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
-  }*/
+  }
   else
 	{
     GoStraight();
     Decision = FWD;
-//     sprintf(DEBUGDATA, "Straight");
   }
-// 	OS_EthernetSendState(DEBUGDATA, dist, IR_Dist, OS_MsTime());
-// 	OS_EthernetMailBox_Send(DEBUGDATA,60);
 }
 
 // ADC0 is the (angle) right IR
