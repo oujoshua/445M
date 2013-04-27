@@ -311,7 +311,7 @@ void OS_EthernetMailBox_Send(unsigned char* buffer, unsigned long size);
 // It will spin/block if the MailBox is empty 
 void OS_EthernetMailBox_Recv(void);
 
-void OS_EthernetSendState(char* decision, unsigned long ping, unsigned long IRs[4]);
+void OS_EthernetSendState(char* decision, unsigned long ping, unsigned long IRs[4], unsigned long time);
 
 void ADC_Mailbox_Init(void);
 

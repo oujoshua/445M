@@ -105,7 +105,7 @@ void pingAction(unsigned long dist, int id)
     GoStraight();
     sprintf(DEBUGDATA, "Straight");
   }
-	OS_EthernetSendState(DEBUGDATA, dist, IR_Dist);
+	OS_EthernetSendState(DEBUGDATA, dist, IR_Dist, OS_MsTime());
 // 	OS_EthernetMailBox_Send(DEBUGDATA,60);
 }
 

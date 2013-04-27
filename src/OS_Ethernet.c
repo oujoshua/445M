@@ -86,14 +86,17 @@ void OS_EthernetListener(void) {
       _OLED_Message(TOP, 0, str, 15);
       sprintf(str, "Ping = %d             ", hisState.state.ping);
       _OLED_Message(TOP, 1, str, 15);
-      sprintf(str, "Left = %d             ", hisState.state.IRs[IR_LEFT]);
+      sprintf(str, "Time = %d             ", hisState.state.time);
       _OLED_Message(TOP, 2, str, 15);
-      sprintf(str, "Front Left = %d       ", hisState.state.IRs[IR_FLEFT]);
-      _OLED_Message(TOP, 3, str, 15);
-      sprintf(str, "Right = %d            ", hisState.state.IRs[IR_RIGHT]);
-      _OLED_Message(TOP, 4, str, 15);
-      sprintf(str, "Front Right = %d      ", hisState.state.IRs[IR_FRIGHT]);
+      
+      sprintf(str, "Left = %d             ", hisState.state.IRs[IR_LEFT]);
       _OLED_Message(BOTTOM, 0, str, 15);
+      sprintf(str, "Front Left = %d       ", hisState.state.IRs[IR_FLEFT]);
+      _OLED_Message(BOTTOM, 1, str, 15);
+      sprintf(str, "Right = %d            ", hisState.state.IRs[IR_RIGHT]);
+      _OLED_Message(BOTTOM, 2, str, 15);
+      sprintf(str, "Front Right = %d      ", hisState.state.IRs[IR_FRIGHT]);
+      _OLED_Message(BOTTOM, 3, str, 15);
     }
 //     size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
 //     if(size){
@@ -197,9 +200,10 @@ void OS_EthernetMailBox_Recv(void) {
   OS_bSignal(&_OS_EthernetMailbox.gotData);
 }
 
-void OS_EthernetSendState(char* decision, unsigned long ping, unsigned long IRs[4]) {
+void OS_EthernetSendState(char* decision, unsigned long ping, unsigned long IRs[4], unsigned long time) {
   strcpy(myState.state.decision, decision);
   myState.state.ping = ping;
   memcpy(myState.state.IRs, IRs, sizeof(unsigned long) * 4);
+  myState.state.time = time;
   OS_EthernetMailBox_Send(myState.byteArr, sizeof(OS_GlobalState));
 }
