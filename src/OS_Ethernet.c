@@ -5,6 +5,7 @@
 #include "commands.h"
 #include "OS_Ethernet.h"
 #include "rit128x96x4.h"
+#include "ir.h"
 #include <stdio.h>
 #include <string.h>
 #define LOG_FILE "enet.txt"
@@ -71,43 +72,60 @@ void OS_EthernetInit(void) {
 //   OS_Kill();
 }
 
+char str[32] = {0, };
 void OS_EthernetListener(void) {
-  char str[16] = {0, };
   unsigned long size;
   int i;
   eFile_Init();
   while(1) {
-    size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
-    if(size){
-			
-			
-			
-      RcvCount++;
-      // if an SD card is available, dump messages to disk; otherwise print to OLED
+    size = MAC_ReceiveNonBlocking(RcvMessage, sizeof(OS_GlobalState) + 14);
+    if (size) {
       memcpy(hisState.byteArr, RcvMessage + 14, sizeof(OS_GlobalState));
-      if(eFile_WOpen(LOG_FILE) == 0) {
-        for(i = 14; i < size; i++) {
-					if(RcvMessage[i])
-						eFile_Write(RcvMessage[i]);
-        }
-        eFile_Write('\n');
-        eFile_WClose();
-      }
-      else {
-        OLED_Init(15);  // repeated calls just return immediately
-        i = (i + 1) % 5;
-//         sprintf(str, "%d %s\n",size,RcvMessage+14);
-        
-        _OLED_Message(TOP, i, RcvMessage+14, 15);
-      }
-			
-			//recieve instruction
-			//send instruction to controller (through FIFO? mailbox?)
-			MoveCmd = *(Command*)(RcvMessage + 14);
-			OS_bSignal(&CmdReady);
-			
-			
+      OLED_Init(15);
+      sprintf(str, "%s            ", hisState.state.decision);
+      _OLED_Message(TOP, 0, str, 15);
+      sprintf(str, "Ping = %d             ", hisState.state.ping);
+      _OLED_Message(TOP, 1, str, 15);
+      sprintf(str, "Left = %d             ", hisState.state.IRs[IR_LEFT]);
+      _OLED_Message(TOP, 2, str, 15);
+      sprintf(str, "Front Left = %d       ", hisState.state.IRs[IR_FLEFT]);
+      _OLED_Message(TOP, 3, str, 15);
+      sprintf(str, "Right = %d            ", hisState.state.IRs[IR_RIGHT]);
+      _OLED_Message(TOP, 4, str, 15);
+      sprintf(str, "Front Right = %d      ", hisState.state.IRs[IR_FRIGHT]);
+      _OLED_Message(BOTTOM, 0, str, 15);
     }
+//     size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
+//     if(size){
+// 			
+// 			
+// 			
+//       RcvCount++;
+//       // if an SD card is available, dump messages to disk; otherwise print to OLED
+//       memcpy(hisState.byteArr, RcvMessage + 14, sizeof(OS_GlobalState));
+//       if(eFile_WOpen(LOG_FILE) == 0) {
+//         for(i = 14; i < size; i++) {
+// 					if(RcvMessage[i])
+// 						eFile_Write(RcvMessage[i]);
+//         }
+//         eFile_Write('\n');
+//         eFile_WClose();
+//       }
+//       else {
+//         OLED_Init(15);  // repeated calls just return immediately
+//         i = (i + 1) % 5;
+// //         sprintf(str, "%d %s\n",size,RcvMessage+14);
+//         
+//         _OLED_Message(TOP, i, RcvMessage+14, 15);
+//       }
+// 			
+// 			//recieve instruction
+// 			//send instruction to controller (through FIFO? mailbox?)
+// 			MoveCmd = *(Command*)(RcvMessage + 14);
+// 			OS_bSignal(&CmdReady);
+// 			
+			
+//     }
   }
 }
 
@@ -177,4 +195,11 @@ void OS_EthernetMailBox_Send(unsigned char* buffer, unsigned long size) {
 void OS_EthernetMailBox_Recv(void) {
   OS_bWait(&_OS_EthernetMailbox.hasData);
   OS_bSignal(&_OS_EthernetMailbox.gotData);
+}
+
+void OS_EthernetSendState(char* decision, unsigned long ping, unsigned long IRs[4]) {
+  strcpy(myState.state.decision, decision);
+  myState.state.ping = ping;
+  memcpy(myState.state.IRs, IRs, sizeof(unsigned long) * 4);
+  OS_EthernetMailBox_Send(myState.byteArr, sizeof(OS_GlobalState));
 }

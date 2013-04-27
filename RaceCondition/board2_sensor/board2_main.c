@@ -24,6 +24,7 @@ int main(void) {
   OS_Init();
  	OS_EthernetInit();
 	OLED_Init(15);
+  _OLED_Message(BOTTOM, 4, "this is stupid", 8);
 	//eFile_Init();
   //OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
  	OS_AddThread(&OS_EthernetListener, 128, NET_PRIORITY);

@@ -55,9 +55,9 @@ typedef struct OS_EthernetMailbox {
 } OS_EthernetMailbox;
 
 typedef struct OS_GlobalState {
-  unsigned long tacho;
-  unsigned long IR;
+  char decision[16];
   unsigned long ping;
+  unsigned long IRs[4];
 } OS_GlobalState;
 
 typedef union Ethernet_State { 

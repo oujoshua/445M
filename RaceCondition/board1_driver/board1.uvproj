@@ -527,29 +527,9 @@
               <FilePath>..\..\src\PWM.c</FilePath>
             </File>
             <File>
-              <FileName>pwm.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\pwm.h</FilePath>
-            </File>
-            <File>
-              <FileName>PID.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\PID.c</FilePath>
-            </File>
-            <File>
-              <FileName>commands.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\commands.h</FilePath>
-            </File>
-            <File>
               <FileName>PingMeasure.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\src\PingMeasure.c</FilePath>
-            </File>
-            <File>
-              <FileName>PingMeasure.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\PingMeasure.h</FilePath>
             </File>
             <File>
               <FileName>IR.c</FileName>

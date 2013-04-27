@@ -46,50 +46,67 @@ long IR_Dist[4] = {200, };
 char DEBUGDATA[60];
 void pingAction(unsigned long dist, int id)
 {  
-  if(dist < 60)
+  if(dist < 50)
 	{
     // turn whichever direction is more open
-    if(IR_Dist[IR_RIGHT] > IR_Dist[IR_LEFT]){
-      TurnRight(HARD);
-		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+    if(IR_Dist[IR_FRIGHT] - IR_Dist[IR_FLEFT] < 5){
+      if(IR_Dist[IR_RIGHT] > IR_Dist[IR_LEFT]){
+        TurnRight(HARD);
+        sprintf(DEBUGDATA, "Hard Right");
+      }
+      else{
+        TurnLeft(HARD);
+        sprintf(DEBUGDATA, "Hard Left");
+      }
 		}
     else{
-      TurnLeft(HARD);
-		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+      if(IR_Dist[IR_FRIGHT] > IR_Dist[IR_FLEFT]){
+        TurnRight(HARD);
+        sprintf(DEBUGDATA, "Hard Right");
+      }
+      else{
+        TurnLeft(HARD);
+        sprintf(DEBUGDATA, "Hard Left");
+  // 		  sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; HardLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+  // 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+      }
 		}
   }
 	else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 20)
 	{
     TurnLeft(SOFT);
-		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+    sprintf(DEBUGDATA, "Soft Left");
+// 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+// 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
   else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 20)
 	{
     TurnRight(SOFT);
-		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+    sprintf(DEBUGDATA, "Soft Right");
+// 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+// 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
 	else if(IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20)
 	{
     TurnLeft(SOFT);
-		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+    sprintf(DEBUGDATA, "Soft Left");
+// 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftLeft\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+// 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
   else if(IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20)
 	{
     TurnRight(SOFT);
-		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
-		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+    sprintf(DEBUGDATA, "Soft Right");
+// 		sprintf(DEBUGDATA, "T:%d  PING: %d IR: %d,%d,%d,%d; SoftRight\n", OS_MsTime(), dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT],
+// 		         IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
   }
   else
 	{
     GoStraight();
+    sprintf(DEBUGDATA, "Straight");
   }
-	
-	OS_EthernetMailBox_Send(DEBUGDATA,60);
+	OS_EthernetSendState(DEBUGDATA, dist, IR_Dist);
+// 	OS_EthernetMailBox_Send(DEBUGDATA,60);
 }
 
 // ADC0 is the (angle) right IR
@@ -97,8 +114,10 @@ void pingAction(unsigned long dist, int id)
 void IR_Listener(void) {
   while(1) {
     ADC_Mailbox_Receive(IR_Samples);
-    IR_Dist[0] = IR_Distance(IR_Samples[0]);
-    IR_Dist[1] = IR_Distance(IR_Samples[1]);
+    IR_Dist[IR_LEFT] = IR_Distance(IR_Samples[IR_LEFT]);
+    IR_Dist[IR_RIGHT] = IR_Distance(IR_Samples[IR_RIGHT]);
+    IR_Dist[IR_FLEFT] = IR_Distance(IR_Samples[IR_FLEFT]);
+    IR_Dist[IR_FRIGHT] = IR_Distance(IR_Samples[IR_FRIGHT]);
   }
 }
 

@@ -300,8 +300,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>568</TopLine>
-      <CurrentLine>580</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\shell.c</PathWithFileName>
       <FilenameWithoutPath>shell.c</FilenameWithoutPath>
@@ -458,10 +458,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>4</ColumnNumber>
+      <ColumnNumber>22</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>502</TopLine>
-      <CurrentLine>507</CurrentLine>
+      <TopLine>353</TopLine>
+      <CurrentLine>385</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\edisk.c</PathWithFileName>
       <FilenameWithoutPath>edisk.c</FilenameWithoutPath>
@@ -476,8 +476,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>191</TopLine>
-      <CurrentLine>208</CurrentLine>
+      <TopLine>271</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Lab5.c</PathWithFileName>
       <FilenameWithoutPath>Lab5.c</FilenameWithoutPath>
@@ -492,8 +492,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>556</TopLine>
-      <CurrentLine>559</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\eFile.c</PathWithFileName>
       <FilenameWithoutPath>eFile.c</FilenameWithoutPath>
@@ -506,10 +506,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>3</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>32</TopLine>
-      <CurrentLine>38</CurrentLine>
+      <TopLine>22</TopLine>
+      <CurrentLine>37</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Retarget.c</PathWithFileName>
       <FilenameWithoutPath>Retarget.c</FilenameWithoutPath>
