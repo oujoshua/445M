@@ -88,6 +88,8 @@ void OS_EthernetListener(void) {
       _OLED_Message(TOP, 1, str, 15);
       sprintf(str, "Time = %d             ", hisState.state.time);
       _OLED_Message(TOP, 2, str, 15);
+      sprintf(str, "Samples Lost = %d     ", hisState.state.lost);
+      _OLED_Message(TOP, 3, str, 15);
       
       sprintf(str, "Left = %d             ", hisState.state.IRs[IR_LEFT]);
       _OLED_Message(BOTTOM, 0, str, 15);
