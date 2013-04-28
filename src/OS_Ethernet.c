@@ -200,10 +200,11 @@ void OS_EthernetMailBox_Recv(void) {
   OS_bSignal(&_OS_EthernetMailbox.gotData);
 }
 
-void OS_EthernetSendState(char* decision, unsigned long ping, unsigned long IRs[4], unsigned long time) {
+void OS_EthernetSendState(char* decision, unsigned long ping, unsigned long IRs[4], unsigned long time, unsigned long lost) {
   strcpy(myState.state.decision, decision);
   myState.state.ping = ping;
   memcpy(myState.state.IRs, IRs, sizeof(unsigned long) * 4);
   myState.state.time = time;
+  myState.state.lost = lost;
   OS_EthernetMailBox_Send(myState.byteArr, sizeof(OS_GlobalState));
 }

@@ -59,6 +59,7 @@ typedef struct OS_GlobalState {
   unsigned long ping;
   unsigned long IRs[4];
   unsigned long time;
+  unsigned long lost;
 } OS_GlobalState;
 
 typedef union Ethernet_State { 
