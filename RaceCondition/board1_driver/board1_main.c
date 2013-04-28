@@ -312,7 +312,7 @@ int main (void) {
 	//eFile_Init();
 	//SH_Init();
 	OS_EthernetInit();
-  ADC_Init(7500);
+  ADC_Init(2500);
   PingMeasurePD56_Init(&pingAction);
 	OS_InitSemaphore(&IR_Ready, 0);
 	PingReady = 0;
