@@ -8,10 +8,12 @@
 
 // duty cycles
 #define PWM_FAST	48000
-#define PWM_MED		28000
-#define PWM_SLOW	12000
+#define PWM_MED		29000
+#define PWM_SLOWISH 26000
+#define PWM_SLOW	14000
 #define HARD			PWM_SLOW
 #define SOFT			PWM_MED
+#define MED       PWM_SLOWISH
 
 #define LEFT 0
 #define RIGHT 1
