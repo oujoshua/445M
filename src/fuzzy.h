@@ -20,6 +20,22 @@ typedef struct FuzzyMovement {
  */
 void Fuzzify(unsigned long dist_cm, FuzzyDistance *fuzzy);
 
+/* Fuzzy_Compute
+ * given a set of fuzzy inputs representing the state of each sensor, compute a fuzzy output
+ * that represents what direction the robot should turn, or go straight
+ * input   : none (FuzzyDistance values for each sensor, read from global variables)
+ * outputs : output (writes fuzzy values to struct passed in via pointer
+ */
+void Fuzzy_Compute(FuzzyMovement *output);
+
+/* Defuzzify
+ * compute the crisp output as a weighted average of the fuzzy variables
+ * inputs : none (uses Fuzzy_Output global variable)
+ * output : dLeft the difference to be applied to the left PWM, returned by writing to variable passed by pointer
+ * output : dRight the difference to be applied to the right PWM, returned by writing to the variable passed by pointer
+ */
+void Defuzzify(long *dLeft, long *dRight);
+
 /* compute the fuzzy or, A + B, which is equivalent to a mathematical MAX
  * input A : FuzzyValue argument to or/max
  * input B : FuzzyValue argument to or/max
