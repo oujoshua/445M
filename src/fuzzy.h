@@ -1,7 +1,9 @@
 
-typedef struct Fuzzy_Distance {
-  unsigned char close;
-  unsigned char ok;
-  unsigned char far;
-} Fuzzy_Distance;
+typedef unsigned char FuzzyValue;
+
+typedef struct FuzzyDistance {
+  FuzzyValue close;
+  FuzzyValue ok;
+  FuzzyValue far;
+} FuzzyDistance;
 
