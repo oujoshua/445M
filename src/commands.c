@@ -24,8 +24,8 @@ void TurnLeft(int speed) {
 }
 
 void Stop(void) {
-  PWM1_SetADuty(0);
-  PWM1_SetBDuty(0);
+  PWM1_SetADuty(1);
+  PWM1_SetBDuty(1);
 }
 
 // needs to be updated for multiple sensors

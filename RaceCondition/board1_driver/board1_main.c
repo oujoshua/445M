@@ -11,12 +11,16 @@
 #include "OS_ethernet.h"
 #include "PingMeasure.h"
 
+extern unsigned long ADC_SamplesLost;
+
+
 short LeftDuty;
 short rightDuty;
 unsigned long TargetSpdLft;
 unsigned long TargetSpdRgt;
 volatile char PingReady;
 OS_SemaphoreType IR_Ready;
+
 void moveThread(void){
   unsigned long start = OS_MsTime();
 // 	eFile_RedirectToFile("PIDlog.txt");
@@ -47,9 +51,8 @@ unsigned long Ping_Dist;
 Command Decision;
 char ifelse_block;
 char DEBUGDATA[60];
-
-
-
+char Turned_ON_Flag = 0;
+unsigned long Turned_ON_Time;
 
 void pingAction(unsigned long dist, int id){
 	Ping_Dist = dist;
@@ -58,157 +61,162 @@ void pingAction(unsigned long dist, int id){
 
 void Brain(void)
 {
-	while(1){
-	OS_Wait(&IR_Ready);
-	if(PingReady){
-		PingReady = 0;
-		if(Ping_Dist < 55 || IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 25 && IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 25)
-		{
-			// turn whichever direction is more open
-			if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 20 && IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20 &&
-				IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 20 && IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20){
-					Decision = STOP;
-					ifelse_block = 0;
-					Stop();
-			}
-			else if(IR_Dist[IR_RIGHT] > IR_Dist[IR_LEFT]){
-				if(Ping_Dist < 35)
-				{
-					TurnRight(HARD);
-					Decision = HARDRIGHT;
-					ifelse_block = 1;
-				}
-				else
-				{
-					TurnRight(MED);
-					Decision = MEDRIGHT;
-					ifelse_block = 2;
-				}
-			}
-			else{
-				if(Ping_Dist < 35)
-				{
-					TurnLeft(HARD);
-					Decision = HARDLEFT;
-					ifelse_block = 3;
-				}
-				else
-				{
-					TurnLeft(MED);
-					Decision = MEDLEFT;
-					ifelse_block = 4;
-				}
-			}
-		}
-		else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 18 && IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20)
-		{
-			TurnLeft(HARD);
-			Decision = HARDLEFT;
-			ifelse_block = 5;
-		}
-		else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 18 && IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20)
-		{
-			TurnRight(HARD);
-			Decision = HARDRIGHT;
-			ifelse_block = 6;
-		}
-		else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 23)
-		{
-			TurnLeft(MED);
-			Decision = MEDLEFT;
-			ifelse_block = 7;
-		}
-		else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 23)
-		{
-			TurnRight(MED);
-			Decision = MEDRIGHT;
-			ifelse_block = 8;
-		}
-		else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 28)
-		{
-			TurnLeft(SOFT);
-			Decision = SOFTLEFT;
-			ifelse_block = 9;
-		}
-		else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 28)
-		{
-			TurnRight(SOFT);
-			Decision = SOFTRIGHT;
-			ifelse_block = 10;
-		}
-// 		else if(IR_Dist[IR_RIGHT] > 50 /*&& IR_Dist[IR_LEFT] < 8*/){
-// 			TurnRight(MED);
-// 			Decision = MEDRIGHT;
-// 			ifelse_block = 11;
-// 		}
-// 		else if(IR_Dist[IR_LEFT] > 50 /*&& IR_Dist[IR_RIGHT] < 8*/){
-// 			TurnLeft(MED);
-// 			Decision = MEDLEFT;
-// 			ifelse_block = 12;
-// 		}
-		else
-		{
-			GoStraight();
-			Decision = FWD;
-			ifelse_block = 13;
-		}
-  }
-	else{ //if no new ping data, but new IR data
-		if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 18 && IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20)
-		{
-			TurnLeft(HARD);
-			Decision = HARDLEFT;
-			ifelse_block = 14;
-		}
-		else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 18 && IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20)
-		{
-			TurnRight(HARD);
-			Decision = HARDRIGHT;
-			ifelse_block = 15;
-		}
-		else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 23)
-		{
-			TurnLeft(MED);
-			Decision = MEDLEFT;
-			ifelse_block = 16;
-		}
-		else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 23)
-		{
-			TurnRight(MED);
-			Decision = MEDRIGHT;
-			ifelse_block = 17;
-		}
-		else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 28)
-		{
-			TurnLeft(SOFT);
-			Decision = SOFTLEFT;
-			ifelse_block = 18;
-		}
-		else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 28)
-		{
-			TurnRight(SOFT);
-			Decision = SOFTRIGHT;
-			ifelse_block = 19;
-		}
+  while(1){
+    if(Turned_ON_Flag){
+      OS_Wait(&IR_Ready);
+      if(PingReady){
+        PingReady = 0;
+        if(Ping_Dist < 55 || IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 25 && IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 25)
+        {
+          // turn whichever direction is more open
+          if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 20 && IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20 &&
+            IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 20 && IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20){
+              Decision = STOP;
+              ifelse_block = 0;
+              Stop();
+          }
+          else if(IR_Dist[IR_RIGHT] > IR_Dist[IR_LEFT]){
+            if(Ping_Dist < 35)
+            {
+              TurnRight(HARD);
+              Decision = HARDRIGHT;
+              ifelse_block = 1;
+            }
+            else
+            {
+              TurnRight(MED);
+              Decision = MEDRIGHT;
+              ifelse_block = 2;
+            }
+          }
+          else{
+            if(Ping_Dist < 35)
+            {
+              TurnLeft(HARD);
+              Decision = HARDLEFT;
+              ifelse_block = 3;
+            }
+            else
+            {
+              TurnLeft(MED);
+              Decision = MEDLEFT;
+              ifelse_block = 4;
+            }
+          }
+        }
+        else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 18 && IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20)
+        {
+          TurnLeft(HARD);
+          Decision = HARDLEFT;
+          ifelse_block = 5;
+        }
+        else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 18 && IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20)
+        {
+          TurnRight(HARD);
+          Decision = HARDRIGHT;
+          ifelse_block = 6;
+        }
+        else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 23)
+        {
+          TurnLeft(MED);
+          Decision = MEDLEFT;
+          ifelse_block = 7;
+        }
+        else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 23)
+        {
+          TurnRight(MED);
+          Decision = MEDRIGHT;
+          ifelse_block = 8;
+        }
+        else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 28)
+        {
+          TurnLeft(SOFT);
+          Decision = SOFTLEFT;
+          ifelse_block = 9;
+        }
+        else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 28)
+        {
+          TurnRight(SOFT);
+          Decision = SOFTRIGHT;
+          ifelse_block = 10;
+        }
+        else if(IR_Dist[IR_RIGHT] > 50 /*&& IR_Dist[IR_LEFT] < 8*/){
+          TurnRight(MED);
+          Decision = MEDRIGHT;
+          ifelse_block = 11;
+        }
+        else if(IR_Dist[IR_LEFT] > 50 /*&& IR_Dist[IR_RIGHT] < 8*/){
+          TurnLeft(MED);
+          Decision = MEDLEFT;
+          ifelse_block = 12;
+        }
+        else
+        {
+          GoStraight();
+          Decision = FWD;
+          ifelse_block = 13;
+        }
+      }
+      else{ //if no new ping data, but new IR data
+        if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 18 && IR_Dist[IR_RIGHT] > 5 && IR_Dist[IR_RIGHT] < 20)
+        {
+          TurnLeft(HARD);
+          Decision = HARDLEFT;
+          ifelse_block = 14;
+        }
+        else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 18 && IR_Dist[IR_LEFT] > 5 && IR_Dist[IR_LEFT] < 20)
+        {
+          TurnRight(HARD);
+          Decision = HARDRIGHT;
+          ifelse_block = 15;
+        }
+        else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 23)
+        {
+          TurnLeft(MED);
+          Decision = MEDLEFT;
+          ifelse_block = 16;
+        }
+        else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 23)
+        {
+          TurnRight(MED);
+          Decision = MEDRIGHT;
+          ifelse_block = 17;
+        }
+        else if(IR_Dist[IR_FRIGHT] > 5 && IR_Dist[IR_FRIGHT] < 28)
+        {
+          TurnLeft(SOFT);
+          Decision = SOFTLEFT;
+          ifelse_block = 18;
+        }
+        else if(IR_Dist[IR_FLEFT] > 5 && IR_Dist[IR_FLEFT] < 28)
+        {
+          TurnRight(SOFT);
+          Decision = SOFTRIGHT;
+          ifelse_block = 19;
+        }
 
-// 		else if(IR_Dist[IR_RIGHT] > 50 /*&& IR_Dist[IR_LEFT] < 8*/){
-// 			TurnRight(MED);
-// 			Decision = MEDRIGHT;
-// 			ifelse_block = 20;
-// 		}
-// 		else if(IR_Dist[IR_LEFT] > 50 /*&& IR_Dist[IR_RIGHT] < 8*/){
-// 			TurnLeft(MED);
-// 			Decision = MEDLEFT;
-// 			ifelse_block = 21;
-// 		}
-		else
-		{
-			GoStraight();
-			Decision = FWD;
-			ifelse_block = 22;
-		}
-	}
-}
+        else if(IR_Dist[IR_RIGHT] > 50 /*&& IR_Dist[IR_LEFT] < 8*/){
+          TurnRight(MED);
+          Decision = MEDRIGHT;
+          ifelse_block = 20;
+        }
+        else if(IR_Dist[IR_LEFT] > 50 /*&& IR_Dist[IR_RIGHT] < 8*/){
+          TurnLeft(MED);
+          Decision = MEDLEFT;
+          ifelse_block = 21;
+        }
+        else
+        {
+          GoStraight();
+          Decision = FWD;
+          ifelse_block = 22;
+        }
+      }
+    }
+    else{
+      Stop();
+    }
+  }
 }
 
 // ADC0 is the (angle) right IR
@@ -276,8 +284,27 @@ void State_Sender(void){
         sprintf(DEBUGDATA, "WUT, %d", ifelse_block);
         break;
     }
-    OS_EthernetSendState(DEBUGDATA, Ping_Dist, IR_Dist, OS_MsTime());
+    OS_EthernetSendState(DEBUGDATA, Ping_Dist, IR_Dist, OS_MsTime(),ADC_SamplesLost);
   }
+}
+
+void Turner_Offer(void){
+  while(1){
+    if(OS_MsTime() >= (Turned_ON_Time + 180*1000)){
+      Turned_ON_Flag = 0;
+    }
+    else{
+      OS_Sleep(1000);
+    }
+  }
+}
+
+void GOGOGO(void){
+  Turned_ON_Flag = 1;
+  Turned_ON_Time = OS_MsTime();
+  OS_AddThread(&Turner_Offer, 128, 7);
+	OS_AddThread(&moveThread, 128, 3);
+  OS_Kill();
 }
 
 int main (void) {
@@ -292,7 +319,7 @@ int main (void) {
 	TargetSpdLft = 2000;
   TargetSpdRgt = 2000;	
   PWM1_Init(50000,100);
-	OS_AddThread(&moveThread, 128, 3);
+  OS_AddButtonTask(&GOGOGO, 0);
   OS_AddThread(&IR_Listener, 128, 0);
   OS_AddThread(&State_Sender, 128, 7);
 	OS_AddThread(&Brain, 128, 1);

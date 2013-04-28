@@ -283,7 +283,7 @@ long MAC_ReceiveBlocking(unsigned char *pucBuf, long lBufLen){
 long MAC_ReceiveNonBlocking(unsigned char *pucBuf, long lBufLen){
 //   if((MAC_NP_R & MAC_NP_NPR_M) == 0)return 0;   // return if no packet
   while((MAC_NP_R & MAC_NP_NPR_M) == 0) {
-    OS_Sleep(100);
+    OS_Sleep(10);
   }
   return MACPacketGet( pucBuf, lBufLen);        // return packet
 }
