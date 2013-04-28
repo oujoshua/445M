@@ -30,6 +30,7 @@ void EnableInterrupts(void);  // Enable interrupts
 
 static void(*_ADC_tasks[4])(unsigned short) = {NULL};
 ADC_MailBox_Type _ADC_Mailbox;
+unsigned long ADC_SamplesLost = 0;
 
 #pragma O0
 void ADC_Init(unsigned int fs) {
@@ -121,7 +122,7 @@ void ADC1_Handler(void) {
     }
     ADC_LogIndex = (ADC_LogIndex < 16) ?  ADC_LogIndex + 1 : ADC_LogIndex;
   }
-  ADC_Mailbox_Send(data);
+  ADC_SamplesLost += ADC_Mailbox_Send(data);
 }
 
 void ADC_Mailbox_Init(void) {
