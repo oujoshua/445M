@@ -541,6 +541,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\src\commands.c</FilePath>
             </File>
+            <File>
+              <FileName>fuzzy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\fuzzy.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

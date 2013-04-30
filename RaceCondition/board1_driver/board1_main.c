@@ -60,6 +60,7 @@ void pingAction(unsigned long dist, int id){
 	PingReady = 0x1;
 }
 
+#pragma O0
 void Brain(void)
 {
 	unsigned long left, right;
@@ -67,11 +68,16 @@ void Brain(void)
   while(1)
 	{
 		long dright, dleft;
-		Fuzzify_All(Ping_Dist, IR_Samples[IR_LEFT], IR_Samples[IR_FLEFT], IR_Samples[IR_FRIGHT], IR_Samples[IR_RIGHT]);
+		Fuzzify_All(Ping_Dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT], IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		Fuzzy_Compute();
 		Defuzzify(&dleft, &dright);
 		left = MAX(0, MIN(left + dleft, PWM_FAST));
 		right = MAX(0, MIN(right + dright, PWM_FAST));
+		/*if(left < right)
+			right = PWM_FAST;
+		else
+			left = PWM_FAST;*/
+		
 		if(Turned_ON_Flag)
 		{
 			PWM1_SetADuty(left);

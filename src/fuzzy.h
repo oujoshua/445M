@@ -1,5 +1,17 @@
-#define MIN(a, b) (a < b) ? a : b
-#define MAX(a, b) (a > b) ? a : b
+#define MIN(a, b) ((a < b) ? a : b)
+#define MAX(a, b) ((a > b) ? a : b)
+
+#define CLOSE_MIN		5
+#define CLOSE_MAX		40
+#define OK_MIN			5
+#define OK_MID			23
+#define OK_MAX			40
+#define FAR_MIN			5
+#define FAR_MAX			40
+
+#define CLOSE_SLOPE	255/(CLOSE_MAX - CLOSE_MIN)
+#define OK_SLOPE	255/(OK_MAX - OK_MIN)*2
+#define FAR_SLOPE	255/(FAR_MAX - FAR_MIN)
 
 typedef unsigned short FuzzyValue;
 
