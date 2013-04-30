@@ -25,7 +25,7 @@ unsigned char All[6] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 OS_EthernetMailbox _OS_EthernetMailbox;
 unsigned char Ethernet_okToSend = 0;
 
-Ethernet_State myState, hisState;
+Fuzzy_Ethernet_State myState, hisState;
 extern unsigned long IC_buffer[];
 extern unsigned long PingBuff[];
 extern unsigned long IR_Buff[];
@@ -81,23 +81,25 @@ void OS_EthernetListener(void) {
     if (size) {
       memcpy(hisState.byteArr, RcvMessage + 14, sizeof(OS_GlobalState));
       OLED_Init(15);
-      sprintf(str, "%s            ", hisState.state.decision);
+      sprintf(str, "fwd:%d            ", hisState.state.fwd);
       _OLED_Message(TOP, 0, str, 15);
-      sprintf(str, "Ping = %d             ", hisState.state.ping);
+      sprintf(str, "lft:%d            ", hisState.state.turn_left);
       _OLED_Message(TOP, 1, str, 15);
-      sprintf(str, "Time = %d             ", hisState.state.time);
+      sprintf(str, "rgt:%d             ", hisState.state.turn_right);
       _OLED_Message(TOP, 2, str, 15);
-      sprintf(str, "Samples Lost = %d     ", hisState.state.lost);
+      sprintf(str, "%d,%d     ", hisState.state.PWM_left, hisState.state.PWM_right);
       _OLED_Message(TOP, 3, str, 15);
       
-      sprintf(str, "Left = %d             ", hisState.state.IRs[IR_LEFT]);
+      sprintf(str, "%d,%d,%d,%d,%d          ",hisState.state.IRs[IR_LEFT],
+			                              hisState.state.IRs[IR_FLEFT],
+			                              hisState.state.ping,
+			                              hisState.state.IRs[IR_FRIGHT],
+			                              hisState.state.IRs[IR_RIGHT]);
       _OLED_Message(BOTTOM, 0, str, 15);
-      sprintf(str, "Front Left = %d       ", hisState.state.IRs[IR_FLEFT]);
+      sprintf(str, "Time:%d            ", hisState.state.time);
       _OLED_Message(BOTTOM, 1, str, 15);
-      sprintf(str, "Right = %d            ", hisState.state.IRs[IR_RIGHT]);
+      sprintf(str, "Lost:%d            ", hisState.state.lost);
       _OLED_Message(BOTTOM, 2, str, 15);
-      sprintf(str, "Front Right = %d      ", hisState.state.IRs[IR_FRIGHT]);
-      _OLED_Message(BOTTOM, 3, str, 15);
     }
 //     size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
 //     if(size){
@@ -201,11 +203,6 @@ void OS_EthernetMailBox_Recv(void) {
   OS_bSignal(&_OS_EthernetMailbox.gotData);
 }
 
-void OS_EthernetSendState(char* decision, unsigned long ping, unsigned long IRs[4], unsigned long time, unsigned long lost) {
-  strcpy(myState.state.decision, decision);
-  myState.state.ping = ping;
-  memcpy(myState.state.IRs, IRs, sizeof(unsigned long) * 4);
-  myState.state.time = time;
-  myState.state.lost = lost;
+void OS_EthernetSendState(void) {
   OS_EthernetMailBox_Send(myState.byteArr, sizeof(OS_GlobalState));
 }

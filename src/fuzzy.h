@@ -27,6 +27,7 @@ typedef struct FuzzyMovement {
   FuzzyValue turnRight;
 } FuzzyMovement;
 
+extern FuzzyMovement Fuzzy_Output;
 /* convert a crisp input into a fuzzy distance
  * input  : dist_cm distance in centimeters
  * input  : fuzzy pointer to FuzzyDistance variable to write the result to

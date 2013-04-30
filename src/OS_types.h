@@ -8,7 +8,7 @@ typedef struct _OS_Task {
 	unsigned long time,			/* _OS_Task_Time at which to perform */
 							priority,		/* Task priority */
 							period;			/* Frequency in units of 100ns */
-	struct _OS_Task *next;	/* Pointer to next task to perform*/
+	struct _OS_TaFsk *next;	/* Pointer to next task to perform*/
 } _OS_Task;
 
 /* Thread struct */
@@ -62,10 +62,27 @@ typedef struct OS_GlobalState {
   unsigned long lost;
 } OS_GlobalState;
 
+typedef struct Fuzzy_State {
+	unsigned char fwd;
+	unsigned char turn_left;
+	unsigned char turn_right;
+	unsigned char PWM_left;
+	unsigned char PWM_right;
+	unsigned long IRs[4];
+	unsigned long ping;
+	unsigned long time;
+	unsigned long lost;
+	
+} Fuzzy_State;
 typedef union Ethernet_State { 
   OS_GlobalState state;
   unsigned char byteArr[sizeof(OS_GlobalState)];
 } Ethernet_State;
+
+typedef union Fuzzy_Ethernet_State {
+	Fuzzy_State state;
+	unsigned char byteArr[sizeof(Fuzzy_State)];
+} Fuzzy_Ethernet_State;
 
 typedef struct ADC_MailBox_Type {
   unsigned short samples[CHANNELS];

@@ -1,5 +1,7 @@
 //OS_Ethernet.h
 
+extern Fuzzy_Ethernet_State myState;
+
 void OS_EthernetInit(void);
 
 //Meant to run in a foreground thread. Whenever an ethernet message

@@ -86,6 +86,16 @@ void Brain(void)
 			PWM1_SetADuty(left);
 			PWM1_SetBDuty(right);
 		}
+		myState.state.fwd = Fuzzy_Output.goStraight;
+	myState.state.turn_left = Fuzzy_Output.turnLeft;
+	myState.state.turn_right = Fuzzy_Output.turnRight;
+	myState.state.PWM_left = left;
+	myState.state.PWM_right = right;
+	memcpy(myState.state.IRs, IR_Dist, sizeof(unsigned long)*4);
+	myState.state.ping = Ping_Dist;
+	myState.state.time = OS_Time();
+	myState.state.lost = ADC_SamplesLost;
+	
 		
   }
 }
@@ -101,61 +111,13 @@ void IR_Listener(void) {
     IR_Dist[IR_FRIGHT] = IR_Distance(IR_Samples[IR_FRIGHT]);
 		//OS_bSignal(&IR_Ready);
   }
+	
+	
 }
 
 void State_Sender(void){
   while(1){
-    switch(Decision){
-      case(FWD):
-        sprintf(DEBUGDATA, "FWD, %d", ifelse_block);
-        break;
-      case(HARDLEFT):
-        sprintf(DEBUGDATA, "HARDLEFT, %d", ifelse_block);
-        break;
-      case(HARDRIGHT):
-        sprintf(DEBUGDATA, "HARDRIGHT, %d", ifelse_block);
-        break;
-      case(SOFTLEFT):
-        sprintf(DEBUGDATA, "SOFTLEFT, %d", ifelse_block);
-        break;
-      case(SOFTRIGHT):
-        sprintf(DEBUGDATA, "SOFTRIGHT, %d", ifelse_block);
-        break;
-      case(STOP):
-        sprintf(DEBUGDATA, "STOP, %d", ifelse_block);
-        break;
-      case(MEDLEFT):
-        sprintf(DEBUGDATA, "MEDLEFT, %d", ifelse_block);
-        break;
-      case(MEDRIGHT):
-        sprintf(DEBUGDATA, "MEDRIGHT, %d", ifelse_block);
-        break;
-      case(BACK):
-        sprintf(DEBUGDATA, "BACK, %d", ifelse_block);
-        break;
-      case(BACKHLEFT):
-        sprintf(DEBUGDATA, "BACKHLEFT, %d", ifelse_block);
-        break;
-      case(BACKHRIGHT):
-        sprintf(DEBUGDATA, "BACKHRIGHT, %d", ifelse_block);
-        break;
-      case(BACKSLEFT):
-        sprintf(DEBUGDATA, "BACKSLEFT, %d", ifelse_block);
-        break;
-      case(BACKSRIGHT):
-        sprintf(DEBUGDATA, "BACKSRIGHT, %d", ifelse_block);
-        break;
-      case(BACKMLEFT):
-        sprintf(DEBUGDATA, "BACKMLEFT, %d", ifelse_block);
-        break;
-      case(BACKMRIGHT):
-        sprintf(DEBUGDATA, "BACKMRIGHT, %d", ifelse_block);
-        break;
-      default:
-        sprintf(DEBUGDATA, "WUT, %d", ifelse_block);
-        break;
-    }
-    OS_EthernetSendState(DEBUGDATA, Ping_Dist, IR_Dist, OS_MsTime(),ADC_SamplesLost);
+    OS_EthernetSendState();
 		OS_Sleep(50);
   }
 }
@@ -193,7 +155,7 @@ int main (void) {
   PWM1_Init(50000,100);
   OS_AddButtonTask(&GOGOGO, 0);
   OS_AddThread(&IR_Listener, 128, 0);
-  OS_AddThread(&State_Sender, 128, 7);
+  //OS_AddThread(&State_Sender, 128, 7);
 	OS_AddThread(&Brain, 128, 1);
 	//OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
   OS_Add_Periodic_Thread(&PingTriggerPD56, 80, 3);
