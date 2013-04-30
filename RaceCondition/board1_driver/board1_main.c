@@ -11,6 +11,7 @@
 #include "OS_ethernet.h"
 #include "PingMeasure.h"
 #include "Fuzzy.h"
+#include <string.h>
 
 extern unsigned long ADC_SamplesLost;
 
@@ -68,10 +69,11 @@ void Brain(void)
   while(1)
 	{
 		long dright, dleft;
+		char set;
 		//OS_bWait(&IR_Ready);
 		Fuzzify_All(Ping_Dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT] + 15, IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		Fuzzy_Compute();
-		Defuzzify(&dleft, &dright);
+		Defuzzify(&dleft, &dright, &set);
 		
 		PingReady=0;
 		left = MIN(left + dleft, PWM_FAST);
@@ -83,18 +85,22 @@ void Brain(void)
 		
 		if(Turned_ON_Flag)
 		{
+			if(set == 1)
+			{
+				left = right = PWM_FAST;
+			}
 			PWM1_SetADuty(left);
 			PWM1_SetBDuty(right);
 		}
 		myState.state.fwd = Fuzzy_Output.goStraight;
-	myState.state.turn_left = Fuzzy_Output.turnLeft;
-	myState.state.turn_right = Fuzzy_Output.turnRight;
-	myState.state.PWM_left = left;
-	myState.state.PWM_right = right;
-	memcpy(myState.state.IRs, IR_Dist, sizeof(unsigned long)*4);
-	myState.state.ping = Ping_Dist;
-	myState.state.time = OS_Time();
-	myState.state.lost = ADC_SamplesLost;
+		myState.state.turn_left = Fuzzy_Output.turnLeft;
+		myState.state.turn_right = Fuzzy_Output.turnRight;
+		myState.state.PWM_left = left;
+		myState.state.PWM_right = right;
+		memcpy(myState.state.IRs, IR_Dist, sizeof(unsigned long)*4);
+		myState.state.ping = Ping_Dist;
+		myState.state.time = OS_Time();
+		myState.state.lost = ADC_SamplesLost;
 	
 		
   }

@@ -77,9 +77,9 @@ void OS_EthernetListener(void) {
   unsigned long size;
   eFile_Init();
   while(1) {
-    size = MAC_ReceiveNonBlocking(RcvMessage, sizeof(OS_GlobalState) + 14);
+    size = MAC_ReceiveNonBlocking(RcvMessage, sizeof(Fuzzy_State) + 14);
     if (size) {
-      memcpy(hisState.byteArr, RcvMessage + 14, sizeof(OS_GlobalState));
+      memcpy(hisState.byteArr, RcvMessage + 14, sizeof(Fuzzy_State));
       OLED_Init(15);
       sprintf(str, "fwd:%d            ", hisState.state.fwd);
       _OLED_Message(TOP, 0, str, 15);
@@ -108,7 +108,7 @@ void OS_EthernetListener(void) {
 // 			
 //       RcvCount++;
 //       // if an SD card is available, dump messages to disk; otherwise print to OLED
-//       memcpy(hisState.byteArr, RcvMessage + 14, sizeof(OS_GlobalState));
+//       memcpy(hisState.byteArr, RcvMessage + 14, sizeof(Fuzzy_State));
 //       if(eFile_WOpen(LOG_FILE) == 0) {
 //         for(i = 14; i < size; i++) {
 // 					if(RcvMessage[i])
@@ -154,7 +154,7 @@ void EthernetTest(void) {
 //     myState.state.tacho = IC_buffer[0];
 //     myState.state.ping = PingBuff[0];
 //     myState.state.IR =  IR_Buff[0];
-//     OS_EthernetMailBox_Send(myState.byteArr, sizeof(OS_GlobalState));
+//     OS_EthernetMailBox_Send(myState.byteArr, sizeof(Fuzzy_State));
 //     printf("Sent %d, %d, %d\n", myState.state.tacho, myState.state.ping, myState.state.IR);
 //     OS_Sleep(1000);
 //     if(i++ % 2) {
@@ -204,5 +204,5 @@ void OS_EthernetMailBox_Recv(void) {
 }
 
 void OS_EthernetSendState(void) {
-  OS_EthernetMailBox_Send(myState.byteArr, sizeof(OS_GlobalState));
+  OS_EthernetMailBox_Send(myState.byteArr, sizeof(Fuzzy_State));
 }

@@ -49,7 +49,7 @@ void Fuzzy_Compute(void);
  * output : dLeft the difference to be applied to the left PWM, returned by writing to variable passed by pointer
  * output : dRight the difference to be applied to the right PWM, returned by writing to the variable passed by pointer
  */
-void Defuzzify(long *dLeft, long *dRight);
+void Defuzzify(long *dLeft, long *dRight, char *set);
 
 /* compute the fuzzy or, A + B, which is equivalent to a mathematical MAX
  * input A : FuzzyValue argument to or/max

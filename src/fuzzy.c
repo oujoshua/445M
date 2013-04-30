@@ -30,7 +30,7 @@ void Fuzzify(unsigned long dist_cm, unsigned char scale, FuzzyDistance *output)
 
 void Fuzzify_All(unsigned long front, unsigned long left, unsigned long fleft, unsigned long fright, unsigned long right)
 {
-	Fuzzify(front, 2, &Fuzzy_Ping);
+	Fuzzify(front, 1, &Fuzzy_Ping);
 	Fuzzify(left, 1, &Fuzzy_IRs[IR_LEFT]);
 	Fuzzify(fleft, 1, &Fuzzy_IRs[IR_FLEFT]);
 	Fuzzify(fright, 1, &Fuzzy_IRs[IR_FRIGHT]);
@@ -43,14 +43,16 @@ void Fuzzify_All(unsigned long front, unsigned long left, unsigned long fleft, u
  * input   : none (FuzzyDistance values for each sensor, read from global variables)
  * outputs : output (writes fuzzy values to struct passed in via pointer
  */
+#pragma O0
 void Fuzzy_Compute()
 {
 	FuzzyMovement *output = &Fuzzy_Output;
-  output->turnLeft = /*OR(*/OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close)) \
-										, AND(Fuzzy_IRs[IR_FRIGHT].close, Fuzzy_IRs[IR_RIGHT].close))/*, AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_LEFT].far))*/;
-  output->goStraight = AND(AND(Fuzzy_IRs[IR_RIGHT].ok, Fuzzy_IRs[IR_LEFT].ok), OR(Fuzzy_Ping.ok, Fuzzy_Ping.far));
-  output->turnRight = /*OR(*/OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close))  \
-										, AND(Fuzzy_IRs[IR_FLEFT].close, Fuzzy_IRs[IR_LEFT].close))/*, AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_RIGHT].far))*/;
+  output->turnLeft = /*OR(*/OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close >> 1)) \
+										, AND(Fuzzy_IRs[IR_FRIGHT].close, Fuzzy_IRs[IR_RIGHT].close >> 1))/*, AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_LEFT].far))*/;
+  output->goStraight = 
+		//AND(AND(Fuzzy_IRs[IR_RIGHT].ok, Fuzzy_IRs[IR_LEFT].ok), OR(Fuzzy_Ping.ok, Fuzzy_Ping.far));
+  output->turnRight = /*OR(*/OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close >> 1))  \
+										, AND(Fuzzy_IRs[IR_FLEFT].close, Fuzzy_IRs[IR_LEFT].close >> 1))/*, AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_RIGHT].far))*/;
 }
 
 /* Defuzzify
@@ -59,10 +61,14 @@ void Fuzzy_Compute()
  * output : dLeft the difference to be applied to the left PWM, returned by writing to variable passed by pointer
  * output : dRight the difference to be applied to the right PWM, returned by writing to the variable passed by pointer
  */
-void Defuzzify(long *dLeft, long *dRight)
+void Defuzzify(long *dLeft, long *dRight, char *set)
 {
-  *dLeft = (400 * (Fuzzy_Output.turnRight - Fuzzy_Output.turnLeft))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
-  *dRight = (400 * (Fuzzy_Output.turnLeft - Fuzzy_Output.turnRight))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
+  *dLeft = (200 * (Fuzzy_Output.turnRight - Fuzzy_Output.turnLeft))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
+  *dRight = (200 * (Fuzzy_Output.turnLeft - Fuzzy_Output.turnRight))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
+	if(Fuzzy_Output.goStraight > 200 || (*dLeft < 10 && *dRight < 10))
+		*set = 1;
+	else
+		*set = 0;
 }
 
 /* Fuzzy_Or

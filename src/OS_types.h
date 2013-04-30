@@ -8,7 +8,7 @@ typedef struct _OS_Task {
 	unsigned long time,			/* _OS_Task_Time at which to perform */
 							priority,		/* Task priority */
 							period;			/* Frequency in units of 100ns */
-	struct _OS_TaFsk *next;	/* Pointer to next task to perform*/
+	struct _OS_Task *next;	/* Pointer to next task to perform*/
 } _OS_Task;
 
 /* Thread struct */
