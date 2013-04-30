@@ -78,10 +78,10 @@ void Brain(void)
 		PingReady=0;
 		left = MIN(left + dleft, PWM_FAST);
 		right = MIN(right + dright, PWM_FAST);
-		/*if(left < right)
+		if(left < right)
 			right = PWM_FAST;
 		else
-			left = PWM_FAST;*/
+			left = PWM_FAST;
 		
 		if(Turned_ON_Flag)
 		{
@@ -92,6 +92,11 @@ void Brain(void)
 			PWM1_SetADuty(left);
 			PWM1_SetBDuty(right);
 		}
+		else
+		{
+			PWM1_SetADuty(1);
+			PWM1_SetBDuty(1);
+		}
 		myState.state.fwd = Fuzzy_Output.goStraight;
 		myState.state.turn_left = Fuzzy_Output.turnLeft;
 		myState.state.turn_right = Fuzzy_Output.turnRight;
@@ -101,8 +106,7 @@ void Brain(void)
 		myState.state.ping = Ping_Dist;
 		myState.state.time = OS_Time();
 		myState.state.lost = ADC_SamplesLost;
-	
-		
+		memcpy(myState.byteArr, &myState.state, sizeof(Fuzzy_State));
   }
 }
 
@@ -161,7 +165,7 @@ int main (void) {
   PWM1_Init(50000,100);
   OS_AddButtonTask(&GOGOGO, 0);
   OS_AddThread(&IR_Listener, 128, 0);
-  //OS_AddThread(&State_Sender, 128, 7);
+  OS_AddThread(&State_Sender, 128, 7);
 	OS_AddThread(&Brain, 128, 1);
 	//OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
   OS_Add_Periodic_Thread(&PingTriggerPD56, 80, 3);
