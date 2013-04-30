@@ -1,5 +1,7 @@
+#define MIN(a, b) (a < b) ? a : b
+#define MAX(a, b) (a > b) ? a : b
 
-typedef unsigned char FuzzyValue;
+typedef unsigned short FuzzyValue;
 
 typedef struct FuzzyDistance {
   FuzzyValue close;
@@ -18,7 +20,7 @@ typedef struct FuzzyMovement {
  * input  : fuzzy pointer to FuzzyDistance variable to write the result to
  * outputs: none (writes fuzzy values to struct passed in via pointer)
  */
-void Fuzzify(unsigned long dist_cm, FuzzyDistance *fuzzy);
+void Fuzzify(unsigned long dist_cm, unsigned char scale, FuzzyDistance *fuzzy);
 
 /* Fuzzy_Compute
  * given a set of fuzzy inputs representing the state of each sensor, compute a fuzzy output
@@ -26,7 +28,7 @@ void Fuzzify(unsigned long dist_cm, FuzzyDistance *fuzzy);
  * input   : none (FuzzyDistance values for each sensor, read from global variables)
  * outputs : output (writes fuzzy values to struct passed in via pointer
  */
-void Fuzzy_Compute(FuzzyMovement *output);
+void Fuzzy_Compute(void);
 
 /* Defuzzify
  * compute the crisp output as a weighted average of the fuzzy variables
@@ -41,12 +43,13 @@ void Defuzzify(long *dLeft, long *dRight);
  * input B : FuzzyValue argument to or/max
  * output  : FuzzyVale or/max of A and B
  */
-FuzzyValue Fuzzy_Or(FuzzyValue A, FuzzyValue B);
+FuzzyValue OR(FuzzyValue A, FuzzyValue B);
 
 /* compute the fuzzy and, A * B, which is equivalent to a mathematical MIN
  * input A : FuzzyValue argument to and/min
  * input B : FuzzyValue argument to and/min
  * output  : FuzzyValue and/min of A and B
  */
-FuzzyValue Fuzzy_And(FuzzyValue A, FuzzyValue B);
+FuzzyValue AND(FuzzyValue A, FuzzyValue B);
 
+void Fuzzify_All(unsigned long front, unsigned long left, unsigned long fleft, unsigned long fright, unsigned long right);

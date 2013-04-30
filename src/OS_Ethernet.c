@@ -75,7 +75,6 @@ void OS_EthernetInit(void) {
 char str[32] = {0, };
 void OS_EthernetListener(void) {
   unsigned long size;
-  int i;
   eFile_Init();
   while(1) {
     size = MAC_ReceiveNonBlocking(RcvMessage, sizeof(OS_GlobalState) + 14);

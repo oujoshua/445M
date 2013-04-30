@@ -16,10 +16,25 @@ FuzzyMovement Fuzzy_Output;
  * input  : fuzzy pointer to FuzzyDistance variable to write the result to
  * outputs: output (writes fuzzy values to struct passed in via pointer)
  */
-void Fuzzify(unsigned long dist_cm, FuzzyDistance *output) {
-  output->close = 64;
-  output->ok = 64;
-  output->far = 64;
+void Fuzzify(unsigned long dist_cm, unsigned char scale, FuzzyDistance *output)
+{
+	if(dist_cm < 12)
+		dist_cm = 12;
+	else if(dist_cm > 48)
+		dist_cm = 48;
+	
+  output->close = 255 - (dist_cm - 12) * 7 / scale;
+  output->ok = (dist_cm > 30) ? (14*dist_cm - 168) / scale : (420 + 255 - 14*dist_cm) / scale;
+  output->far = (dist_cm - 12) * 7 / scale;
+}
+
+void Fuzzify_All(unsigned long front, unsigned long left, unsigned long fleft, unsigned long fright, unsigned long right)
+{
+	Fuzzify(front, 2, &Fuzzy_Ping);
+	Fuzzify(left, 1, &Fuzzy_IRs[IR_LEFT]);
+	Fuzzify(fleft, 1, &Fuzzy_IRs[IR_FLEFT]);
+	Fuzzify(fright, 1, &Fuzzy_IRs[IR_FRIGHT]);
+	Fuzzify(right, 1, &Fuzzy_IRs[IR_RIGHT]);
 }
 
 /* Fuzzy_Compute
@@ -28,10 +43,12 @@ void Fuzzify(unsigned long dist_cm, FuzzyDistance *output) {
  * input   : none (FuzzyDistance values for each sensor, read from global variables)
  * outputs : output (writes fuzzy values to struct passed in via pointer
  */
-void Fuzzy_Compute(FuzzyMovement *output) {
-  output->turnLeft = 0;
-  output->goStraight = 255;
-  output->turnRight = 0;
+void Fuzzy_Compute()
+{
+	FuzzyMovement *output = &Fuzzy_Output;
+  output->turnLeft = OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close));
+  output->goStraight = AND(AND(OR(Fuzzy_Ping.ok, Fuzzy_Ping.far), Fuzzy_IRs[IR_LEFT].ok), Fuzzy_IRs[IR_RIGHT].ok);
+  output->turnRight = OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close));
 }
 
 /* Defuzzify
@@ -41,8 +58,8 @@ void Fuzzy_Compute(FuzzyMovement *output) {
  * output : dRight the difference to be applied to the right PWM, returned by writing to the variable passed by pointer
  */
 void Defuzzify(long *dLeft, long *dRight) {
-  *dLeft = 0;
-  *dRight = 0;
+  *dLeft = (100 * (Fuzzy_Output.turnRight - Fuzzy_Output.turnLeft))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
+  *dRight = (100 * (Fuzzy_Output.turnLeft - Fuzzy_Output.turnRight))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
 }
 
 /* Fuzzy_Or
@@ -51,7 +68,7 @@ void Defuzzify(long *dLeft, long *dRight) {
  * input B : FuzzyValue argument to or/max
  * output  : FuzzyVale or/max of A and B
  */
-FuzzyValue Fuzzy_Or(FuzzyValue A, FuzzyValue B) {
+FuzzyValue OR(FuzzyValue A, FuzzyValue B) {
   return (A > B) ? A : B;
 }
 
@@ -61,7 +78,7 @@ FuzzyValue Fuzzy_Or(FuzzyValue A, FuzzyValue B) {
  * input B : FuzzyValue argument to and/min
  * output  : FuzzyValue and/min of A and B
  */
-FuzzyValue Fuzzy_And(FuzzyValue A, FuzzyValue B) {
+FuzzyValue AND(FuzzyValue A, FuzzyValue B) {
   return (A < B) ? A : B;
 }
 
