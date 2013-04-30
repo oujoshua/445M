@@ -68,9 +68,12 @@ void Brain(void)
   while(1)
 	{
 		long dright, dleft;
+		OS_Wait(&IR_Ready);
 		Fuzzify_All(Ping_Dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT], IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		Fuzzy_Compute();
 		Defuzzify(&dleft, &dright);
+		
+		PingReady=0;
 		left = MAX(0, MIN(left + dleft, PWM_FAST));
 		right = MAX(0, MIN(right + dright, PWM_FAST));
 		/*if(left < right)
@@ -83,6 +86,7 @@ void Brain(void)
 			PWM1_SetADuty(left);
 			PWM1_SetBDuty(right);
 		}
+		
   }
 }
 
@@ -152,6 +156,7 @@ void State_Sender(void){
         break;
     }
     OS_EthernetSendState(DEBUGDATA, Ping_Dist, IR_Dist, OS_MsTime(),ADC_SamplesLost);
+		OS_Sleep(50);
   }
 }
 
