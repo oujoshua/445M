@@ -68,14 +68,14 @@ void Brain(void)
   while(1)
 	{
 		long dright, dleft;
-		OS_Wait(&IR_Ready);
-		Fuzzify_All(Ping_Dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT], IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+		//OS_bWait(&IR_Ready);
+		Fuzzify_All(Ping_Dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT] + 15, IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		Fuzzy_Compute();
 		Defuzzify(&dleft, &dright);
 		
 		PingReady=0;
-		left = MAX(0, MIN(left + dleft, PWM_FAST));
-		right = MAX(0, MIN(right + dright, PWM_FAST));
+		left = MIN(left + dleft, PWM_FAST);
+		right = MIN(right + dright, PWM_FAST);
 		/*if(left < right)
 			right = PWM_FAST;
 		else
@@ -99,7 +99,7 @@ void IR_Listener(void) {
     IR_Dist[IR_RIGHT] = IR_Distance(IR_Samples[IR_RIGHT]);
     IR_Dist[IR_FLEFT] = IR_Distance(IR_Samples[IR_FLEFT]);
     IR_Dist[IR_FRIGHT] = IR_Distance(IR_Samples[IR_FRIGHT]);
-		OS_Signal(&IR_Ready);
+		//OS_bSignal(&IR_Ready);
   }
 }
 

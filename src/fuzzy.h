@@ -9,9 +9,9 @@
 #define FAR_MIN			12
 #define FAR_MAX			48
 
-#define CLOSE_SLOPE	(255/(CLOSE_MAX - CLOSE_MIN))
-#define OK_SLOPE	((255/OK_MAX - OK_MIN)*2)
-#define FAR_SLOPE	(255/(FAR_MAX - FAR_MIN))
+#define CLOSE_SLOPE	((unsigned short)(255/(CLOSE_MAX - CLOSE_MIN)))
+#define OK_SLOPE	((unsigned short)((255/(OK_MAX - OK_MIN)*2)))
+#define FAR_SLOPE	((unsigned short)(255/(FAR_MAX - FAR_MIN)))
 
 typedef unsigned short FuzzyValue;
 
