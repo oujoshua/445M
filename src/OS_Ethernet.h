@@ -1,7 +1,8 @@
 //OS_Ethernet.h
 
 extern Fuzzy_Ethernet_State myState;
-
+extern volatile long FIR_Dist;
+extern volatile long FIR_Ready;
 void OS_EthernetInit(void);
 
 //Meant to run in a foreground thread. Whenever an ethernet message

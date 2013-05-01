@@ -313,6 +313,8 @@ void OS_EthernetMailBox_Recv(void);
 
 void OS_EthernetSendState(void);
 
+void OS_EthernetSendVal(long *val);
+
 void ADC_Mailbox_Init(void);
 
 int ADC_Mailbox_Send(unsigned short samples[CHANNELS]);

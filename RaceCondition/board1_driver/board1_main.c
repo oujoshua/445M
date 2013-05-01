@@ -62,6 +62,10 @@ void Brain(void)
 		long dright, dleft;
 		char set;
 		//OS_bWait(&IR_Ready);
+		if(FIR_Ready){
+			FIR_Ready = 0;
+			Ping_Dist = (FIR_Dist > Ping_Dist)? Ping_Dist:FIR_Dist;
+		}
 		Fuzzify_All(Ping_Dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT], IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		Fuzzy_Compute();
 		Defuzzify(&dleft, &dright, &set);

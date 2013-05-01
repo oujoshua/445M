@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #define LOG_FILE "enet.txt"
-
+#define BOARD 1
 // void OS_EthernetListener(void);
 // void OS_EthernetSender(void);
 // void EthernetTest(void);
@@ -21,7 +21,8 @@ unsigned long ulUser0, ulUser1;
 unsigned long RcvCount, XmtCount;
 unsigned char Me[6];
 unsigned char All[6] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
-
+volatile long FIR_Dist;
+volatile long FIR_Ready;
 OS_EthernetMailbox _OS_EthernetMailbox;
 unsigned char Ethernet_okToSend = 0;
 
@@ -79,6 +80,8 @@ void OS_EthernetListener(void) {
   while(1) {
     size = MAC_ReceiveNonBlocking(RcvMessage, sizeof(Fuzzy_State) + 14);
     if (size) {
+			
+			if(BOARD != 1){
       memcpy(hisState.byteArr, RcvMessage + 14, sizeof(Fuzzy_State));
       OLED_Init(15);
       sprintf(str, "fwd:%d            ", hisState.state.fwd);
@@ -100,7 +103,14 @@ void OS_EthernetListener(void) {
       _OLED_Message(BOTTOM, 1, str, 15);
       sprintf(str, "Lost:%d            ", hisState.state.lost);
       _OLED_Message(BOTTOM, 2, str, 15);
-    }
+    } 
+		
+		else{
+			//if recieving on board 1, it will be an ADC value
+			FIR_Dist = *(long*)(RcvMessage + 14);
+			FIR_Ready = 1;
+		}
+	  }
 //     size = MAC_ReceiveNonBlocking(RcvMessage,MAXBUF);
 //     if(size){
 // 			
@@ -205,4 +215,8 @@ void OS_EthernetMailBox_Recv(void) {
 
 void OS_EthernetSendState(void) {
   OS_EthernetMailBox_Send(myState.byteArr, sizeof(Fuzzy_State));
+}
+
+void OS_EthernetSendVal(long *val){
+	OS_EthernetMailBox_Send((unsigned char*) val, sizeof(unsigned long));
 }
