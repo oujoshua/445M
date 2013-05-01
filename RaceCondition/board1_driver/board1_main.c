@@ -22,15 +22,6 @@ unsigned long TargetSpdRgt;
 volatile char PingReady;
 OS_SemaphoreType IR_Ready;
 
-void moveThread(void){
-  unsigned long start = OS_MsTime();
-// 	eFile_RedirectToFile("PIDlog.txt");
-  PWM1_SetADuty(PWM_MED);
-  PWM1_SetBDuty(PWM_MED);
-  while(1);
-// 	eFile_EndRedirectToFile();
-}
-
 /*
 void sendCMDS(void){
   MoveCmd = FWD;
@@ -53,6 +44,7 @@ Command Decision;
 char ifelse_block;
 char DEBUGDATA[60];
 char Turned_ON_Flag = 0;
+char Done_Flag = 0;
 unsigned long Turned_ON_Time;
 
 void pingAction(unsigned long dist, int id){
@@ -91,7 +83,7 @@ void Brain(void)
 			PWM1_SetADuty(left);
 			PWM1_SetBDuty(right);
 		}
-		else
+		else if(Done_Flag == 1)
 		{
 			PWM1_SetADuty(1);
 			PWM1_SetBDuty(1);
@@ -151,18 +143,26 @@ void Turner_Offer(void){
   while(1){
     if(OS_MsTime() >= (Turned_ON_Time + 180*1000)){
       Turned_ON_Flag = 0;
+      Done_Flag = 1;
     }
     else{
-      OS_Sleep(1000);
+      OS_Sleep(500);
     }
   }
 }
-
+#pragma O0
 void GOGOGO(void){
-  Turned_ON_Flag = 1;
+  int speed = PWM_SLOW;
   Turned_ON_Time = OS_MsTime();
   OS_AddThread(&Turner_Offer, 128, 7);
-	OS_AddThread(&moveThread, 128, 3);
+  while(speed < PWM_FAST){
+    PWM1_SetADuty(speed);
+    PWM1_SetBDuty(speed);
+    speed = speed + 2000;
+    OS_Sleep(25);
+  }
+  Turned_ON_Flag = 1;
+  Done_Flag = 0;
   OS_Kill();
 }
 
@@ -170,7 +170,7 @@ int main (void) {
   OS_Init();
 	//eFile_Init();
 	//SH_Init();
-//	OS_EthernetInit();
+	OS_EthernetInit();
   ADC_Init(833);
   PingMeasurePD56_Init(&pingAction);
 	OS_InitSemaphore(&IR_Ready, 0);
@@ -180,7 +180,7 @@ int main (void) {
   PWM1_Init(50000,100);
   OS_AddButtonTask(&GOGOGO, 0);
   OS_AddThread(&IR_Listener, 128, 0);
-  //OS_AddThread(&State_Sender, 128, 7);
+  OS_AddThread(&State_Sender, 128, 7);
 	OS_AddThread(&Brain, 128, 1);
 	//OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
   OS_Add_Periodic_Thread(&PingTriggerPD56, 80, 3);
