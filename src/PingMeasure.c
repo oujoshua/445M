@@ -136,7 +136,7 @@ void GPIOPortB_Handler(){
 
 }
 
-
+/*
 #pragma O0
 void PingMeasurePC57_Init(void(*task)(unsigned long distance, int id)){
                                    // activate port C
@@ -182,7 +182,7 @@ void GPIOPortC_Handler(){
 	}
 
 }
-
+*/
 //trigger a ping measurement
 //returns 0 on success. 
 //returns 1 if sensor is not ready.
