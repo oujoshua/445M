@@ -56,16 +56,16 @@ void pingAction(unsigned long dist, int id){
 void Brain(void)
 {
 	unsigned long left, right;
+	long FIR_Dist;
 	left = right = PWM_MED;
   while(1)
 	{
 		long dright, dleft;
 		char set;
 		//OS_bWait(&IR_Ready);
-		if(FIR_Ready){
-			FIR_Ready = 0;
+		FIR_Dist = OS_EthernetReceiveNonBlocking();	
 			Ping_Dist = (FIR_Dist > Ping_Dist)? Ping_Dist:FIR_Dist;
-		}
+		
 		Fuzzify_All(Ping_Dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT], IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		Fuzzy_Compute();
 		Defuzzify(&dleft, &dright, &set);

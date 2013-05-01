@@ -18,7 +18,7 @@ FuzzyMovement Fuzzy_Output;
 void Fuzzify(unsigned long dist_cm, unsigned char scale, FuzzyDistance *output)
 {
 	unsigned long raw = dist_cm;
-	unsigned long far_min = 57,
+	unsigned long far_min = 72,
 								far_slope = 8;
 	if(dist_cm < CLOSE_MIN)
 		dist_cm = CLOSE_MIN;
@@ -54,17 +54,23 @@ void Fuzzify_All(unsigned long front, unsigned long left, unsigned long fleft, u
 void Fuzzy_Compute(void)
 {
 	FuzzyMovement *output = &Fuzzy_Output;
-  output->turnLeft  = OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close),
-											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close >> 1)),
-											AND(Fuzzy_IRs[IR_FRIGHT].close<<1, Fuzzy_IRs[IR_RIGHT].close >> 1)),
-											OR(Fuzzy_IRs[IR_LEFT].far,Fuzzy_IRs[IR_FLEFT].far));
+  output->turnLeft  = /*OR(*//*OR(*/OR(OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close),
+											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close)),
+											AND(Fuzzy_IRs[IR_FRIGHT].close<<0, Fuzzy_IRs[IR_RIGHT].close )),
+											//OR(Fuzzy_IRs[IR_LEFT].far,Fuzzy_IRs[IR_FLEFT].far)),
+											AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_LEFT].far)),
+										//	AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].ok)),
+											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].far));
 	
-  output->goStraight = AND(AND(Fuzzy_IRs[IR_RIGHT].ok, Fuzzy_IRs[IR_LEFT].ok), OR(Fuzzy_Ping.ok, Fuzzy_Ping.far));
+  output->goStraight = (AND(AND(AND(Fuzzy_IRs[IR_FRIGHT].ok,Fuzzy_IRs[IR_FLEFT].ok),AND(Fuzzy_IRs[IR_RIGHT].ok, Fuzzy_IRs[IR_LEFT].ok)), OR(Fuzzy_Ping.ok, Fuzzy_Ping.far)))>>1;
   
-	output->turnRight = OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close),
-											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close >> 1)),
-											AND(Fuzzy_IRs[IR_FLEFT].close<<1, Fuzzy_IRs[IR_LEFT].close >> 1)),
-											OR(Fuzzy_IRs[IR_RIGHT].far,Fuzzy_IRs[IR_FRIGHT].far ));
+	output->turnRight = /*OR(*//*OR(*/OR(OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close),
+											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close )),
+											AND(Fuzzy_IRs[IR_FLEFT].close<<0, Fuzzy_IRs[IR_LEFT].close)),
+											//OR(Fuzzy_IRs[IR_RIGHT].far,Fuzzy_IRs[IR_FRIGHT].far )),
+											AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_RIGHT].far)),
+										//	AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].ok)),
+											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].far));
 }
 
 /* Defuzzify
@@ -77,7 +83,7 @@ void Defuzzify(long *dLeft, long *dRight, char *set)
 {
   *dLeft = (200 * (Fuzzy_Output.turnRight - Fuzzy_Output.turnLeft))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
   *dRight = (200 * (Fuzzy_Output.turnLeft - Fuzzy_Output.turnRight))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
-	if(*dLeft < 20 && *dRight < 20)
+	if(*dLeft < 20 && *dRight < 20 /*|| Fuzzy_Output.goStraight > (MAX(Fuzzy_Output.turnRight,Fuzzy_Output.turnLeft))*/)
 		*set = 1;
 	else
 		*set = 0;

@@ -7,6 +7,7 @@
 #include "eFile.h"
 #include "eDisk.h"
 #include "rit128x96x4.h"
+#include "stdio.h"
 #define ADC_PERIOD 10000 // configure for 20 Hz fs, ADC prescale is 5us
 #define IR_PRIORITY 1
 #define DECISION_PRIORITY 2
@@ -45,8 +46,11 @@ void IR_Listener(void) {
   while(1) {
      ADC_Mailbox_Receive(&IR_Samples[count][0]);
 //    if(count == 2){
-		val = IR_Distance(Median_Of_3(IR_Samples[0][IR_LEFT], IR_Samples[1][IR_LEFT], IR_Samples[2][IR_LEFT]));
+		val = IR_Distance(Median_Of_3(IR_Samples[0][0], IR_Samples[1][0], IR_Samples[2][0]));
+
+
      OS_EthernetSendVal(&val);
+		 OS_EthernetSendNow();
  //    }
     count = (count + 1) % 3;
         //OS_bSignal(&IR_Ready);
@@ -57,7 +61,7 @@ void IR_Listener(void) {
 int main(void) {
   OS_Init();
  	OS_EthernetInit();
-	  ADC_Init(833);
+	ADC_Init(833);
 
 	OLED_Init(15);
   _OLED_Message(BOTTOM, 4, "this is stupid", 8);

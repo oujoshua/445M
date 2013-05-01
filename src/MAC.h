@@ -114,6 +114,8 @@ long MAC_ReceiveBlocking(unsigned char *pucBuf, long lBufLen);
 // Will not wait if no input (returns 0 if no input)
 long MAC_ReceiveNonBlocking(unsigned char *pucBuf, long lBufLen);
 
+long MAC_ReceiveRealNonBlocking(unsigned char *pucBuf, long lBufLen);
+
 //*****************************************************************************
 // Nonblocking Send a packet to the Ethernet controller.
 //

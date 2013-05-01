@@ -288,6 +288,14 @@ long MAC_ReceiveNonBlocking(unsigned char *pucBuf, long lBufLen){
   return MACPacketGet( pucBuf, lBufLen);        // return packet
 }
 
+long MAC_ReceiveRealNonBlocking(unsigned char *pucBuf, long lBufLen){
+//   if((MAC_NP_R & MAC_NP_NPR_M) == 0)return 0;   // return if no packet
+  if((MAC_NP_R & MAC_NP_NPR_M) == 0) {
+    return 0;
+  }
+  return MACPacketGet( pucBuf, lBufLen);        // return packet
+}
+
 
 // 
 ////*****************************************************************************

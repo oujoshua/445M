@@ -30,7 +30,7 @@ Fuzzy_Ethernet_State myState, hisState;
 extern unsigned long IC_buffer[];
 extern unsigned long PingBuff[];
 extern unsigned long IR_Buff[];
-
+long FIRVAL;
 
 #pragma O0
 void OS_EthernetInit(void) {
@@ -64,8 +64,12 @@ void OS_EthernetInit(void) {
   
   OS_EthernetMailBox_Init();
   
+	if(BOARD != 1){
   OS_AddThread(&OS_EthernetListener, 128, 4);
+	}
+	if(BOARD != 2){
   OS_AddThread(&OS_EthernetSender, 128, 4);
+	}
 //   OS_AddThread(&EthernetTest, 128, 4);
   
 	printf("Ethernet connected\n");
@@ -103,6 +107,8 @@ void OS_EthernetListener(void) {
       _OLED_Message(BOTTOM, 1, str, 15);
       sprintf(str, "Lost:%d            ", hisState.state.lost);
       _OLED_Message(BOTTOM, 2, str, 15);
+					 sprintf(str, "FIR:%d          ", FIRVAL);
+		 _OLED_Message(BOTTOM, 3, str, 15);
     } 
 		
 		else{
@@ -156,6 +162,10 @@ void OS_EthernetSender(void) {
   }
 }
 
+void OS_EthernetSendNow(void){
+	OS_EthernetMailBox_Recv();
+    MAC_SendData(SendBuff, _OS_EthernetMailbox.size, All);
+}
 
 
 void EthernetTest(void) {
@@ -218,5 +228,17 @@ void OS_EthernetSendState(void) {
 }
 
 void OS_EthernetSendVal(long *val){
+	FIRVAL = *val;
 	OS_EthernetMailBox_Send((unsigned char*) val, sizeof(unsigned long));
+}
+
+long OS_EthernetReceiveNonBlocking(void){long size;
+	    size = MAC_ReceiveRealNonBlocking(RcvMessage, sizeof(unsigned long) + 14);
+	
+	   if(size){
+			 return *(long*)(RcvMessage + 14);
+		 }
+		 else {
+			 return 255;
+		 }
 }
