@@ -70,7 +70,7 @@ void Brain(void)
 		long dright, dleft;
 		char set;
 		//OS_bWait(&IR_Ready);
-		Fuzzify_All(Ping_Dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT] + 15, IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
+		Fuzzify_All(Ping_Dist, IR_Dist[IR_LEFT], IR_Dist[IR_FLEFT], IR_Dist[IR_FRIGHT], IR_Dist[IR_RIGHT]);
 		Fuzzy_Compute();
 		Defuzzify(&dleft, &dright, &set);
 		

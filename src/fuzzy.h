@@ -1,12 +1,12 @@
 #define MIN(a, b) ((a < b) ? a : b)
 #define MAX(a, b) ((a > b) ? a : b)
 
-#define CLOSE_MIN		5
+#define CLOSE_MIN		13
 #define CLOSE_MAX		47
-#define OK_MIN			5
-#define OK_MID			26
+#define OK_MIN			13
+#define OK_MID			30
 #define OK_MAX			47
-#define FAR_MIN			5
+#define FAR_MIN			13
 #define FAR_MAX			47
 
 #define CLOSE_SLOPE	((unsigned short)(255/(CLOSE_MAX - CLOSE_MIN)))

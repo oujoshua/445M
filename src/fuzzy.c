@@ -14,10 +14,11 @@ FuzzyMovement Fuzzy_Output;
  * input  : fuzzy pointer to FuzzyDistance variable to write the result to
  * outputs: output (writes fuzzy values to struct passed in via pointer)
  */
+ #pragma O0
 void Fuzzify(unsigned long dist_cm, unsigned char scale, FuzzyDistance *output)
 {
 	unsigned long raw = dist_cm;
-	unsigned long far_min = 63,
+	unsigned long far_min = 57,
 								far_slope = 8;
 	if(dist_cm < CLOSE_MIN)
 		dist_cm = CLOSE_MIN;
@@ -53,12 +54,17 @@ void Fuzzify_All(unsigned long front, unsigned long left, unsigned long fleft, u
 void Fuzzy_Compute(void)
 {
 	FuzzyMovement *output = &Fuzzy_Output;
-  output->turnLeft = OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close >> 1)) \
-										, AND(Fuzzy_IRs[IR_FRIGHT].close<<1, Fuzzy_IRs[IR_RIGHT].close >> 1)), OR(Fuzzy_IRs[IR_LEFT].far,Fuzzy_IRs[IR_FLEFT].far));
-  output->goStraight = 
-		AND(AND(Fuzzy_IRs[IR_RIGHT].ok, Fuzzy_IRs[IR_LEFT].ok), OR(Fuzzy_Ping.ok, Fuzzy_Ping.far));
-  output->turnRight = OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close >> 1))  \
-										, AND(Fuzzy_IRs[IR_FLEFT].close<<1, Fuzzy_IRs[IR_LEFT].close >> 1)), OR(Fuzzy_IRs[IR_RIGHT].far,Fuzzy_IRs[IR_FRIGHT].far ));
+  output->turnLeft  = OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close),
+											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close >> 1)),
+											AND(Fuzzy_IRs[IR_FRIGHT].close<<1, Fuzzy_IRs[IR_RIGHT].close >> 1)),
+											OR(Fuzzy_IRs[IR_LEFT].far,Fuzzy_IRs[IR_FLEFT].far));
+	
+  output->goStraight = AND(AND(Fuzzy_IRs[IR_RIGHT].ok, Fuzzy_IRs[IR_LEFT].ok), OR(Fuzzy_Ping.ok, Fuzzy_Ping.far));
+  
+	output->turnRight = OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close),
+											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close >> 1)),
+											AND(Fuzzy_IRs[IR_FLEFT].close<<1, Fuzzy_IRs[IR_LEFT].close >> 1)),
+											OR(Fuzzy_IRs[IR_RIGHT].far,Fuzzy_IRs[IR_FRIGHT].far ));
 }
 
 /* Defuzzify
@@ -71,7 +77,7 @@ void Defuzzify(long *dLeft, long *dRight, char *set)
 {
   *dLeft = (200 * (Fuzzy_Output.turnRight - Fuzzy_Output.turnLeft))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
   *dRight = (200 * (Fuzzy_Output.turnLeft - Fuzzy_Output.turnRight))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
-	if(/*Fuzzy_Output.goStraight > 200 || */(*dLeft < 29 && *dRight < 29))
+	if(*dLeft < 20 && *dRight < 20)
 		*set = 1;
 	else
 		*set = 0;
