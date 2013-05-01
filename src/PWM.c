@@ -3,25 +3,12 @@
 // Use PWM0 to generate a 100 Hz square wave with 50% duty cycle.
 // Daniel Valvano
 // June 27, 2011
-
-/* This example accompanies the book
-   "Embedded Systems: Real Time Interfacing to the Arm Cortex M3",
-   ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2011
-
- Copyright 2011 by Jonathan W. Valvano, valvano@mail.utexas.edu
-    You may use, edit, run or distribute this file
-    as long as the above copyright notice remains
- THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
- OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
- VALVANO SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL,
- OR CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
- For more information about my classes, my research, and my books, see
- http://users.ece.utexas.edu/~valvano/
- */
 #include "lm3s8962.h"
 
 #define PB_PINS 0x3
+#define MAX 250
+#define DELTA(A,B) (A>B ? A-B : B-A)
+#define CAP(PREV,NEW) (NEW>PREV ? PREV+MAX : PREV-MAX)
 
 // period is number of PWM clock cycles in one period (3<=period)
 // duty is number of PWM clock cycles output is high  (2<=duty<=period-1)
@@ -87,9 +74,17 @@ void PWM0_SetBDuty(unsigned short newDuty){
 }
 
 void PWM1_SetADuty(unsigned short newDuty) {
+	/*static unsigned short prev = 0;
+	if(DELTA(prev, newDuty) > MAX)
+		newDuty = CAP(prev, newDuty);
+	prev = newDuty;*/
   PWM_1_CMPA_R = newDuty - 1;
 }
 
 void PWM1_SetBDuty(unsigned short newDuty) {
+	/*static unsigned short prev = 0;
+	if(DELTA(prev, newDuty) > MAX)
+		newDuty = CAP(prev, newDuty);
+	prev = newDuty;*/
   PWM_1_CMPB_R = newDuty - 1;
 }

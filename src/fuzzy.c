@@ -54,11 +54,11 @@ void Fuzzy_Compute(void)
 {
 	FuzzyMovement *output = &Fuzzy_Output;
   output->turnLeft = OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close >> 1)) \
-										, AND(Fuzzy_IRs[IR_FRIGHT].close<<1, Fuzzy_IRs[IR_RIGHT].close >> 1)), OR(Fuzzy_IRs[IR_LEFT].far<<1,Fuzzy_IRs[IR_FLEFT].far));
+										, AND(Fuzzy_IRs[IR_FRIGHT].close<<1, Fuzzy_IRs[IR_RIGHT].close >> 1)), OR(Fuzzy_IRs[IR_LEFT].far,Fuzzy_IRs[IR_FLEFT].far));
   output->goStraight = 
 		AND(AND(Fuzzy_IRs[IR_RIGHT].ok, Fuzzy_IRs[IR_LEFT].ok), OR(Fuzzy_Ping.ok, Fuzzy_Ping.far));
   output->turnRight = OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close), AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close >> 1))  \
-										, AND(Fuzzy_IRs[IR_FLEFT].close<<1, Fuzzy_IRs[IR_LEFT].close >> 1)), OR(Fuzzy_IRs[IR_RIGHT].far<<1,Fuzzy_IRs[IR_FRIGHT].far ));
+										, AND(Fuzzy_IRs[IR_FLEFT].close<<1, Fuzzy_IRs[IR_LEFT].close >> 1)), OR(Fuzzy_IRs[IR_RIGHT].far,Fuzzy_IRs[IR_FRIGHT].far ));
 }
 
 /* Defuzzify

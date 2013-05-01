@@ -15,7 +15,6 @@
 
 extern unsigned long ADC_SamplesLost;
 
-
 short LeftDuty;
 short rightDuty;
 unsigned long TargetSpdLft;
@@ -26,8 +25,8 @@ OS_SemaphoreType IR_Ready;
 void moveThread(void){
   unsigned long start = OS_MsTime();
 // 	eFile_RedirectToFile("PIDlog.txt");
-  PWM1_SetADuty(49790);
-  PWM1_SetBDuty(49990);
+  PWM1_SetADuty(PWM_MED);
+  PWM1_SetBDuty(PWM_MED);
   while(1);
 // 	eFile_EndRedirectToFile();
 }
@@ -47,7 +46,7 @@ void sendCMDS(void){
   OS_Kill();
 }
 */
-unsigned short IR_Samples[4] = {0,};
+unsigned short IR_Samples[3][4] = {0,};
 long IR_Dist[4] = {200, };
 unsigned long Ping_Dist;
 Command Decision;
@@ -87,7 +86,7 @@ void Brain(void)
 		{
 			if(set == 1)
 			{
-				left = right = PWM_FAST;
+				left = right = ((PWM_FAST+ (2*MIN(left,right)))/3);
 			}
 			PWM1_SetADuty(left);
 			PWM1_SetBDuty(right);
@@ -109,21 +108,37 @@ void Brain(void)
 		memcpy(myState.byteArr, &myState.state, sizeof(Fuzzy_State));
   }
 }
+long Median_Of_3(long a, long b, long c){
+  long middle;
+  if ((a <= b) && (a <= c)){
+    middle = (b <= c) ? b : c;
+  }
+  else if ((b <= a) && (b <= c)){
+    middle = (a <= c) ? a : c;
+   }
+  else{
+    middle = (a <= b) ? a : b;
+  }
+  return middle;
+}
 
 // ADC0 is the (angle) right IR
 // ADC1 is the (angle) left IR
 void IR_Listener(void) {
+  char count = 0;
   while(1) {
-    ADC_Mailbox_Receive(IR_Samples);
-    IR_Dist[IR_LEFT] = IR_Distance(IR_Samples[IR_LEFT]);
-    IR_Dist[IR_RIGHT] = IR_Distance(IR_Samples[IR_RIGHT]);
-    IR_Dist[IR_FLEFT] = IR_Distance(IR_Samples[IR_FLEFT]);
-    IR_Dist[IR_FRIGHT] = IR_Distance(IR_Samples[IR_FRIGHT]);
-		//OS_bSignal(&IR_Ready);
+     ADC_Mailbox_Receive(&IR_Samples[count][0]);
+//    if(count == 2){
+      IR_Dist[IR_LEFT] = IR_Distance(Median_Of_3(IR_Samples[0][IR_LEFT], IR_Samples[1][IR_LEFT], IR_Samples[2][IR_LEFT]));
+      IR_Dist[IR_RIGHT] = IR_Distance(Median_Of_3(IR_Samples[0][IR_RIGHT], IR_Samples[1][IR_RIGHT], IR_Samples[2][IR_RIGHT]));
+       IR_Dist[IR_FLEFT] = IR_Distance(Median_Of_3(IR_Samples[0][IR_FLEFT], IR_Samples[1][IR_FLEFT], IR_Samples[2][IR_FLEFT]));
+      IR_Dist[IR_FRIGHT] = IR_Distance(Median_Of_3(IR_Samples[0][IR_FRIGHT], IR_Samples[1][IR_FRIGHT], IR_Samples[2][IR_FRIGHT]));
+ //    }
+    count = (count + 1) % 3;
+        //OS_bSignal(&IR_Ready);
   }
-	
-	
 }
+
 
 void State_Sender(void){
   while(1){
@@ -155,8 +170,8 @@ int main (void) {
   OS_Init();
 	//eFile_Init();
 	//SH_Init();
-	//OS_EthernetInit();
-  ADC_Init(2500);
+//	OS_EthernetInit();
+  ADC_Init(833);
   PingMeasurePD56_Init(&pingAction);
 	OS_InitSemaphore(&IR_Ready, 0);
 	PingReady = 0;
