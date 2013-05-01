@@ -54,23 +54,23 @@ void Fuzzify_All(unsigned long front, unsigned long left, unsigned long fleft, u
 void Fuzzy_Compute(void)
 {
 	FuzzyMovement *output = &Fuzzy_Output;
-  output->turnLeft  = /*OR(*//*OR(*/OR(OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close),
+  output->turnLeft  = /*OR(*//*OR(*//*OR(*/OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].close),
 											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close)),
-											AND(Fuzzy_IRs[IR_FRIGHT].close<<0, Fuzzy_IRs[IR_RIGHT].close )),
+											AND(Fuzzy_IRs[IR_FRIGHT].close, Fuzzy_IRs[IR_RIGHT].close )),
 											//OR(Fuzzy_IRs[IR_LEFT].far,Fuzzy_IRs[IR_FLEFT].far)),
-											AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_LEFT].far)),
+											AND(AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_LEFT].far),AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].far))
 										//	AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].ok)),
-											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].far));
+											);
 	
   output->goStraight = (AND(AND(AND(Fuzzy_IRs[IR_FRIGHT].ok,Fuzzy_IRs[IR_FLEFT].ok),AND(Fuzzy_IRs[IR_RIGHT].ok, Fuzzy_IRs[IR_LEFT].ok)), OR(Fuzzy_Ping.ok, Fuzzy_Ping.far)))>>1;
   
-	output->turnRight = /*OR(*//*OR(*/OR(OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close),
+	output->turnRight = /*OR(*//*OR(*//*OR(*/OR(OR(OR(AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].close),
 											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close )),
-											AND(Fuzzy_IRs[IR_FLEFT].close<<0, Fuzzy_IRs[IR_LEFT].close)),
+											AND(Fuzzy_IRs[IR_FLEFT].close, Fuzzy_IRs[IR_LEFT].close)),
 											//OR(Fuzzy_IRs[IR_RIGHT].far,Fuzzy_IRs[IR_FRIGHT].far )),
-											AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_RIGHT].far)),
+										 AND(AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_RIGHT].far),AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].far))
 										//	AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].ok)),
-											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].far));
+											);
 }
 
 /* Defuzzify
@@ -83,8 +83,8 @@ void Defuzzify(long *dLeft, long *dRight, char *set)
 {
   *dLeft = (200 * (Fuzzy_Output.turnRight - Fuzzy_Output.turnLeft))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
   *dRight = (200 * (Fuzzy_Output.turnLeft - Fuzzy_Output.turnRight))/(Fuzzy_Output.turnLeft + Fuzzy_Output.turnRight + Fuzzy_Output.goStraight);
-	if(*dLeft < 20 && *dRight < 20 /*|| Fuzzy_Output.goStraight > (MAX(Fuzzy_Output.turnRight,Fuzzy_Output.turnLeft))*/)
-		*set = 1;
+	if(*dLeft < 24 && *dRight < 24 /*|| Fuzzy_Output.goStraight > (MAX(Fuzzy_Output.turnRight,Fuzzy_Output.turnLeft))*/)
+		*set = 1;//< 20
 	else
 		*set = 0;
 }
