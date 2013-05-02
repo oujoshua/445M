@@ -58,7 +58,7 @@ void Fuzzy_Compute(void)
 											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].close)),
 											AND(Fuzzy_IRs[IR_FRIGHT].close, Fuzzy_IRs[IR_RIGHT].close )),
 											//OR(Fuzzy_IRs[IR_LEFT].far,Fuzzy_IRs[IR_FLEFT].far)),
-											AND(AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_LEFT].far),AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].far))
+											OR(AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_LEFT].far),AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FLEFT].far>>1))
 										//	AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].ok)),
 											);
 	
@@ -68,7 +68,7 @@ void Fuzzy_Compute(void)
 											AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_LEFT].close )),
 											AND(Fuzzy_IRs[IR_FLEFT].close, Fuzzy_IRs[IR_LEFT].close)),
 											//OR(Fuzzy_IRs[IR_RIGHT].far,Fuzzy_IRs[IR_FRIGHT].far )),
-										 AND(AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_RIGHT].far),AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].far))
+										 OR(AND(Fuzzy_Ping.close,Fuzzy_IRs[IR_RIGHT].far),AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_FRIGHT].far>>1))
 										//	AND(Fuzzy_Ping.close, Fuzzy_IRs[IR_RIGHT].ok)),
 											);
 }
