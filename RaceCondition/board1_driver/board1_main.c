@@ -159,6 +159,7 @@ void GOGOGO(void){
   int speed = PWM_SLOW;
   Turned_ON_Time = OS_MsTime();
   OS_AddThread(&Turner_Offer, 128, 7);
+  Forward();
   while(speed < PWM_FAST){
     PWM1_SetADuty(speed);
     PWM1_SetBDuty(speed);
@@ -174,10 +175,10 @@ int main (void) {
   OS_Init();
 	//eFile_Init();
 	//SH_Init();
-	//OS_EthernetInit();
+	OS_EthernetInit();
 	InitCommands();
-	Reverse();
-  ADC_Init(400);
+	//Reverse();
+  ADC_Init(833);
   PingMeasurePD56_Init(&pingAction);
 	OS_InitSemaphore(&IR_Ready, 0);
 	PingReady = 0;
@@ -186,7 +187,7 @@ int main (void) {
   PWM1_Init(50000,100);
   OS_AddButtonTask(&GOGOGO, 0);
   OS_AddThread(&IR_Listener, 128, 0);
-  //OS_AddThread(&State_Sender, 128, 7);
+  OS_AddThread(&State_Sender, 128, 7);
 	OS_AddThread(&Brain, 128, 1);
 	//OS_Add_Periodic_Thread(&disk_timerproc, 10, 4);
   OS_Add_Periodic_Thread(&PingTriggerPD56, 80, 3);
