@@ -3,7 +3,44 @@
 #include "PWM.h"
 #include "eFile.h"
 #include "OS.h"
+#include "lm3s8962.h"
 
+
+#define PB4 (*((volatile unsigned long *)0x40005040))
+#define PB6 (*((volatile unsigned long *)0x40005100))
+
+#pragma O0
+void InitCommands(void){
+  volatile long delay;
+  SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOB;
+  delay = SYSCTL_RCGC2_R;
+
+  
+  GPIO_PORTB_DEN_R |= 0x50;        // enable digital I/O on PB4,6
+  GPIO_PORTB_DIR_R |= 0x50;        //set PB4,6 to output
+  PB4 = ~0x10;//go forward
+  PB6 = ~0x40;//go forward
+}
+
+void Reverse(void){
+  PB4 = 0x10;//reverse
+  PB6 = 0x40;//reverse
+}
+
+void Forward(void){
+  PB4 = ~0x10;//go forward
+  PB6 = ~0x40;//go forward
+}
+
+void LeftForward_RightReverse(void){
+  PB4 = ~0x10;//go forward
+  PB6 = 0x40;//reverse
+}
+
+void LeftReverse_RightForward(void){
+  PB4 = 0x10;//reverse
+  PB6 = ~0x40;//go forward
+}
 
 void GoStraight(void) {
 //  PWM1_SetADuty(PWM_FAST-2200);

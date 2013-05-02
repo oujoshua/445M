@@ -2,6 +2,7 @@
 #define __CMD_h__
 #include "OS.h"
 
+
 // board controlling the two motors
 #define PWMPERIODMAX 24999
 #define PWMPERIODMIN 3
@@ -24,6 +25,11 @@
 typedef enum {FWD, HARDLEFT, HARDRIGHT, SOFTLEFT, SOFTRIGHT, STOP, MEDLEFT, MEDRIGHT,
               BACK, BACKHLEFT, BACKHRIGHT, BACKSLEFT, BACKSRIGHT, BACKMLEFT, BACKMRIGHT} Command;
 
+void InitCommands(void);
+void Reverse(void);
+void Forward(void);
+void LeftForward_RightReverse(void);
+void LeftReverse_RightForward(void);
 void GoStraight(void);
 void TurnRight(int speed);
 void TurnLeft(int speed);
